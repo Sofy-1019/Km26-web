@@ -2,591 +2,324 @@
 <html lang="es">
 
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>KM26 Performance</title>
-
+<meta name="description" content="KM26 Performance: mecánica integral, diagnóstico computarizado, suspensión, frenos, embragues y mantenimiento de cajas automáticas en Berazategui, Buenos Aires.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
 <header>
-
-<nav>
-
-<a href="#inicio">INICIO</a>
-
-<a href="#servicios">SERVICIOS</a>
-
-<a href="#repuestos">REPUESTOS</a>
-
-<a href="#galeria">GALERÍA</a>
-
-<a href="#contacto">CONTACTO</a>
-
-</nav>
-
+    <nav id="mainNav">
+        <a href="#inicio">INICIO</a>
+        <a href="#servicios">SERVICIOS</a>
+        <a href="#repuestos">REPUESTOS</a>
+        <a href="#galeria">GALERÍA</a>
+        <a href="#contacto">CONTACTO</a>
+    </nav>
+    <button id="navToggle" class="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mainNav">
+        <span></span><span></span><span></span>
+    </button>
 </header>
 
 <section id="inicio" class="hero">
 
-<img
-src="images/portada.jpg"
-class="hero-image"
-alt="KM26 Performance">
-
-<div class="hero-overlay"></div>
-
-<div class="hero-logo">
-
-<img
-src="images/logo.png"
-alt="KM26 Performance">
-
-</div>
-
-<div class="hero-buttons hero-buttons-bottom">
-
-<a
-href="#contacto"
-class="btn-principal"
-id="btnTurno">
-
-SOLICITAR TURNO
-
-</a>
-
-<a
-href="https://wa.me/54911XXXXXXXX"
-target="_blank"
-class="btn-whatsapp-top"
-aria-label="WhatsApp">
-
-<img
-src="images/whatsapp.png"
-alt="WhatsApp"
-class="whatsapp-icon">
-
-</a>
-
-</div>
-
-</section><section id="servicios" class="servicios">
-
-<div class="titulo">
-
-<h2>
-
-Nuestros Servicios
-
-</h2>
-
-<p>
-
-Especialistas en mantenimiento, diagnóstico computarizado y mecánica integral.
-
-</p>
-
-</div>
-
-<div class="cards">
-
-<div class="card">
-
-<h3>
-
-Diagnóstico Computarizado
-
-</h3>
-
-<p>
-
-Escaneo profesional de todos los sistemas electrónicos del vehículo con equipos de última generación.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>
-
-Mecánica Integral
-
-</h3>
-
-<p>
-
-Reparación completa, distribución, mantenimiento preventivo y correctivo.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>
-
-Suspensión
-
-</h3>
-
-<p>
-
-Amortiguadores, bujes, rótulas, extremos y alineación del tren delantero.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>
-
-Frenos
-
-</h3>
-
-<p>
-
-Cambio de discos, pastillas, cintas, líquido de frenos y revisión integral del sistema.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>
-
-Embragues
-
-</h3>
-
-<p>
-
-Reemplazo y reparación utilizando repuestos de primeras marcas.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>
-
-Mantenimiento de cajas automáticas
-
-</h3>
-
-<p>
-
-Cambio de fluidos, filtros y mantenimiento preventivo para prolongar la vida útil de la transmisión automática.
-
-</p>
-
-</div>
-
-</div>
+    <img src="images/portada.jpg" class="hero-image" alt="Taller KM26 Performance" width="1536" height="1024">
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-logo">
+        <img src="images/logo.png" alt="KM26 Performance" width="420" height="280">
+    </div>
+
+    <div class="hero-buttons hero-buttons-bottom">
+
+        <a href="#contacto" class="btn-principal" id="btnTurno">
+            SOLICITAR TURNO
+        </a>
+
+        <a href="https://wa.me/5491151270218?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo."
+           target="_blank"
+           rel="noopener"
+           class="btn-social btn-whatsapp-top"
+           aria-label="Escribinos por WhatsApp">
+            <img src="images/whatsapp-icon.png" alt="" class="social-icon">
+        </a>
+
+        <a href="https://www.instagram.com/km26performance/"
+           target="_blank"
+           rel="noopener"
+           class="btn-social btn-instagram-top"
+           aria-label="Seguinos en Instagram">
+            <img src="images/instagram-icon.png" alt="" class="social-icon">
+        </a>
+
+    </div>
+
+</section>
+
+<section id="servicios" class="servicios">
+
+    <div class="titulo">
+        <h2>Nuestros Servicios</h2>
+        <p>Especialistas en mantenimiento, diagnóstico computarizado y mecánica integral.</p>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Diagnóstico Computarizado</h3>
+            <p>Escaneo profesional de todos los sistemas electrónicos del vehículo con equipos de última generación.</p>
+        </div>
+
+        <div class="card">
+            <h3>Mecánica Integral</h3>
+            <p>Reparación completa, distribución, mantenimiento preventivo y correctivo.</p>
+        </div>
+
+        <div class="card">
+            <h3>Suspensión</h3>
+            <p>Amortiguadores, bujes, rótulas, extremos y alineación del tren delantero.</p>
+        </div>
+
+        <div class="card">
+            <h3>Frenos</h3>
+            <p>Cambio de discos, pastillas, cintas, líquido de frenos y revisión integral del sistema.</p>
+        </div>
+
+        <div class="card">
+            <h3>Embragues</h3>
+            <p>Reemplazo y reparación utilizando repuestos de primeras marcas.</p>
+        </div>
+
+        <div class="card">
+            <h3>Mantenimiento de cajas automáticas</h3>
+            <p>Cambio de fluidos, filtros y mantenimiento preventivo para prolongar la vida útil de la transmisión automática.</p>
+        </div>
+
+    </div>
 
 </section>
 
 <section class="frase">
-
-<h2>
-
-"La potencia empieza por un buen mantenimiento."
-
-</h2>
-
-<p>
-
-En KM26 Performance cuidamos cada vehículo como si fuera propio.
-
-</p>
-
+    <h2>"La potencia empieza por un buen mantenimiento."</h2>
+    <p>En KM26 Performance cuidamos cada vehículo como si fuera propio.</p>
 </section>
 
 <section id="repuestos" class="repuestos">
 
-<div class="titulo">
+    <div class="titulo">
+        <h2>Repuestos</h2>
+        <p>Trabajamos únicamente con primeras marcas para asegurar calidad y durabilidad.</p>
+    </div>
 
-<h2>
-
-Repuestos
-
-</h2>
-
-<p>
-
-Trabajamos únicamente con primeras marcas para asegurar calidad y durabilidad.
-
-</p>
-
-</div>
-
-<div class="marcas">
-
-<div class="marca">SKF</div>
-
-<div class="marca">Bosch</div>
-
-<div class="marca">NGK</div>
-
-<div class="marca">Valeo</div>
-
-<div class="marca">TRW</div>
-
-<div class="marca">Corven</div>
-
-<div class="marca">Sachs</div>
-
-<div class="marca">Gates</div>
-
-</div>
+    <div class="marcas">
+        <div class="marca">SKF</div>
+        <div class="marca">Bosch</div>
+        <div class="marca">NGK</div>
+        <div class="marca">Valeo</div>
+        <div class="marca">TRW</div>
+        <div class="marca">Corven</div>
+        <div class="marca">Sachs</div>
+        <div class="marca">Gates</div>
+    </div>
 
 </section>
 
 <section id="galeria" class="galeria">
 
-<div class="titulo">
+    <div class="titulo">
+        <h2>Nuestro Taller</h2>
+        <p>Conocé nuestras instalaciones y algunos de nuestros trabajos.</p>
+    </div>
 
-<h2>
+    <div class="galeria-grid">
+        <div class="foto"><img src="images/galeria1.jpg" alt="Taller KM26 - foto 1" loading="lazy"></div>
+        <div class="foto"><img src="images/galeria2.jpg" alt="Taller KM26 - foto 2" loading="lazy"></div>
+        <div class="foto"><img src="images/galeria3.jpg" alt="Taller KM26 - foto 3" loading="lazy"></div>
+        <div class="foto"><img src="images/galeria4.jpg" alt="Taller KM26 - foto 4" loading="lazy"></div>
+        <div class="foto"><img src="images/galeria5.jpg" alt="Taller KM26 - foto 5" loading="lazy"></div>
+        <div class="foto"><img src="images/galeria6.jpg" alt="Taller KM26 - foto 6" loading="lazy"></div>
+        <div class="foto"><img src="images/galeria7.jpg" alt="Taller KM26 - foto 7" loading="lazy"></div>
+        <div class="foto"><img src="images/galeria8.jpg" alt="Taller KM26 - foto 8" loading="lazy"></div>
+    </div>
 
-Nuestro Taller
+</section>
 
-</h2>
+<section class="pagos">
 
-<p>
+    <div class="titulo">
+        <h2>Medios de Pago</h2>
+        <p>Elegí la forma de pago que más te convenga.</p>
+    </div>
 
-Conocé nuestras instalaciones y algunos de nuestros trabajos.
+    <div class="pagos-grid">
 
-</p>
+        <div class="pago-item">
+            <img src="images/pago-efectivo.png" alt="" class="pago-icono">
+            <p>Efectivo</p>
+        </div>
 
-</div>
+        <div class="pago-item">
+            <img src="images/pago-debito.png" alt="" class="pago-icono">
+            <p>Tarjetas de Débito</p>
+        </div>
 
-<div class="galeria-grid">
+        <div class="pago-item">
+            <img src="images/pago-credito.png" alt="" class="pago-icono">
+            <p>Tarjetas de Crédito</p>
+        </div>
 
-<div class="foto">
+        <div class="pago-item">
+            <img src="images/pago-mercadopago.png" alt="" class="pago-icono">
+            <p>Mercado Pago</p>
+        </div>
 
-<img src="images/portada.jpg" alt="KM26">
+        <div class="pago-item">
+            <img src="images/pago-transferencia.png" alt="" class="pago-icono">
+            <p>Transferencia Bancaria</p>
+        </div>
 
-</div>
+        <div class="pago-item">
+            <img src="images/pago-factura.png" alt="" class="pago-icono">
+            <p>Factura A y B</p>
+        </div>
 
-<div class="foto">
-
-<img src="images/portada.jpg" alt="KM26">
-
-</div>
-
-<div class="foto">
-
-<img src="images/portada.jpg" alt="KM26">
-
-</div>
-
-<div class="foto">
-
-<img src="images/portada.jpg" alt="KM26">
-
-</div>
-
-</div>
-
-</section><section class="stats">
-
-<div class="stat">
-
-<h2 class="contador" data-numero="15">0</h2>
-
-<p>
-
-Años de experiencia
-
-</p>
-
-</div>
-
-<div class="stat">
-
-<h2 class="contador" data-numero="5000">0</h2>
-
-<p>
-
-Vehículos reparados
-
-</p>
-
-</div>
-
-<div class="stat">
-
-<h2 class="contador" data-numero="100">0</h2>
-
-<p>
-
-Compromiso en cada trabajo
-
-</p>
-
-</div>
+    </div>
 
 </section>
 
 <section class="cta">
 
-<div class="cta-contenido">
+    <div class="cta-contenido">
 
-<h2>
+        <h2>Tu vehículo merece un servicio de excelencia.</h2>
+        <p>Solicitá un turno y recibí atención rápida, diagnóstico preciso y repuestos de calidad.</p>
 
-Tu vehículo merece un servicio de excelencia.
+        <div class="cta-botones">
 
-</h2>
+            <a href="#contacto" class="btn-principal" id="btnTurno2">
+                SOLICITAR TURNO
+            </a>
 
-<p>
+            <a href="https://wa.me/5491151270218?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo."
+               target="_blank"
+               rel="noopener"
+               class="btn-social btn-whatsapp-top"
+               aria-label="Escribinos por WhatsApp">
+                <img src="images/whatsapp-icon.png" alt="" class="social-icon">
+            </a>
 
-Solicitá un turno y recibí atención rápida, diagnóstico preciso y repuestos de calidad.
+            <a href="https://www.instagram.com/km26performance/"
+               target="_blank"
+               rel="noopener"
+               class="btn-social btn-instagram-top"
+               aria-label="Seguinos en Instagram">
+                <img src="images/instagram-icon.png" alt="" class="social-icon">
+            </a>
 
-</p>
+        </div>
 
-<div class="cta-botones">
-
-<a
-href="#contacto"
-class="btn-principal"
-id="btnTurno2">
-
-SOLICITAR TURNO
-
-</a>
-
-<a
-href="https://wa.me/54911XXXXXXXX"
-target="_blank"
-class="btn-whatsapp-top"
-aria-label="WhatsApp">
-
-<img
-src="images/whatsapp.png"
-class="whatsapp-icon"
-alt="WhatsApp">
-
-</a>
-
-</div>
-
-</div>
+    </div>
 
 </section>
 
 <section id="contacto" class="contacto">
 
-<div class="titulo">
+    <div class="titulo">
+        <h2>Solicitá tu Turno</h2>
+        <p>Completá el formulario y te vamos a redirigir a WhatsApp con todo listo para confirmar tu turno.</p>
+    </div>
 
-<h2>
+    <div class="contacto-grid">
 
-Solicitá tu Turno
+        <div class="info">
+            <h3>KM26 Performance</h3>
+            <p>📍 Berazategui - Buenos Aires</p>
+            <p>📞 +54 9 11 5127-0218 - 11 3441-2079</p>
+            <p>🕗 Lunes a Viernes<br>8:00 a 18:00</p>
+        </div>
 
-</h2>
+        <div class="formulario">
+            <form id="formTurno">
+                <input type="text" name="nombre" placeholder="Nombre" aria-label="Nombre" required>
+                <input type="tel" name="telefono" placeholder="Teléfono" aria-label="Teléfono" required>
+                <input type="email" name="email" placeholder="Email" aria-label="Email">
+                <input type="text" name="vehiculo" placeholder="Marca y modelo del vehículo" aria-label="Marca y modelo del vehículo">
+                <textarea name="mensaje" rows="6" placeholder="Contanos qué necesita tu vehículo..." aria-label="Mensaje"></textarea>
+                <button type="submit" class="btn-principal">SOLICITAR TURNO</button>
+            </form>
+        </div>
 
-<p>
+    </div>
 
-Completá el formulario y nos comunicaremos con vos a la brevedad.
+</section>
 
-</p>
-
-</div>
-
-<div class="contacto-grid">
-
-<div class="info">
-
-<h3>
-
-KM26 Performance
-
-</h3>
-
-<p>
-
-📍 Berazategui - Buenos Aires
-
-</p>
-
-<p>
-
-📞 +54 9 11 5127-0218 -  11 3441-2079
-
-</p>
-
-<p>
-
-🕗 Lunes a Viernes
-
-8:00 a 18:00
-
-</p>
-
-</div>
-
-<div class="formulario">
-
-<form id="formTurno">
-
-<input
-type="text"
-placeholder="Nombre"
-required>
-
-<input
-type="tel"
-placeholder="Teléfono"
-required>
-
-<input
-type="email"
-placeholder="Correo electrónico">
-
-<input
-type="text"
-placeholder="Marca y modelo del vehículo">
-
-<textarea
-rows="6"
-placeholder="Contanos qué necesita tu vehículo..."></textarea>
-
-<button
-type="submit"
-class="btn-principal">
-
-SOLICITAR TURNO
-
-</button>
-
-</form>
-
-</div>
-
-</div>
-
-</section><section class="mapa">
-
-<iframe
-src="https://www.google.com/maps?q=Berazategui,+Buenos+Aires&output=embed"
-loading="lazy"
-allowfullscreen>
-
-</iframe>
-
+<section class="mapa">
+    <iframe
+        src="https://www.google.com/maps?q=Berazategui,+Buenos+Aires&output=embed"
+        loading="lazy"
+        title="Ubicación de KM26 Performance"
+        allowfullscreen>
+    </iframe>
 </section>
 
 <footer>
 
-<div class="footer-grid">
+    <div class="footer-grid">
 
-<div class="footer-col">
+        <div class="footer-col">
+            <h2>KM26 Performance</h2>
+            <p>Especialistas en mecánica integral, diagnóstico computarizado, suspensión, frenos, embragues, mantenimiento de cajas automáticas y venta de repuestos.</p>
+        </div>
 
-<h2>
+        <div class="footer-col">
+            <h3>Navegación</h3>
+            <ul>
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#repuestos">Repuestos</a></li>
+                <li><a href="#galeria">Galería</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </div>
 
-KM26 Performance
+        <div class="footer-col">
+            <h3>Contacto</h3>
+            <p>📍 Berazategui - Buenos Aires</p>
+            <p>📞 +54 9 11 5127-0218 - 11 3441-2079</p>
+            <p>🕗 Lunes a Viernes de 8:00 a 18:00</p>
+        </div>
 
-</h2>
+    </div>
 
-<p>
-
-Especialistas en mecánica integral, diagnóstico computarizado, suspensión, frenos, embragues, mantenimiento de cajas automáticas y venta de repuestos.
-
-</p>
-
-</div>
-
-<div class="footer-col">
-
-<h3>
-
-Navegación
-
-</h3>
-
-<ul>
-
-<li><a href="#inicio">Inicio</a></li>
-
-<li><a href="#servicios">Servicios</a></li>
-
-<li><a href="#repuestos">Repuestos</a></li>
-
-<li><a href="#galeria">Galería</a></li>
-
-<li><a href="#contacto">Contacto</a></li>
-
-</ul>
-
-</div>
-
-<div class="footer-col">
-
-<h3>
-
-Contacto
-
-</h3>
-
-<p>
-
-📍 Berazategui - Buenos Aires
-
-</p>
-
-<p>
-
-📞 +54 9 1151270218 -  
-1134412079
-
-</p>
-
-<p>
-
-🕗 Lunes a Viernes de 8:00 a 18:00
-
-</p>
-
-</div>
-
-</div>
-
-<div class="copyright">
-
-© <span id="year"></span> KM26 Performance · Todos los derechos reservados.
-
-</div>
+    <div class="copyright">
+        © <span id="year"></span> KM26 Performance · Todos los derechos reservados.
+    </div>
 
 </footer>
 
-</footer>
-
-<audio id="motorSound">
+<audio id="motorSound" preload="none">
     <source src="audio/v8.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="okSound">
+<audio id="okSound" preload="none">
     <source src="audio/ok.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="whatsappSound">
+<audio id="whatsappSound" preload="none">
     <source src="audio/WhatsApp.mp3" type="audio/mpeg">
 </audio>
+
+<div id="lightbox" class="lightbox">
+    <button class="lightbox-close" aria-label="Cerrar imagen">&times;</button>
+    <img id="lightboxImg" src="" alt="">
+</div>
 
 <script src="script.js"></script>
 

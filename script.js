@@ -7,6 +7,38 @@
 const motorSound = document.getElementById("motorSound");
 const okSound = document.getElementById("okSound");
 const whatsappSound = document.getElementById("whatsappSound");
+
+// ========================================
+// MENÚ MOBILE (hamburguesa)
+// ========================================
+
+const navToggle = document.getElementById("navToggle");
+const mainNav = document.getElementById("mainNav");
+
+if (navToggle && mainNav) {
+
+    navToggle.addEventListener("click", () => {
+
+        const abierto = mainNav.classList.toggle("open");
+        navToggle.classList.toggle("open", abierto);
+        navToggle.setAttribute("aria-expanded", abierto ? "true" : "false");
+
+    });
+
+}
+
+function cerrarMenuMobile() {
+
+    if (mainNav && mainNav.classList.contains("open")) {
+
+        mainNav.classList.remove("open");
+        navToggle.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+
+    }
+
+}
+
 // ========================================
 // BOTONES SOLICITAR TURNO
 // ========================================
@@ -24,14 +56,16 @@ botonesTurno.forEach(btn => {
 
         }
 
+        cerrarMenuMobile();
+
         const formulario = document.getElementById("formTurno");
 
-        if(formulario){
+        if (formulario) {
 
             formulario.scrollIntoView({
 
-                behavior:"smooth",
-                block:"start"
+                behavior: "smooth",
+                block: "start"
 
             });
 
@@ -41,8 +75,9 @@ botonesTurno.forEach(btn => {
 
 });
 
-// ---------- Formulario ----------
+// ---------- Formulario: arma el mensaje y lo manda por WhatsApp ----------
 const form = document.getElementById("formTurno");
+const NUMERO_WHATSAPP_NEGOCIO = "5491151270218";
 
 if (form) {
 
@@ -50,12 +85,34 @@ if (form) {
 
         e.preventDefault();
 
+        const nombre = form.nombre.value.trim();
+        const telefono = form.telefono.value.trim();
+        const email = form.email.value.trim();
+        const vehiculo = form.vehiculo.value.trim();
+        const mensaje = form.mensaje.value.trim();
+
+        if (!nombre || !telefono) {
+            alert("Por favor completá al menos tu nombre y teléfono.");
+            return;
+        }
+
+        let texto = "🔧 *Nueva solicitud de turno - KM26 Performance*\n\n";
+        texto += `*Nombre:* ${nombre}\n`;
+        texto += `*Teléfono:* ${telefono}\n`;
+        if (email) texto += `*Email:* ${email}\n`;
+        if (vehiculo) texto += `*Vehículo:* ${vehiculo}\n`;
+        if (mensaje) texto += `*Mensaje:* ${mensaje}\n`;
+
         if (okSound) {
             okSound.currentTime = 0;
             okSound.play().catch(() => {});
         }
 
-        alert("¡Turno solicitado correctamente! Nos comunicaremos con vos a la brevedad.");
+        const destino = `https://wa.me/${NUMERO_WHATSAPP_NEGOCIO}?text=${encodeURIComponent(texto)}`;
+
+        setTimeout(() => {
+            window.open(destino, "_blank");
+        }, 500);
 
         form.reset();
 
@@ -74,13 +131,17 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 
         e.preventDefault();
 
+        cerrarMenuMobile();
+
         destino.scrollIntoView({
             behavior: "smooth"
         });
 
     });
 
-});// ========================================
+});
+
+// ========================================
 // HEADER AL HACER SCROLL
 // ========================================
 
@@ -90,76 +151,7 @@ window.addEventListener("scroll", () => {
 
     if (!header) return;
 
-    if (window.scrollY > 80) {
-
-        header.style.background = "rgba(0,0,0,.92)";
-        header.style.backdropFilter = "blur(10px)";
-        header.style.boxShadow = "0 8px 30px rgba(0,0,0,.35)";
-
-    } else {
-
-        header.style.background = "transparent";
-        header.style.backdropFilter = "none";
-        header.style.boxShadow = "none";
-
-    }
-
-});
-
-// ========================================
-// CONTADORES ANIMADOS
-// ========================================
-
-const counters = document.querySelectorAll(".stat h2");
-
-const animateCounter = (counter) => {
-
-    const target = Number(counter.dataset.target);
-
-    if (!target) return;
-
-    let value = 0;
-
-    const step = Math.max(1, Math.ceil(target / 120));
-
-    const timer = setInterval(() => {
-
-        value += step;
-
-        if (value >= target) {
-
-            value = target;
-            clearInterval(timer);
-
-        }
-
-        counter.textContent = "+" + value;
-
-    }, 15);
-
-};
-
-const counterObserver = new IntersectionObserver((entries) => {
-
-    entries.forEach(entry => {
-
-        if (!entry.isIntersecting) return;
-
-        animateCounter(entry.target);
-
-        counterObserver.unobserve(entry.target);
-
-    });
-
-}, {
-
-    threshold: 0.5
-
-});
-
-counters.forEach(counter => {
-
-    counterObserver.observe(counter);
+    header.classList.toggle("header-scroll", window.scrollY > 80);
 
 });
 
@@ -168,7 +160,7 @@ counters.forEach(counter => {
 // ========================================
 
 const revealItems = document.querySelectorAll(
-".card, .marca, .foto, .stat, .titulo, .formulario"
+    ".card, .marca, .foto, .pago-item, .titulo, .formulario"
 );
 
 const revealObserver = new IntersectionObserver((entries) => {
@@ -177,9 +169,11 @@ const revealObserver = new IntersectionObserver((entries) => {
 
         if (entry.isIntersecting) {
 
+            entry.target.style.transition = ".7s ease";
             entry.target.style.opacity = "1";
             entry.target.style.transform = "translateY(0)";
-            entry.target.style.transition = ".7s";
+
+            revealObserver.unobserve(entry.target);
 
         }
 
@@ -193,55 +187,44 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 revealItems.forEach(item => {
 
-    item.style.opacity = "0";
-    item.style.transform = "translateY(40px)";
-
     revealObserver.observe(item);
 
-});// ========================================
-// WHATSAPP
+});
+
+// ========================================
+// WHATSAPP (sonido antes de abrir el chat)
 // ========================================
 
 const whatsappButtons = document.querySelectorAll(
-".btn-whatsapp-top, .whatsapp-float"
+    ".btn-whatsapp-top, .whatsapp-float"
 );
-
-const telefono = "5491151270218"; // <-- CAMBIAR POR TU NÚMERO
-
-const mensaje =
-"Hola KM26 Performance. Quisiera consultar por un turno para mi vehículo.";
 
 whatsappButtons.forEach(btn => {
 
-    btn.addEventListener("click", function(e){
+    btn.addEventListener("click", function (e) {
 
-        e.preventDefault();
-
+        // El link ya tiene el href correcto de wa.me,
+        // así que solo agregamos el sonido y dejamos
+        // que el navegador abra el link con un pequeño delay.
         if (whatsappSound) {
+
+            e.preventDefault();
 
             whatsappSound.pause();
             whatsappSound.currentTime = 0;
-
             whatsappSound.play().catch(() => {});
 
+            const destino = btn.href;
+
+            setTimeout(() => {
+                window.open(destino, "_blank");
+            }, 500);
+
         }
-
-        setTimeout(() => {
-
-            window.open(
-
-                `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`,
-
-                "_blank"
-
-            );
-
-        }, 600);
 
     });
 
 });
-
 
 // ========================================
 // AÑO AUTOMÁTICO EN FOOTER
@@ -249,35 +232,81 @@ whatsappButtons.forEach(btn => {
 
 const year = document.getElementById("year");
 
-if(year){
+if (year) {
 
     year.textContent = new Date().getFullYear();
 
 }
 
 // ========================================
-// BOTÓN VOLVER ARRIBA
+// BOTÓN VOLVER ARRIBA (tecla Home)
 // ========================================
 
-const volverArriba = () =>{
+window.addEventListener("keydown", (e) => {
 
-    window.scrollTo({
+    if (e.key === "Home") {
 
-        top:0,
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
 
-        behavior:"smooth"
+    }
+
+});
+
+// ========================================
+// LIGHTBOX GALERÍA
+// ========================================
+
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImg");
+const lightboxClose = document.querySelector(".lightbox-close");
+const fotosGaleria = document.querySelectorAll(".foto img");
+
+function abrirLightbox(img) {
+
+    if (!lightbox || !lightboxImg) return;
+
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightbox.classList.add("open");
+    document.body.style.overflow = "hidden";
+
+}
+
+function cerrarLightbox() {
+
+    if (!lightbox) return;
+
+    lightbox.classList.remove("open");
+    document.body.style.overflow = "";
+
+}
+
+fotosGaleria.forEach(img => {
+
+    img.addEventListener("click", () => abrirLightbox(img));
+
+});
+
+if (lightboxClose) {
+    lightboxClose.addEventListener("click", cerrarLightbox);
+}
+
+if (lightbox) {
+
+    lightbox.addEventListener("click", (e) => {
+
+        if (e.target === lightbox) cerrarLightbox();
 
     });
 
-};
+}
 
-window.addEventListener("keydown",(e)=>{
+window.addEventListener("keydown", (e) => {
 
-    if(e.key==="Home"){
-
-        volverArriba();
-
-    }
+    if (e.key === "Escape") cerrarLightbox();
 
 });
 
@@ -286,8 +315,7 @@ window.addEventListener("keydown",(e)=>{
 // ========================================
 
 const portada = new Image();
-
-portada.src="img/portada.jpg";
+portada.src = "images/portada.jpg";
 
 // ========================================
 // FIN
