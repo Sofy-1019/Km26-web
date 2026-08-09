@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de gestión · KM26 Performance</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+body{
+    background:#0f0f0f;
+    color:#fff;
+    min-height:100vh;
+}
+
+/* ---------- Pantalla de PIN ---------- */
+
+#pantallaPin{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    text-align:center;
+}
+
+#pantallaPin h1{
+    font-size:24px;
+    margin-bottom:8px;
+}
+
+#pantallaPin p{
+    color:#999;
+    margin-bottom:24px;
+    font-size:14px;
+}
+
+#inputPin{
+    width:100%;
+    max-width:220px;
+    padding:16px;
+    font-size:22px;
+    text-align:center;
+    letter-spacing:8px;
+    border-radius:12px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    margin-bottom:16px;
+}
+
+#inputPin:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.btn-red{
+    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    color:#fff;
+    border:none;
+    padding:14px 32px;
+    border-radius:50px;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.btn-red:hover{
+    background:linear-gradient(180deg,#ff3941,#d71920);
+}
+
+#errorPin{
+    color:#ff6b6b;
+    font-size:13px;
+    margin-top:12px;
+    min-height:18px;
+}
+
+/* ---------- App principal ---------- */
+
+#app{
+    display:none;
+    max-width:1000px;
+    margin:0 auto;
+    padding:20px;
+}
+
+header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+}
+
+.marca{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.marca-logo{
+    width:38px;
+    height:38px;
+    border-radius:8px;
+    background:#2a0a0b;
+    color:#ff6b6b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:13px;
+}
+
+.marca-nombre{
+    font-weight:700;
+    font-size:15px;
+}
+
+.marca-sub{
+    font-size:12px;
+    color:#888;
+}
+
+#buscador{
+    flex:1;
+    min-width:180px;
+    max-width:320px;
+    padding:12px 16px;
+    border-radius:10px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+}
+
+#buscador:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+nav.tabs{
+    display:flex;
+    gap:4px;
+    border-bottom:1px solid #262626;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+}
+
+nav.tabs button{
+    background:none;
+    border:none;
+    color:#999;
+    font-size:14px;
+    font-weight:600;
+    padding:10px 16px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    font-family:'Montserrat',sans-serif;
+}
+
+nav.tabs button.activo{
+    color:#ff6b6b;
+    border-bottom-color:#d71920;
+}
+
+.seccion{
+    display:none;
+}
+
+.seccion.activa{
+    display:block;
+}
+
+.grid-stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin-bottom:24px;
+}
+
+.stat-card{
+    background:#1a1a1a;
+    border-radius:12px;
+    padding:16px;
+}
+
+.stat-card.verde{
+    background:#0d2418;
+}
+
+.stat-label{
+    font-size:12px;
+    color:#999;
+    margin-bottom:6px;
+}
+
+.stat-card.verde .stat-label{
+    color:#5fd98a;
+}
+
+.stat-valor{
+    font-size:22px;
+    font-weight:700;
+}
+
+.stat-card.verde .stat-valor{
+    color:#5fd98a;
+}
+
+.fila-titulo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.fila-titulo h2{
+    font-size:15px;
+    font-weight:600;
+}
+
+.btn-chico{
+    background:#1a1a1a;
+    border:1px solid #333;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-chico:hover{
+    border-color:#d71920;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#161616;
+    border-radius:12px;
+    overflow:hidden;
+    font-size:13px;
+    margin-bottom:24px;
+}
+
+th{
+    text-align:left;
+    padding:12px 14px;
+    background:#1e1e1e;
+    color:#999;
+    font-weight:600;
+    font-size:12px;
+}
+
+td{
+    padding:12px 14px;
+    border-top:1px solid #262626;
+}
+
+td.mono{
+    color:#bbb;
+}
+
+.vacio{
+    text-align:center;
+    color:#666;
+    padding:30px;
+    font-size:13px;
+}
+
+/* ---------- Modal ---------- */
+
+.overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+    padding:20px;
+}
+
+.overlay.abierto{
+    display:flex;
+}
+
+.modal{
+    background:#161616;
+    border-radius:16px;
+    padding:24px;
+    max-width:420px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+}
+
+.modal h3{
+    font-size:17px;
+    margin-bottom:18px;
+}
+
+.modal label{
+    display:block;
+    font-size:12px;
+    color:#999;
+    margin-bottom:6px;
+    margin-top:14px;
+}
+
+.modal input, .modal select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.modal input:focus, .modal select:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.modal-botones{
+    display:flex;
+    gap:10px;
+    margin-top:22px;
+}
+
+.btn-cancelar{
+    flex:1;
+    background:none;
+    border:1px solid #333;
+    color:#ccc;
+    padding:12px;
+    border-radius:50px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.modal .btn-red{
+    flex:1;
+}
+
+#mensajeEstado{
+    font-size:13px;
+    text-align:center;
+    margin-top:14px;
+    min-height:18px;
+}
+
+.tipo-toggle{
+    display:flex;
+    gap:8px;
+    margin-top:6px;
+}
+
+.tipo-toggle button{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#999;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.tipo-toggle button.activo-ingreso{
+    background:#0d2418;
+    border-color:#2fdb6e;
+    color:#5fd98a;
+}
+
+.tipo-toggle button.activo-egreso{
+    background:#2a0a0b;
+    border-color:#d71920;
+    color:#ff6b6b;
+}
+
+@media (max-width:600px){
+    header{flex-direction:column;align-items:stretch;}
+    #buscador{max-width:none;}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ---------- Pantalla de PIN ---------- -->
+<div id="pantallaPin">
+    <h1>Panel de gestión</h1>
+    <p>KM26 Performance</p>
+    <input type="password" id="inputPin" placeholder="••••" maxlength="8" inputmode="numeric">
+    <br>
+    <button class="btn-red" onclick="entrar()">Entrar</button>
+    <p id="errorPin"></p>
+</div>
+
+<!-- ---------- App ---------- -->
+<div id="app">
+
+    <header>
+        <div class="marca">
+            <div class="marca-logo">KM</div>
+            <div>
+                <div class="marca-nombre">KM26 Performance</div>
+                <div class="marca-sub">Panel de gestión</div>
+            </div>
+        </div>
+        <input type="text" id="buscador" placeholder="Buscar por patente o apellido">
+        <button class="btn-red" onclick="abrirModalCliente()">+ Nuevo cliente</button>
+    </header>
+
+    <nav class="tabs">
+        <button class="activo" data-tab="inicio" onclick="cambiarTab('inicio')">Inicio</button>
+        <button data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
+        <button data-tab="caja" onclick="cambiarTab('caja')">Caja</button>
+    </nav>
+
+    <!-- INICIO -->
+    <section class="seccion activa" id="tab-inicio">
+
+        <div class="grid-stats">
+            <div class="stat-card"><div class="stat-label">Clientes</div><div class="stat-valor" id="statClientes">-</div></div>
+            <div class="stat-card verde"><div class="stat-label">Caja de hoy</div><div class="stat-valor" id="statCajaHoy">-</div></div>
+            <div class="stat-card"><div class="stat-label">Caja del mes</div><div class="stat-valor" id="statCajaMes">-</div></div>
+        </div>
+
+        <div class="fila-titulo"><h2>Clientes recientes</h2></div>
+        <div id="tablaInicio"></div>
+
+    </section>
+
+    <!-- CLIENTES / BUSQUEDA -->
+    <section class="seccion" id="tab-clientes">
+        <div class="fila-titulo"><h2 id="tituloClientes">Últimos clientes</h2></div>
+        <div id="tablaClientes"></div>
+    </section>
+
+    <!-- CAJA -->
+    <section class="seccion" id="tab-caja">
+
+        <div class="grid-stats">
+            <div class="stat-card verde"><div class="stat-label">Hoy</div><div class="stat-valor" id="cajaHoy">-</div></div>
+            <div class="stat-card"><div class="stat-label">Esta semana</div><div class="stat-valor" id="cajaSemana">-</div></div>
+            <div class="stat-card"><div class="stat-label">Este mes</div><div class="stat-valor" id="cajaMes">-</div></div>
+        </div>
+
+        <div class="fila-titulo">
+            <h2>Movimientos recientes</h2>
+            <button class="btn-chico" onclick="abrirModalCaja()">+ Registrar movimiento</button>
+        </div>
+        <div id="tablaCaja"></div>
+
+    </section>
+
+</div>
+
+<!-- ---------- Modal: nuevo cliente ---------- -->
+<div class="overlay" id="modalCliente">
+    <div class="modal">
+        <h3>Nuevo cliente</h3>
+
+        <label>Nombre</label>
+        <input type="text" id="fNombre" placeholder="Juan">
+
+        <label>Apellido</label>
+        <input type="text" id="fApellido" placeholder="Pérez">
+
+        <label>Teléfono</label>
+        <input type="tel" id="fTelefono" placeholder="11 5555-1234">
+
+        <label>Email (opcional)</label>
+        <input type="email" id="fEmail" placeholder="juan@mail.com">
+
+        <label>Patente del vehículo (opcional)</label>
+        <input type="text" id="fPatente" placeholder="AB123CD">
+
+        <label>Marca y modelo</label>
+        <input type="text" id="fMarcaModelo" placeholder="VW Gol">
+
+        <label>Año</label>
+        <input type="text" id="fAnio" placeholder="2020">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarCliente()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstado"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: nuevo movimiento de caja ---------- -->
+<div class="overlay" id="modalCaja">
+    <div class="modal">
+        <h3>Registrar movimiento</h3>
+
+        <div class="tipo-toggle">
+            <button id="btnIngreso" class="activo-ingreso" onclick="elegirTipo('Ingreso')">Ingreso</button>
+            <button id="btnEgreso" onclick="elegirTipo('Egreso')">Egreso</button>
+        </div>
+
+        <label>Descripción</label>
+        <input type="text" id="mDescripcion" placeholder="Cambio de aceite - Gol">
+
+        <label>Monto</label>
+        <input type="number" id="mMonto" placeholder="15000">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarMovimiento()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoCaja"></p>
+    </div>
+</div>
+
+<script>
+
+// ======================================================
+// CONFIGURACIÓN
+// ======================================================
+
+const API_URL = "https://script.google.com/macros/s/AKfycbyGF2JEog_2U5xLWG-Mg1AprcnJP9ZISm5Q-RP0Y7ewbM5s8lGS4ybKIC5m1s2ArjdC/exec";
+
+let PIN_GUARDADO = "";
+let tipoMovimiento = "Ingreso";
+
+// ======================================================
+// PIN / ACCESO
+// ======================================================
+
+async function entrar() {
+
+    const pin = document.getElementById("inputPin").value.trim();
+    const errorEl = document.getElementById("errorPin");
+
+    if (!pin) {
+        errorEl.textContent = "Ingresá el PIN.";
+        return;
+    }
+
+    errorEl.textContent = "Verificando...";
+
+    try {
+
+        const res = await llamar("listarClientes", {}, pin);
+
+        if (res && res.error) {
+            errorEl.textContent = "PIN incorrecto.";
+            return;
+        }
+
+        PIN_GUARDADO = pin;
+        sessionStorage.setItem("km26_pin", pin);
+
+        document.getElementById("pantallaPin").style.display = "none";
+        document.getElementById("app").style.display = "block";
+
+        cargarInicio();
+        cargarCaja();
+
+    } catch (err) {
+        errorEl.textContent = "No se pudo conectar. Revisá tu conexión.";
+    }
+
+}
+
+// ======================================================
+// LLAMADAS A LA API
+// ======================================================
+
+async function llamar(action, params, pinOverride) {
+
+    const pin = pinOverride || PIN_GUARDADO;
+    const url = new URL(API_URL);
+    url.searchParams.set("action", action);
+    url.searchParams.set("pin", pin);
+
+    Object.keys(params || {}).forEach(k => {
+        url.searchParams.set(k, params[k]);
+    });
+
+    const res = await fetch(url.toString());
+    return res.json();
+
+}
+
+function formatoPlata(n) {
+    n = Number(n) || 0;
+    const signo = n < 0 ? "-" : "";
+    return signo + "$" + Math.abs(Math.round(n)).toLocaleString("es-AR");
+}
+
+// ======================================================
+// TABS
+// ======================================================
+
+function cambiarTab(tab) {
+
+    document.querySelectorAll("nav.tabs button").forEach(b => b.classList.remove("activo"));
+    document.querySelector(`nav.tabs button[data-tab="${tab}"]`).classList.add("activo");
+
+    document.querySelectorAll(".seccion").forEach(s => s.classList.remove("activa"));
+    document.getElementById("tab-" + tab).classList.add("activa");
+
+    if (tab === "clientes" && !document.getElementById("buscador").value) {
+        cargarClientesRecientes();
+    }
+
+}
+
+// ======================================================
+// INICIO
+// ======================================================
+
+async function cargarInicio() {
+
+    const clientes = await llamar("listarClientes", {});
+    const resumen = await llamar("resumenCaja", {});
+
+    if (Array.isArray(clientes)) {
+        document.getElementById("statClientes").textContent = clientes.length + "+";
+        renderTablaClientes(clientes, "tablaInicio");
+    }
+
+    if (resumen && !resumen.error) {
+        document.getElementById("statCajaHoy").textContent = formatoPlata(resumen.hoy);
+        document.getElementById("statCajaMes").textContent = formatoPlata(resumen.mes);
+    }
+
+}
+
+function renderTablaClientes(lista, contenedorId) {
+
+    const el = document.getElementById(contenedorId);
+
+    if (!lista || lista.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay clientes cargados.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Email</th></tr></thead><tbody>";
+
+    lista.forEach(c => {
+        html += `<tr>
+            <td>${escapar(c.apellido)}, ${escapar(c.nombre)}</td>
+            <td class="mono">${escapar(c.telefono || "-")}</td>
+            <td class="mono">${escapar(c.email || "-")}</td>
+        </tr>`;
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+function escapar(s) {
+    if (s === undefined || s === null) return "";
+    return String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// ======================================================
+// CLIENTES / BUSQUEDA
+// ======================================================
+
+let buscarTimeout;
+
+document.getElementById("buscador").addEventListener("input", function () {
+
+    clearTimeout(buscarTimeout);
+    const q = this.value.trim();
+
+    buscarTimeout = setTimeout(() => {
+
+        cambiarTab("clientes");
+
+        if (!q) {
+            cargarClientesRecientes();
+            return;
+        }
+
+        buscarYRenderizar(q);
+
+    }, 350);
+
+});
+
+async function cargarClientesRecientes() {
+    document.getElementById("tituloClientes").textContent = "Últimos clientes";
+    const clientes = await llamar("listarClientes", {});
+    renderTablaClientes(clientes, "tablaClientes");
+}
+
+async function buscarYRenderizar(q) {
+
+    document.getElementById("tituloClientes").textContent = `Resultados para "${q}"`;
+    const resultados = await llamar("buscar", { q: q });
+    const el = document.getElementById("tablaClientes");
+
+    if (!Array.isArray(resultados) || resultados.length === 0) {
+        el.innerHTML = '<div class="vacio">No se encontraron coincidencias.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Patente</th><th>Cliente</th><th>Vehículo</th><th>Teléfono</th></tr></thead><tbody>";
+
+    resultados.forEach(r => {
+
+        if (r.tipo === "vehiculo") {
+            html += `<tr>
+                <td class="mono">${escapar(r.patente)}</td>
+                <td>${escapar(r.clienteNombre)}</td>
+                <td class="mono">${escapar(r.marca)} ${escapar(r.modelo)} ${escapar(r.anio || "")}</td>
+                <td class="mono">${escapar(r.clienteTelefono || "-")}</td>
+            </tr>`;
+        } else {
+            html += `<tr>
+                <td class="mono">-</td>
+                <td>${escapar(r.apellido)}, ${escapar(r.nombre)}</td>
+                <td class="mono">-</td>
+                <td class="mono">${escapar(r.telefono || "-")}</td>
+            </tr>`;
+        }
+
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+// ======================================================
+// MODAL: NUEVO CLIENTE
+// ======================================================
+
+function abrirModalCliente() {
+    document.getElementById("modalCliente").classList.add("abierto");
+    document.getElementById("mensajeEstado").textContent = "";
+}
+
+function cerrarModales() {
+    document.getElementById("modalCliente").classList.remove("abierto");
+    document.getElementById("modalCaja").classList.remove("abierto");
+}
+
+async function guardarCliente() {
+
+    const nombre = document.getElementById("fNombre").value.trim();
+    const apellido = document.getElementById("fApellido").value.trim();
+    const telefono = document.getElementById("fTelefono").value.trim();
+    const email = document.getElementById("fEmail").value.trim();
+    const patente = document.getElementById("fPatente").value.trim();
+    const marcaModelo = document.getElementById("fMarcaModelo").value.trim();
+    const anio = document.getElementById("fAnio").value.trim();
+
+    const estado = document.getElementById("mensajeEstado");
+
+    if (!nombre || !apellido) {
+        estado.textContent = "Nombre y apellido son obligatorios.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const partesMarca = marcaModelo.split(" ");
+    const marca = partesMarca[0] || "";
+    const modelo = partesMarca.slice(1).join(" ") || "";
+
+    const res = await llamar("agregarCliente", {
+        nombre, apellido, telefono, email, patente, marca, modelo, anio
+    });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Cliente guardado!";
+    estado.style.color = "#5fd98a";
+
+    document.querySelectorAll("#modalCliente input").forEach(i => i.value = "");
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarInicio();
+        if (document.getElementById("tab-clientes").classList.contains("activa")) {
+            cargarClientesRecientes();
+        }
+    }, 700);
+
+}
+
+// ======================================================
+// CAJA
+// ======================================================
+
+async function cargarCaja() {
+
+    const resumen = await llamar("resumenCaja", {});
+    const movimientos = await llamar("movimientosCaja", {});
+
+    if (resumen && !resumen.error) {
+        document.getElementById("cajaHoy").textContent = formatoPlata(resumen.hoy);
+        document.getElementById("cajaSemana").textContent = formatoPlata(resumen.semana);
+        document.getElementById("cajaMes").textContent = formatoPlata(resumen.mes);
+    }
+
+    const el = document.getElementById("tablaCaja");
+
+    if (!Array.isArray(movimientos) || movimientos.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay movimientos cargados.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>";
+
+    movimientos.forEach(m => {
+
+        const fecha = new Date(m.fecha);
+        const fechaTexto = isNaN(fecha) ? "-" : fecha.toLocaleDateString("es-AR");
+        const color = m.tipo === "Ingreso" ? "#5fd98a" : "#ff6b6b";
+        const signo = m.tipo === "Ingreso" ? "+" : "-";
+
+        html += `<tr>
+            <td class="mono">${fechaTexto}</td>
+            <td>${escapar(m.tipo)}</td>
+            <td>${escapar(m.descripcion)}</td>
+            <td class="mono" style="color:${color}">${signo}${formatoPlata(m.monto).replace("$","$")}</td>
+        </tr>`;
+
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+function abrirModalCaja() {
+    document.getElementById("modalCaja").classList.add("abierto");
+    document.getElementById("mensajeEstadoCaja").textContent = "";
+    elegirTipo("Ingreso");
+}
+
+function elegirTipo(tipo) {
+
+    tipoMovimiento = tipo;
+
+    document.getElementById("btnIngreso").classList.toggle("activo-ingreso", tipo === "Ingreso");
+    document.getElementById("btnEgreso").classList.toggle("activo-egreso", tipo === "Egreso");
+
+}
+
+async function guardarMovimiento() {
+
+    const descripcion = document.getElementById("mDescripcion").value.trim();
+    const monto = document.getElementById("mMonto").value.trim();
+    const estado = document.getElementById("mensajeEstadoCaja");
+
+    if (!descripcion || !monto) {
+        estado.textContent = "Completá descripción y monto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("agregarMovimiento", {
+        tipo: tipoMovimiento, descripcion, monto
+    });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Movimiento guardado!";
+    estado.style.color = "#5fd98a";
+
+    document.getElementById("mDescripcion").value = "";
+    document.getElementById("mMonto").value = "";
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarCaja();
+        cargarInicio();
+    }, 700);
+
+}
+
+// ======================================================
+// INICIO AUTOMÁTICO SI YA HABÍA PIN GUARDADO
+// ======================================================
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const pinGuardado = sessionStorage.getItem("km26_pin");
+
+    if (pinGuardado) {
+        document.getElementById("inputPin").value = pinGuardado;
+        entrar();
+    }
+
+});
+
+document.getElementById("inputPin").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") entrar();
+});
+
+</script>
+
+</body>
+</html>
