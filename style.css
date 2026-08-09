@@ -589,28 +589,42 @@ CONTACTO
 
 .contacto-grid{
     display:grid;
-    grid-template-columns:1fr 1.2fr;
-    gap:70px;
+    grid-template-columns:1fr;
+    gap:40px;
     align-items:start;
 }
 
+.info{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:8px 40px;
+    background:#1a1a1a;
+    border-radius:20px;
+    padding:26px 30px;
+    border:1px solid rgba(255,255,255,.05);
+    text-align:left;
+}
+
 .info h3{
-    font-size:36px;
-    margin-bottom:30px;
+    width:100%;
+    text-align:center;
+    font-size:26px;
+    margin-bottom:6px;
 }
 
 .info p{
-    font-size:18px;
-    line-height:1.9;
-    margin-bottom:18px;
-    color:#c9c9c9;
+    margin-bottom:0;
+    font-size:16px;
 }
 
 .info-alt{
-    margin-top:10px;
-    padding-top:22px;
+    width:100%;
+    text-align:center;
     border-top:1px solid rgba(255,255,255,.08);
-    font-size:16px;
+    margin-top:14px;
+    padding-top:14px;
 }
 
 .info-alt a{
@@ -633,12 +647,13 @@ CONTACTO
 
 .calendario-embed{
     width:100%;
-    height:660px;
+    height:850px;
+    max-height:80vh;
     border:0;
     border-radius:16px;
     display:block;
-    overflow:hidden;
-    background:#151515;
+    overflow-y:auto;
+    background:#fff;
 }
 
 input::placeholder,
@@ -910,7 +925,7 @@ RESPONSIVE
     }
 
     .calendario-embed{
-        height:520px;
+        height:640px;
     }
 
     .titulo h2{
