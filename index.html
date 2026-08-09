@@ -63,6 +63,33 @@
 
 </section>
 
+<!-- Franja de botones exclusiva para mobile/tablet: en pantallas chicas no hay
+     lugar para superponer los botones a la foto sin taparla, así que van
+     debajo, en su propio bloque. En escritorio esto queda oculto. -->
+<div class="hero-buttons-mobile">
+
+    <a href="#contacto" class="btn-principal" id="btnTurnoMobile">
+        SOLICITAR TURNO
+    </a>
+
+    <a href="https://wa.me/5491151270218?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo."
+       target="_blank"
+       rel="noopener"
+       class="btn-social btn-whatsapp-top"
+       aria-label="Escribinos por WhatsApp">
+        <img src="images/whatsapp-icon.png" alt="" class="social-icon">
+    </a>
+
+    <a href="https://www.instagram.com/km26performance/"
+       target="_blank"
+       rel="noopener"
+       class="btn-social btn-instagram-top"
+       aria-label="Seguinos en Instagram">
+        <img src="images/instagram-icon.png" alt="" class="social-icon">
+    </a>
+
+</div>
+
 <section id="servicios" class="servicios">
 
     <div class="titulo">
@@ -233,7 +260,7 @@
 
     <div class="titulo">
         <h2>Solicitá tu Turno</h2>
-        <p>Completá el formulario y te vamos a redirigir a WhatsApp con todo listo para confirmar tu turno.</p>
+        <p>Elegí el día y el horario que más te convenga, directo en el calendario.</p>
     </div>
 
     <div class="contacto-grid">
@@ -243,17 +270,19 @@
             <p>📍 Berazategui - Buenos Aires</p>
             <p>📞 +54 9 11 5127-0218 - 11 3441-2079</p>
             <p>🕗 Lunes a Viernes<br>8:00 a 18:00</p>
+            <p class="info-alt">
+                ¿Preferís coordinar por WhatsApp?
+                <a href="https://wa.me/5491151270218?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo." target="_blank" rel="noopener">Escribinos directo</a>
+            </p>
         </div>
 
-        <div class="formulario">
-            <form id="formTurno">
-                <input type="text" name="nombre" placeholder="Nombre" aria-label="Nombre" required>
-                <input type="tel" name="telefono" placeholder="Teléfono" aria-label="Teléfono" required>
-                <input type="email" name="email" placeholder="Email" aria-label="Email">
-                <input type="text" name="vehiculo" placeholder="Marca y modelo del vehículo" aria-label="Marca y modelo del vehículo">
-                <textarea name="mensaje" rows="6" placeholder="Contanos qué necesita tu vehículo..." aria-label="Mensaje"></textarea>
-                <button type="submit" class="btn-principal">SOLICITAR TURNO</button>
-            </form>
+        <div class="formulario" id="calendarioTurno">
+            <iframe
+                class="calendario-embed"
+                src="https://calendar.app.google/nyGMyNcYTGVW3vBc8"
+                title="Reservar turno - KM26 Performance"
+                loading="lazy">
+            </iframe>
         </div>
 
     </div>

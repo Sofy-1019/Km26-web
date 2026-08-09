@@ -5,8 +5,50 @@
 
 // ---------- Audios ----------
 const motorSound = document.getElementById("motorSound");
-const okSound = document.getElementById("okSound");
 const whatsappSound = document.getElementById("whatsappSound");
+const todosLosAudios = [motorSound, whatsappSound].filter(Boolean);
+
+// ========================================
+// DESBLOQUEO DE AUDIO EN MOBILE
+// ========================================
+// Los navegadores de celular (Chrome/Safari Android e iOS) no dejan
+// reproducir sonido con JS hasta que hubo una interacción real del
+// usuario en la página, y a veces ni con eso alcanza si el audio no
+// se "preparó" antes. Este truco (reproducir a volumen 0 y pausar de
+// inmediato en el primer toque) deja los audios listos para sonar
+// normalmente en el resto de la visita.
+
+let audioDesbloqueado = false;
+
+function desbloquearAudio() {
+
+    if (audioDesbloqueado) return;
+    audioDesbloqueado = true;
+
+    todosLosAudios.forEach(audio => {
+
+        const volumenOriginal = audio.volume;
+        audio.volume = 0;
+
+        audio.play()
+            .then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+                audio.volume = volumenOriginal;
+            })
+            .catch(() => {
+                audio.volume = volumenOriginal;
+            });
+
+    });
+
+    document.removeEventListener("touchstart", desbloquearAudio);
+    document.removeEventListener("click", desbloquearAudio);
+
+}
+
+document.addEventListener("touchstart", desbloquearAudio, { once: true });
+document.addEventListener("click", desbloquearAudio, { once: true });
 
 // ========================================
 // MENÚ MOBILE (hamburguesa)
@@ -43,7 +85,7 @@ function cerrarMenuMobile() {
 // BOTONES SOLICITAR TURNO
 // ========================================
 
-const botonesTurno = document.querySelectorAll("#btnTurno, #btnTurno2");
+const botonesTurno = document.querySelectorAll("#btnTurno, #btnTurno2, #btnTurnoMobile");
 
 botonesTurno.forEach(btn => {
 
@@ -58,11 +100,11 @@ botonesTurno.forEach(btn => {
 
         cerrarMenuMobile();
 
-        const formulario = document.getElementById("formTurno");
+        const calendario = document.getElementById("calendarioTurno");
 
-        if (formulario) {
+        if (calendario) {
 
-            formulario.scrollIntoView({
+            calendario.scrollIntoView({
 
                 behavior: "smooth",
                 block: "start"
@@ -74,51 +116,6 @@ botonesTurno.forEach(btn => {
     });
 
 });
-
-// ---------- Formulario: arma el mensaje y lo manda por WhatsApp ----------
-const form = document.getElementById("formTurno");
-const NUMERO_WHATSAPP_NEGOCIO = "5491151270218";
-
-if (form) {
-
-    form.addEventListener("submit", function (e) {
-
-        e.preventDefault();
-
-        const nombre = form.nombre.value.trim();
-        const telefono = form.telefono.value.trim();
-        const email = form.email.value.trim();
-        const vehiculo = form.vehiculo.value.trim();
-        const mensaje = form.mensaje.value.trim();
-
-        if (!nombre || !telefono) {
-            alert("Por favor completá al menos tu nombre y teléfono.");
-            return;
-        }
-
-        let texto = "🔧 *Nueva solicitud de turno - KM26 Performance*\n\n";
-        texto += `*Nombre:* ${nombre}\n`;
-        texto += `*Teléfono:* ${telefono}\n`;
-        if (email) texto += `*Email:* ${email}\n`;
-        if (vehiculo) texto += `*Vehículo:* ${vehiculo}\n`;
-        if (mensaje) texto += `*Mensaje:* ${mensaje}\n`;
-
-        if (okSound) {
-            okSound.currentTime = 0;
-            okSound.play().catch(() => {});
-        }
-
-        const destino = `https://wa.me/${NUMERO_WHATSAPP_NEGOCIO}?text=${encodeURIComponent(texto)}`;
-
-        setTimeout(() => {
-            window.open(destino, "_blank");
-        }, 500);
-
-        form.reset();
-
-    });
-
-}
 
 // ---------- Scroll suave menú ----------
 document.querySelectorAll('a[href^="#"]').forEach(link => {
@@ -192,18 +189,20 @@ revealItems.forEach(item => {
 });
 
 // ========================================
-// WHATSAPP (sonido antes de abrir el chat)
+// BOTONES SOCIALES (sonido antes de abrir el link)
+// Reutilizamos el mismo sonido para WhatsApp e Instagram
+// (no hay un audio dedicado para Instagram todavía).
 // ========================================
 
-const whatsappButtons = document.querySelectorAll(
-    ".btn-whatsapp-top, .whatsapp-float"
+const botonesSociales = document.querySelectorAll(
+    ".btn-whatsapp-top, .whatsapp-float, .btn-instagram-top"
 );
 
-whatsappButtons.forEach(btn => {
+botonesSociales.forEach(btn => {
 
     btn.addEventListener("click", function (e) {
 
-        // El link ya tiene el href correcto de wa.me,
+        // El link ya tiene el href correcto (wa.me o instagram.com),
         // así que solo agregamos el sonido y dejamos
         // que el navegador abra el link con un pequeño delay.
         if (whatsappSound) {

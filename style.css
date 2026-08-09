@@ -196,6 +196,12 @@ PORTADA
     z-index:60;
 }
 
+/* Franja de botones para mobile/tablet (debajo de la foto, no encima).
+   Oculta en escritorio: ahí los botones van superpuestos a la foto (arriba). */
+.hero-buttons-mobile{
+    display:none;
+}
+
 .btn-principal{
     background:linear-gradient(180deg,#ef2c33,#c1141b);
     color:white;
@@ -600,49 +606,38 @@ CONTACTO
     color:#c9c9c9;
 }
 
+.info-alt{
+    margin-top:10px;
+    padding-top:22px;
+    border-top:1px solid rgba(255,255,255,.08);
+    font-size:16px;
+}
+
+.info-alt a{
+    color:#ff4d55;
+    font-weight:700;
+    text-decoration:none;
+    margin-left:6px;
+}
+
+.info-alt a:hover{
+    text-decoration:underline;
+}
+
 .formulario{
     background:#1a1a1a;
-    padding:45px;
+    padding:14px;
     border-radius:24px;
     border:1px solid rgba(255,255,255,.05);
 }
 
-.formulario form{
-    display:flex;
-    flex-direction:column;
-    gap:20px;
-}
-
-.formulario input,
-.formulario textarea{
+.calendario-embed{
     width:100%;
-    padding:18px;
-    border:none;
-    border-radius:14px;
-    background:#262626;
-    color:white;
-    font-size:17px;
-    font-family:'Montserrat',sans-serif;
-    outline:none;
-    transition:.3s;
-}
-
-.formulario input:focus,
-.formulario textarea:focus{
-    background:#303030;
-    box-shadow:0 0 0 2px rgba(215,25,32,.45);
-}
-
-.formulario textarea{
-    resize:vertical;
-    min-height:180px;
-}
-
-.formulario button{
-    border:none;
-    cursor:pointer;
-    font-size:17px;
-    font-family:'Montserrat',sans-serif;
+    height:660px;
+    border:0;
+    border-radius:16px;
+    display:block;
+    background:#fff;
 }
 
 input::placeholder,
@@ -861,11 +856,12 @@ RESPONSIVE
     /*
        En pantallas angostas y verticales, object-fit:cover solo deja ver
        una franja central de la foto (no entra el ancho completo).
-       Corremos el encuadre para que esa franja muestre la persiana,
-       y centramos el logo y los botones sobre esa misma franja.
+       Corremos el encuadre para que esa franja muestre la persiana y el logo.
+       Los botones acá NO van superpuestos a la foto (se tapaban entre sí
+       con el texto largo) -> se ocultan y aparece la franja de abajo.
     */
     .hero-image{
-        object-position:22% 6%;
+        object-position:24% 10%;
     }
 
     .hero-logo{
@@ -873,13 +869,18 @@ RESPONSIVE
     }
 
     .hero-buttons-bottom{
-        left:50%;
-        top:66%;
+        display:none;
     }
 
-    .hero-buttons{
+    .hero-buttons-mobile{
+        display:flex;
         flex-wrap:wrap;
-        row-gap:16px;
+        justify-content:center;
+        align-items:center;
+        gap:14px;
+        background:#111;
+        padding:26px 8%;
+        border-bottom:1px solid rgba(255,255,255,.06);
     }
 
     .contacto-grid{
@@ -896,11 +897,19 @@ RESPONSIVE
 @media (max-width:768px){
 
     .hero{
-        height:90vh;
+        height:66vh;
+    }
+
+    .hero-logo{
+        top:85px;
     }
 
     .hero-logo img{
         width:320px;
+    }
+
+    .calendario-embed{
+        height:520px;
     }
 
     .titulo h2{
