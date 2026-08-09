@@ -214,7 +214,7 @@
 
         <div class="pago-item">
             <img src="images/pago-factura.png" alt="" class="pago-icono">
-            <p>Factura A y C </p>
+            <p>Factura A y C</p>
         </div>
 
     </div>
@@ -277,12 +277,7 @@
         </div>
 
         <div class="formulario" id="calendarioTurno">
-            <iframe
-                class="calendario-embed"
-                src="https://calendar.app.google/nyGMyNcYTGVW3vBc8"
-                title="Reservar turno - KM26 Performance"
-                loading="lazy">
-            </iframe>
+            <div id="calKm26" class="calendario-embed"></div>
         </div>
 
     </div>
@@ -349,6 +344,50 @@
     <button class="lightbox-close" aria-label="Cerrar imagen">&times;</button>
     <img id="lightboxImg" src="" alt="">
 </div>
+
+<!-- Cal.com: calendario de turnos embebido (modo oscuro, color de marca) -->
+<script type="text/javascript">
+    (function (C, A, L) {
+        let p = function (a, ar) { a.q.push(ar); };
+        let d = C.document;
+        C.Cal = C.Cal || function () {
+            let cal = C.Cal;
+            let ar = arguments;
+            if (!cal.loaded) {
+                cal.ns = {};
+                cal.q = cal.q || [];
+                d.head.appendChild(d.createElement("script")).src = A;
+                cal.loaded = true;
+            }
+            if (ar[0] === L) {
+                const api = function () { p(api, arguments); };
+                const namespace = ar[1];
+                api.q = api.q || [];
+                if (typeof namespace === "string") {
+                    cal.ns[namespace] = cal.ns[namespace] || api;
+                    p(cal.ns[namespace], ar);
+                    p(cal, ["initNamespace", namespace]);
+                } else p(cal, ar);
+                return;
+            }
+            p(cal, ar);
+        };
+    })(window, "https://app.cal.com/embed/embed.js", "init");
+
+    Cal("init", { origin: "https://cal.com" });
+
+    Cal("inline", {
+        elementOrSelector: "#calKm26",
+        calLink: "km-26/30min",
+        layout: "month_view"
+    });
+
+    Cal("ui", {
+        theme: "dark",
+        styles: { branding: { brandColor: "#d71920" } },
+        hideEventTypeDetails: false
+    });
+</script>
 
 <script src="script.js"></script>
 

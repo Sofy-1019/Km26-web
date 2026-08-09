@@ -637,7 +637,8 @@ CONTACTO
     border:0;
     border-radius:16px;
     display:block;
-    background:#fff;
+    overflow:hidden;
+    background:#151515;
 }
 
 input::placeholder,
