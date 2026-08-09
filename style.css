@@ -855,11 +855,16 @@ RESPONSIVE
 @media (max-width:1400px) and (min-width:993px){
 
     .hero-buttons-bottom{
-        gap:12px;
+        gap:10px;
     }
 
     .btn-principal{
-        padding:16px 32px;
+        padding:16px 30px;
+    }
+
+    .hero-buttons-bottom .btn-social{
+        width:54px;
+        height:54px;
     }
 
 }

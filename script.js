@@ -195,7 +195,7 @@ revealItems.forEach(item => {
 // ========================================
 
 const botonesSociales = document.querySelectorAll(
-    ".btn-whatsapp-top, .whatsapp-float, .btn-instagram-top"
+    ".btn-whatsapp-top, .whatsapp-float, .btn-instagram-top, .btn-call-top"
 );
 
 botonesSociales.forEach(btn => {
