@@ -150,12 +150,10 @@
         <div class="marca">Bosch</div>
         <div class="marca">NGK</div>
         <div class="marca">Valeo</div>
-        <div class="marca">Fram</div>
+        <div class="marca">TRW</div>
         <div class="marca">Corven</div>
         <div class="marca">Sachs</div>
-        <div class="marca">Dayco</div>
-        <div class="marca">Brembo</div>
-        <div class="marca">Monroe</div>
+        <div class="marca">Gates</div>
     </div>
 
 </section>
@@ -397,6 +395,30 @@
     Cal("ui", {
         styles: { branding: { brandColor: "#d71920" } },
         hideEventTypeDetails: false
+    });
+
+    // Cuando la reserva se confirma, bajamos la página para mostrar
+    // el botón de "avisar por WhatsApp" (si no, queda fuera de vista).
+    Cal("on", {
+        action: "bookingSuccessfulV2",
+        callback: () => {
+
+            const boton = document.querySelector(".confirmar-whatsapp");
+
+            if (boton) {
+
+                setTimeout(() => {
+
+                    boton.scrollIntoView({ behavior: "smooth", block: "center" });
+                    boton.classList.add("destacar");
+
+                    setTimeout(() => boton.classList.remove("destacar"), 2600);
+
+                }, 600);
+
+            }
+
+        }
     });
 </script>
 
