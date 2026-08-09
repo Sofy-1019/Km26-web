@@ -656,6 +656,29 @@ CONTACTO
     background:#fff;
 }
 
+.confirmar-whatsapp{
+    margin-top:22px;
+    padding-top:22px;
+    border-top:1px solid rgba(255,255,255,.08);
+    text-align:center;
+}
+
+.confirmar-whatsapp p{
+    color:#c9c9c9;
+    font-size:16px;
+    margin-bottom:16px;
+}
+
+.btn-confirmar-whatsapp{
+    display:inline-block;
+    background:linear-gradient(180deg,#2fdb6e,#1fa851);
+}
+
+.btn-confirmar-whatsapp:hover{
+    background:linear-gradient(180deg,#3aff82,#25c25f);
+    box-shadow:0 15px 35px rgba(37,211,102,.40);
+}
+
 input::placeholder,
 textarea::placeholder{
     color:#9d9d9d;
