@@ -612,20 +612,31 @@ CONTACTO
 .faq-lista{
     max-width:800px;
     margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
 }
 
 .faq-item{
-    border-bottom:1px solid #262626;
+    background:#1b1b1b;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:16px;
+    overflow:hidden;
+    transition:.3s;
+}
+
+.faq-item.abierto{
+    border-color:#d71920;
 }
 
 .faq-pregunta{
     width:100%;
     background:none;
     border:none;
-    color:#fff;
+    color:#f2f2f2;
     text-align:left;
-    padding:22px 4px;
-    font-size:17px;
+    padding:20px 22px;
+    font-size:16px;
     font-weight:600;
     font-family:'Montserrat',sans-serif;
     cursor:pointer;
@@ -640,7 +651,7 @@ CONTACTO
 }
 
 .faq-pregunta span{
-    font-size:24px;
+    font-size:22px;
     font-weight:400;
     color:#d71920;
     transition:.3s;
@@ -658,14 +669,14 @@ CONTACTO
 }
 
 .faq-item.abierto .faq-respuesta{
-    max-height:200px;
+    max-height:220px;
 }
 
 .faq-respuesta p{
-    padding:0 4px 22px;
-    color:#bbb;
+    padding:0 22px 22px;
+    color:#a8a8a8;
     line-height:1.7;
-    font-size:15px;
+    font-size:14px;
 }
 
 .contacto{
