@@ -1670,8 +1670,50 @@ async function procesarCodigoEscaneado(texto) {
                 <button class="btn-redondo" onclick="ajustarDesdeEscaner(${producto.id}, 1)">+</button>
             </div>
         </div>
+
+        <div class="ficha-historial-form" style="margin-top:10px;">
+            <input type="number" id="ventaPrecio" placeholder="Precio de venta $">
+            <button class="btn-chico" style="background:#0d2418;border-color:#2fdb6e;color:#5fd98a;" onclick="registrarVentaDesdeEscaner(${producto.id}, '${escaparComillas(producto.nombre)}')">💰 Registrar venta</button>
+        </div>
+        <p id="ventaEstado" style="font-size:12px;margin-top:6px;"></p>
+
         <button class="btn-chico" style="margin-top:10px;" onclick="reanudarEscaneo()">Escanear otro</button>
     `;
+
+}
+
+async function registrarVentaDesdeEscaner(id, nombre) {
+
+    const precio = document.getElementById("ventaPrecio").value.trim();
+    const estado = document.getElementById("ventaEstado");
+
+    if (!precio || Number(precio) <= 0) {
+        estado.textContent = "Poné el precio de venta primero.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Registrando...";
+    estado.style.color = "#999";
+
+    const resStock = await llamar("ajustarStock", { id, delta: -1 });
+
+    if (resStock && resStock.error) {
+        estado.textContent = "Error: " + resStock.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    await llamar("agregarMovimiento", {
+        tipo: "Ingreso",
+        descripcion: "Venta: " + nombre,
+        monto: precio
+    });
+
+    document.getElementById("escaner-cantidad").textContent = resStock.cantidad;
+    estado.textContent = "✅ Venta registrada y stock descontado.";
+    estado.style.color = "#5fd98a";
+    document.getElementById("ventaPrecio").value = "";
 
 }
 
