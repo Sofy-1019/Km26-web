@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de gestión · KM26 Performance</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+body{
+    background:#0f0f0f;
+    color:#fff;
+    min-height:100vh;
+}
+
+/* ---------- Pantalla de PIN ---------- */
+
+#pantallaPin{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    text-align:center;
+}
+
+#pantallaPin h1{
+    font-size:24px;
+    margin-bottom:8px;
+}
+
+#pantallaPin p{
+    color:#999;
+    margin-bottom:24px;
+    font-size:14px;
+}
+
+#inputPin{
+    width:100%;
+    max-width:220px;
+    padding:16px;
+    font-size:22px;
+    text-align:center;
+    letter-spacing:8px;
+    border-radius:12px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    margin-bottom:16px;
+}
+
+#inputPin:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.btn-red{
+    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    color:#fff;
+    border:none;
+    padding:14px 32px;
+    border-radius:50px;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.btn-red:hover{
+    background:linear-gradient(180deg,#ff3941,#d71920);
+}
+
+#errorPin{
+    color:#ff6b6b;
+    font-size:13px;
+    margin-top:12px;
+    min-height:18px;
+}
+
+/* ---------- App principal ---------- */
+
+#app{
+    display:none;
+    max-width:1000px;
+    margin:0 auto;
+    padding:20px;
+}
+
+header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+}
+
+.marca{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.marca-logo{
+    width:38px;
+    height:38px;
+    border-radius:8px;
+    background:#2a0a0b;
+    color:#ff6b6b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:13px;
+}
+
+.marca-nombre{
+    font-weight:700;
+    font-size:15px;
+}
+
+.marca-sub{
+    font-size:12px;
+    color:#888;
+}
+
+#buscador{
+    flex:1;
+    min-width:180px;
+    max-width:320px;
+    padding:12px 16px;
+    border-radius:10px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+}
+
+#buscador:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+nav.tabs{
+    display:flex;
+    gap:4px;
+    border-bottom:1px solid #262626;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+}
+
+nav.tabs button{
+    background:none;
+    border:none;
+    color:#999;
+    font-size:14px;
+    font-weight:600;
+    padding:10px 16px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    font-family:'Montserrat',sans-serif;
+}
+
+nav.tabs button.activo{
+    color:#ff6b6b;
+    border-bottom-color:#d71920;
+}
+
+.seccion{
+    display:none;
+}
+
+.seccion.activa{
+    display:block;
+}
+
+.grid-stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin-bottom:24px;
+}
+
+.stat-card{
+    background:#1a1a1a;
+    border-radius:12px;
+    padding:16px;
+}
+
+.stat-card.verde{
+    background:#0d2418;
+}
+
+.stat-label{
+    font-size:12px;
+    color:#999;
+    margin-bottom:6px;
+}
+
+.stat-card.verde .stat-label{
+    color:#5fd98a;
+}
+
+.stat-valor{
+    font-size:22px;
+    font-weight:700;
+}
+
+.stat-card.verde .stat-valor{
+    color:#5fd98a;
+}
+
+.fila-titulo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.fila-titulo h2{
+    font-size:15px;
+    font-weight:600;
+}
+
+.btn-chico{
+    background:#1a1a1a;
+    border:1px solid #333;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-chico:hover{
+    border-color:#d71920;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#161616;
+    border-radius:12px;
+    overflow:hidden;
+    font-size:13px;
+    margin-bottom:24px;
+}
+
+th{
+    text-align:left;
+    padding:12px 14px;
+    background:#1e1e1e;
+    color:#999;
+    font-weight:600;
+    font-size:12px;
+}
+
+td{
+    padding:12px 14px;
+    border-top:1px solid #262626;
+}
+
+td.mono{
+    color:#bbb;
+}
+
+.vacio{
+    text-align:center;
+    color:#666;
+    padding:30px;
+    font-size:13px;
+}
+
+/* ---------- Modal ---------- */
+
+.overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+    padding:20px;
+}
+
+.overlay.abierto{
+    display:flex;
+}
+
+.modal{
+    background:#161616;
+    border-radius:16px;
+    padding:24px;
+    max-width:420px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+}
+
+.modal h3{
+    font-size:17px;
+    margin-bottom:18px;
+}
+
+.modal label{
+    display:block;
+    font-size:12px;
+    color:#999;
+    margin-bottom:6px;
+    margin-top:14px;
+}
+
+.modal input, .modal select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.modal input:focus, .modal select:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.modal-botones{
+    display:flex;
+    gap:10px;
+    margin-top:22px;
+}
+
+.btn-cancelar{
+    flex:1;
+    background:none;
+    border:1px solid #333;
+    color:#ccc;
+    padding:12px;
+    border-radius:50px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.modal .btn-red{
+    flex:1;
+}
+
+#mensajeEstado{
+    font-size:13px;
+    text-align:center;
+    margin-top:14px;
+    min-height:18px;
+}
+
+.tipo-toggle{
+    display:flex;
+    gap:8px;
+    margin-top:6px;
+}
+
+.tipo-toggle button{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#999;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.tipo-toggle button.activo-ingreso{
+    background:#0d2418;
+    border-color:#2fdb6e;
+    color:#5fd98a;
+}
+
+.tipo-toggle button.activo-egreso{
+    background:#2a0a0b;
+    border-color:#d71920;
+    color:#ff6b6b;
+}
+
+@media (max-width:600px){
+    header{flex-direction:column;align-items:stretch;}
+    #buscador{max-width:none;}
+}
+
+.fila-stock{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#161616;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+}
+
+.fila-stock-nombre{
+    font-weight:600;
+    font-size:14px;
+}
+
+.fila-stock-cantidad{
+    font-size:12px;
+    color:#999;
+}
+
+.ficha-vehiculo{
+    background:#1e1e1e;
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.ficha-vehiculo-cabecera{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.ficha-vehiculo-patente{
+    font-weight:700;
+    font-size:14px;
+}
+
+.ficha-vehiculo-detalle{
+    font-size:12px;
+    color:#999;
+}
+
+.ficha-historial{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #2a2a2a;
+}
+
+.ficha-historial-item{
+    font-size:12px;
+    color:#ccc;
+    padding:6px 0;
+    border-bottom:1px dashed #262626;
+}
+
+.ficha-historial-fecha{
+    color:#777;
+    margin-right:6px;
+}
+
+.ficha-historial-form{
+    display:flex;
+    gap:6px;
+    margin-top:10px;
+}
+
+.ficha-historial-form input{
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#141414;
+    color:#fff;
+    font-size:12px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.ficha-historial-form input:first-child{
+    flex:1;
+}
+
+.ficha-historial-form input:nth-child(2){
+    width:90px;
+}
+
+.stock-bajo{
+    border:1px solid #7a3a12 !important;
+    background:#2a1b0d !important;
+}
+
+.stock-bajo .fila-stock-cantidad{
+    color:#ffb35f;
+}
+
+.fila-stock-botones{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.btn-redondo{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-redondo:hover{
+    border-color:#d71920;
+}
+
+.cantidad-numero{
+    min-width:28px;
+    text-align:center;
+    font-weight:700;
+    font-size:15px;
+}
+
+/* Etiqueta imprimible */
+
+#modalEtiqueta .modal{
+    text-align:center;
+}
+
+#etiquetaContenido{
+    background:#fff;
+    color:#000;
+    border-radius:12px;
+    padding:24px;
+    margin:16px 0;
+}
+
+#etiquetaNombre{
+    font-weight:800;
+    font-size:16px;
+    margin-bottom:14px;
+    word-break:break-word;
+}
+
+#etiquetaQR{
+    display:flex;
+    justify-content:center;
+}
+
+@media print{
+    body *{
+        visibility:hidden;
+    }
+    #etiquetaContenido, #etiquetaContenido *{
+        visibility:visible;
+    }
+    #etiquetaContenido{
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+    }
+}
+
+/* Escáner */
+
+#videoEscaner{
+    width:100%;
+    border-radius:12px;
+    background:#000;
+}
+
+#resultadoEscaner{
+    margin-top:16px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ---------- Pantalla de PIN ---------- -->
+<div id="pantallaPin">
+    <h1>Panel de gestión</h1>
+    <p>KM26 Performance</p>
+    <input type="password" id="inputPin" placeholder="••••" maxlength="8" inputmode="numeric">
+    <br>
+    <button class="btn-red" onclick="entrar()">Entrar</button>
+    <p id="errorPin"></p>
+</div>
+
+<!-- ---------- App ---------- -->
+<div id="app">
+
+    <header>
+        <div class="marca">
+            <div class="marca-logo">KM</div>
+            <div>
+                <div class="marca-nombre">KM26 Performance</div>
+                <div class="marca-sub">Panel de gestión</div>
+            </div>
+        </div>
+        <input type="text" id="buscador" placeholder="Buscar por patente o apellido">
+        <button class="btn-red" onclick="abrirModalCliente()">+ Nuevo cliente</button>
+    </header>
+
+    <nav class="tabs">
+        <button class="activo" data-tab="inicio" onclick="cambiarTab('inicio')">Inicio</button>
+        <button data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
+        <button data-tab="caja" onclick="cambiarTab('caja')">Caja</button>
+        <button data-tab="stock" onclick="cambiarTab('stock')">Stock</button>
+    </nav>
+
+    <!-- INICIO -->
+    <section class="seccion activa" id="tab-inicio">
+
+        <div class="grid-stats">
+            <div class="stat-card"><div class="stat-label">Clientes</div><div class="stat-valor" id="statClientes">-</div></div>
+            <div class="stat-card verde"><div class="stat-label">Caja de hoy</div><div class="stat-valor" id="statCajaHoy">-</div></div>
+            <div class="stat-card"><div class="stat-label">Caja del mes</div><div class="stat-valor" id="statCajaMes">-</div></div>
+        </div>
+
+        <div class="fila-titulo"><h2>Clientes recientes</h2></div>
+        <div id="tablaInicio"></div>
+
+    </section>
+
+    <!-- CLIENTES / BUSQUEDA -->
+    <section class="seccion" id="tab-clientes">
+        <div class="fila-titulo"><h2 id="tituloClientes">Últimos clientes</h2></div>
+        <div id="tablaClientes"></div>
+    </section>
+
+    <!-- CAJA -->
+    <section class="seccion" id="tab-caja">
+
+        <div class="grid-stats">
+            <div class="stat-card verde"><div class="stat-label">Hoy</div><div class="stat-valor" id="cajaHoy">-</div></div>
+            <div class="stat-card"><div class="stat-label">Esta semana</div><div class="stat-valor" id="cajaSemana">-</div></div>
+            <div class="stat-card"><div class="stat-label">Este mes</div><div class="stat-valor" id="cajaMes">-</div></div>
+        </div>
+
+        <div class="fila-titulo"><h2>Últimos 7 días</h2></div>
+        <canvas id="graficoCaja" height="120" style="width:100%;margin-bottom:24px;"></canvas>
+
+        <div class="fila-titulo">
+            <h2>Movimientos recientes</h2>
+            <button class="btn-chico" onclick="abrirModalCaja()">+ Registrar movimiento</button>
+        </div>
+        <div id="tablaCaja"></div>
+
+    </section>
+
+    <!-- STOCK -->
+    <section class="seccion" id="tab-stock">
+
+        <div class="fila-titulo">
+            <h2>Productos</h2>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-chico" onclick="abrirEscaner()">📷 Escanear</button>
+                <button class="btn-chico" onclick="abrirModalProducto()">+ Nuevo producto</button>
+            </div>
+        </div>
+        <div id="tablaStock"></div>
+
+    </section>
+
+</div>
+
+<!-- ---------- Modal: nuevo cliente ---------- -->
+<div class="overlay" id="modalCliente">
+    <div class="modal">
+        <h3>Nuevo cliente</h3>
+
+        <label>Nombre</label>
+        <input type="text" id="fNombre" placeholder="Juan">
+
+        <label>Apellido</label>
+        <input type="text" id="fApellido" placeholder="Pérez">
+
+        <label>Teléfono</label>
+        <input type="tel" id="fTelefono" placeholder="11 5555-1234">
+
+        <label>Email (opcional)</label>
+        <input type="email" id="fEmail" placeholder="juan@mail.com">
+
+        <label>Patente del vehículo (opcional)</label>
+        <input type="text" id="fPatente" placeholder="AB123CD">
+
+        <label>Marca y modelo</label>
+        <input type="text" id="fMarcaModelo" placeholder="VW Gol">
+
+        <label>Año</label>
+        <input type="text" id="fAnio" placeholder="2020">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarCliente()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstado"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: editar cliente ---------- -->
+<div class="overlay" id="modalEditarCliente">
+    <div class="modal">
+        <h3>Editar cliente</h3>
+
+        <input type="hidden" id="eId">
+
+        <label>Nombre</label>
+        <input type="text" id="eNombre">
+
+        <label>Apellido</label>
+        <input type="text" id="eApellido">
+
+        <label>Teléfono</label>
+        <input type="tel" id="eTelefono">
+
+        <label>Email</label>
+        <input type="email" id="eEmail">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicion()">Guardar cambios</button>
+        </div>
+
+        <p id="mensajeEstadoEdicion"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: ficha de cliente (vehículos + historial) ---------- -->
+<div class="overlay" id="modalFicha">
+    <div class="modal" style="max-width:560px;">
+        <h3 id="fichaTitulo">Cliente</h3>
+
+        <div id="fichaVehiculos"></div>
+
+        <div style="margin-top:18px;padding-top:18px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar vehículo a este cliente</p>
+            <input type="hidden" id="fichaClienteId">
+            <label>Patente</label>
+            <input type="text" id="vPatente" placeholder="AB123CD">
+            <label>Marca y modelo</label>
+            <input type="text" id="vMarcaModelo" placeholder="VW Gol">
+            <label>Año</label>
+            <input type="text" id="vAnio" placeholder="2020">
+            <div class="modal-botones">
+                <button class="btn-chico" style="flex:1;" onclick="agregarVehiculoAFicha()">+ Agregar vehículo</button>
+            </div>
+        </div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: editar vehículo ---------- -->
+<div class="overlay" id="modalEditarVehiculo">
+    <div class="modal">
+        <h3>Editar vehículo</h3>
+
+        <input type="hidden" id="evId">
+
+        <label>Patente</label>
+        <input type="text" id="evPatente">
+
+        <label>Marca</label>
+        <input type="text" id="evMarca">
+
+        <label>Modelo</label>
+        <input type="text" id="evModelo">
+
+        <label>Año</label>
+        <input type="text" id="evAnio">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="document.getElementById('modalEditarVehiculo').classList.remove('abierto')">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicionVehiculo()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoVehiculo"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: nuevo movimiento de caja ---------- -->
+<div class="overlay" id="modalCaja">
+    <div class="modal">
+        <h3>Registrar movimiento</h3>
+
+        <div class="tipo-toggle">
+            <button id="btnIngreso" class="activo-ingreso" onclick="elegirTipo('Ingreso')">Ingreso</button>
+            <button id="btnEgreso" onclick="elegirTipo('Egreso')">Egreso</button>
+        </div>
+
+        <label>Descripción</label>
+        <input type="text" id="mDescripcion" placeholder="Cambio de aceite - Gol">
+
+        <label>Monto</label>
+        <input type="number" id="mMonto" placeholder="15000">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarMovimiento()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoCaja"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: nuevo producto ---------- -->
+<div class="overlay" id="modalProducto">
+    <div class="modal">
+        <h3>Nuevo producto</h3>
+
+        <label>Nombre</label>
+        <input type="text" id="pNombre" placeholder="Perfume Glade">
+
+        <label>Cantidad inicial</label>
+        <input type="number" id="pCantidad" placeholder="10">
+
+        <label>Avisar cuando queden menos de</label>
+        <input type="number" id="pStockMinimo" placeholder="3">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarProducto()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoProducto"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: editar producto ---------- -->
+<div class="overlay" id="modalEditarProducto">
+    <div class="modal">
+        <h3>Editar producto</h3>
+
+        <input type="hidden" id="epId">
+
+        <label>Nombre</label>
+        <input type="text" id="epNombre">
+
+        <label>Cantidad</label>
+        <input type="number" id="epCantidad">
+
+        <label>Avisar cuando queden menos de</label>
+        <input type="number" id="epStockMinimo">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicionProducto()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoEdicionProducto"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: etiqueta imprimible ---------- -->
+<div class="overlay" id="modalEtiqueta">
+    <div class="modal">
+        <h3>Etiqueta para imprimir</h3>
+
+        <div id="etiquetaContenido">
+            <div id="etiquetaNombre"></div>
+            <div id="etiquetaQR"></div>
+        </div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+            <button class="btn-red" onclick="window.print()">Imprimir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: escáner ---------- -->
+<div class="overlay" id="modalEscaner">
+    <div class="modal">
+        <h3>Escanear producto</h3>
+
+        <video id="videoEscaner" autoplay playsinline muted></video>
+        <canvas id="canvasEscaner" style="display:none;"></canvas>
+
+        <div id="resultadoEscaner"></div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarEscaner()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script>
+
+// ======================================================
+// CONFIGURACIÓN
+// ======================================================
+
+const API_URL = "https://script.google.com/macros/s/AKfycbwT4xNTHxHfOF163lRwhGICmcD2pUoLM-DWSWCUQWEEhmYmrusg-q2gKD2-GXH9iIt1/exec";
+
+let PIN_GUARDADO = "";
+let tipoMovimiento = "Ingreso";
+let streamCamara = null;
+let escaneando = false;
+
+// ======================================================
+// PIN / ACCESO
+// ======================================================
+
+async function entrar() {
+
+    const pin = document.getElementById("inputPin").value.trim();
+    const errorEl = document.getElementById("errorPin");
+
+    if (!pin) {
+        errorEl.textContent = "Ingresá el PIN.";
+        return;
+    }
+
+    errorEl.textContent = "Verificando...";
+
+    try {
+
+        const res = await llamar("listarClientes", {}, pin);
+
+        if (res && res.error) {
+            errorEl.textContent = "PIN incorrecto.";
+            return;
+        }
+
+        PIN_GUARDADO = pin;
+        sessionStorage.setItem("km26_pin", pin);
+
+        document.getElementById("pantallaPin").style.display = "none";
+        document.getElementById("app").style.display = "block";
+
+        cargarInicio();
+        cargarCaja();
+
+    } catch (err) {
+        errorEl.textContent = "No se pudo conectar. Revisá tu conexión.";
+    }
+
+}
+
+// ======================================================
+// LLAMADAS A LA API
+// ======================================================
+
+async function llamar(action, params, pinOverride) {
+
+    const pin = pinOverride || PIN_GUARDADO;
+    const url = new URL(API_URL);
+    url.searchParams.set("action", action);
+    url.searchParams.set("pin", pin);
+
+    Object.keys(params || {}).forEach(k => {
+        url.searchParams.set(k, params[k]);
+    });
+
+    const res = await fetch(url.toString());
+    return res.json();
+
+}
+
+function formatoPlata(n) {
+    n = Number(n) || 0;
+    const signo = n < 0 ? "-" : "";
+    return signo + "$" + Math.abs(Math.round(n)).toLocaleString("es-AR");
+}
+
+// ======================================================
+// TABS
+// ======================================================
+
+function cambiarTab(tab) {
+
+    document.querySelectorAll("nav.tabs button").forEach(b => b.classList.remove("activo"));
+    document.querySelector(`nav.tabs button[data-tab="${tab}"]`).classList.add("activo");
+
+    document.querySelectorAll(".seccion").forEach(s => s.classList.remove("activa"));
+    document.getElementById("tab-" + tab).classList.add("activa");
+
+    if (tab === "clientes" && !document.getElementById("buscador").value) {
+        cargarClientesRecientes();
+    }
+
+    if (tab === "stock") {
+        cargarStock();
+    }
+
+}
+
+// ======================================================
+// INICIO
+// ======================================================
+
+async function cargarInicio() {
+
+    const clientes = await llamar("listarClientes", {});
+    const resumen = await llamar("resumenCaja", {});
+
+    if (Array.isArray(clientes)) {
+        document.getElementById("statClientes").textContent = clientes.length + "+";
+        renderTablaClientes(clientes, "tablaInicio");
+    }
+
+    if (resumen && !resumen.error) {
+        document.getElementById("statCajaHoy").textContent = formatoPlata(resumen.hoy);
+        document.getElementById("statCajaMes").textContent = formatoPlata(resumen.mes);
+    }
+
+}
+
+function renderTablaClientes(lista, contenedorId, conAcciones) {
+
+    const el = document.getElementById(contenedorId);
+
+    if (!lista || lista.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay clientes cargados.</div>';
+        return;
+    }
+
+    let encabezado = "<th>Cliente</th><th>Teléfono</th><th>Email</th>";
+    if (conAcciones) encabezado += "<th></th>";
+
+    let html = `<table><thead><tr>${encabezado}</tr></thead><tbody>`;
+
+    lista.forEach(c => {
+
+        html += `<tr>
+            <td>${escapar(c.apellido)}, ${escapar(c.nombre)}</td>
+            <td class="mono">${escapar(c.telefono || "-")}</td>
+            <td class="mono">${escapar(c.email || "-")}</td>`;
+
+        if (conAcciones) {
+            html += `<td style="white-space:nowrap;">
+                <button class="btn-chico" onclick="abrirFicha(${c.id}, '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')">Ver</button>
+                <button class="btn-chico" onclick="abrirEdicion(${c.id}, '${escaparComillas(c.nombre)}', '${escaparComillas(c.apellido)}', '${escaparComillas(c.telefono || "")}', '${escaparComillas(c.email || "")}')">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarCliente(${c.id}, '${escaparComillas(c.nombre + " " + c.apellido)}')">Borrar</button>
+            </td>`;
+        }
+
+        html += `</tr>`;
+
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+function escapar(s) {
+    if (s === undefined || s === null) return "";
+    return String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// ======================================================
+// CLIENTES / BUSQUEDA
+// ======================================================
+
+let buscarTimeout;
+
+document.getElementById("buscador").addEventListener("input", function () {
+
+    clearTimeout(buscarTimeout);
+    const q = this.value.trim();
+
+    buscarTimeout = setTimeout(() => {
+
+        cambiarTab("clientes");
+
+        if (!q) {
+            cargarClientesRecientes();
+            return;
+        }
+
+        buscarYRenderizar(q);
+
+    }, 350);
+
+});
+
+async function cargarClientesRecientes() {
+    document.getElementById("tituloClientes").textContent = "Últimos clientes";
+    const clientes = await llamar("listarClientes", {});
+    renderTablaClientes(clientes, "tablaClientes", true);
+}
+
+async function buscarYRenderizar(q) {
+
+    document.getElementById("tituloClientes").textContent = `Resultados para "${q}"`;
+    const resultados = await llamar("buscar", { q: q });
+    const el = document.getElementById("tablaClientes");
+
+    if (!Array.isArray(resultados) || resultados.length === 0) {
+        el.innerHTML = '<div class="vacio">No se encontraron coincidencias.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Patente</th><th>Cliente</th><th>Vehículo</th><th>Teléfono</th><th></th></tr></thead><tbody>";
+
+    resultados.forEach(r => {
+
+        if (r.tipo === "vehiculo") {
+            html += `<tr>
+                <td class="mono">${escapar(r.patente)}</td>
+                <td>${escapar(r.clienteNombre)}</td>
+                <td class="mono">${escapar(r.marca)} ${escapar(r.modelo)} ${escapar(r.anio || "")}</td>
+                <td class="mono">${escapar(r.clienteTelefono || "-")}</td>
+                <td style="white-space:nowrap;">
+                    <button class="btn-chico" onclick="abrirEdicion(${r.clienteId}, '${escaparComillas(r.clienteNombreSolo)}', '${escaparComillas(r.clienteApellido)}', '${escaparComillas(r.clienteTelefono || "")}', '${escaparComillas(r.clienteEmail || "")}')">Editar</button>
+                    <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarCliente(${r.clienteId}, '${escaparComillas(r.clienteNombre)}')">Borrar</button>
+                </td>
+            </tr>`;
+        } else {
+            html += `<tr>
+                <td class="mono">-</td>
+                <td>${escapar(r.apellido)}, ${escapar(r.nombre)}</td>
+                <td class="mono">-</td>
+                <td class="mono">${escapar(r.telefono || "-")}</td>
+                <td style="white-space:nowrap;">
+                    <button class="btn-chico" onclick="abrirEdicion(${r.id}, '${escaparComillas(r.nombre)}', '${escaparComillas(r.apellido)}', '${escaparComillas(r.telefono || "")}', '${escaparComillas(r.email || "")}')">Editar</button>
+                    <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarCliente(${r.id}, '${escaparComillas(r.nombre + " " + r.apellido)}')">Borrar</button>
+                </td>
+            </tr>`;
+        }
+
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+// ======================================================
+// MODAL: NUEVO CLIENTE
+// ======================================================
+
+function abrirModalCliente() {
+    document.getElementById("modalCliente").classList.add("abierto");
+    document.getElementById("mensajeEstado").textContent = "";
+}
+
+function cerrarModales() {
+
+    const ids = [
+        "modalCliente", "modalCaja", "modalEditarCliente", "modalFicha",
+        "modalEditarVehiculo", "modalEditarProducto", "modalEtiqueta", "modalProducto"
+    ];
+
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("abierto");
+    });
+
+}
+
+function abrirEdicion(id, nombre, apellido, telefono, email) {
+
+    document.getElementById("eId").value = id;
+    document.getElementById("eNombre").value = nombre;
+    document.getElementById("eApellido").value = apellido;
+    document.getElementById("eTelefono").value = telefono;
+    document.getElementById("eEmail").value = email;
+
+    document.getElementById("mensajeEstadoEdicion").textContent = "";
+    document.getElementById("modalEditarCliente").classList.add("abierto");
+
+}
+
+async function guardarEdicion() {
+
+    const id = document.getElementById("eId").value;
+    const nombre = document.getElementById("eNombre").value.trim();
+    const apellido = document.getElementById("eApellido").value.trim();
+    const telefono = document.getElementById("eTelefono").value.trim();
+    const email = document.getElementById("eEmail").value.trim();
+    const estado = document.getElementById("mensajeEstadoEdicion");
+
+    if (!nombre || !apellido) {
+        estado.textContent = "Nombre y apellido son obligatorios.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("editarCliente", { id, nombre, apellido, telefono, email });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Listo!";
+    estado.style.color = "#5fd98a";
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarInicio();
+        cargarClientesRecientes();
+    }, 600);
+
+}
+
+async function borrarCliente(id, nombreCompleto) {
+
+    const confirmado = confirm(`¿Seguro que querés borrar a ${nombreCompleto}? También se van a borrar sus vehículos asociados. Esta acción no se puede deshacer.`);
+
+    if (!confirmado) return;
+
+    await llamar("eliminarCliente", { id });
+
+    cargarInicio();
+    cargarClientesRecientes();
+
+}
+
+async function guardarCliente() {
+
+    const nombre = document.getElementById("fNombre").value.trim();
+    const apellido = document.getElementById("fApellido").value.trim();
+    const telefono = document.getElementById("fTelefono").value.trim();
+    const email = document.getElementById("fEmail").value.trim();
+    const patente = document.getElementById("fPatente").value.trim();
+    const marcaModelo = document.getElementById("fMarcaModelo").value.trim();
+    const anio = document.getElementById("fAnio").value.trim();
+
+    const estado = document.getElementById("mensajeEstado");
+
+    if (!nombre || !apellido) {
+        estado.textContent = "Nombre y apellido son obligatorios.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const partesMarca = marcaModelo.split(" ");
+    const marca = partesMarca[0] || "";
+    const modelo = partesMarca.slice(1).join(" ") || "";
+
+    const res = await llamar("agregarCliente", {
+        nombre, apellido, telefono, email, patente, marca, modelo, anio
+    });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Cliente guardado!";
+    estado.style.color = "#5fd98a";
+
+    document.querySelectorAll("#modalCliente input").forEach(i => i.value = "");
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarInicio();
+        if (document.getElementById("tab-clientes").classList.contains("activa")) {
+            cargarClientesRecientes();
+        }
+    }, 700);
+
+}
+
+// ======================================================
+// CAJA
+// ======================================================
+
+async function cargarCaja() {
+
+    const resumen = await llamar("resumenCaja", {});
+    const movimientos = await llamar("movimientosCaja", {});
+    const semanal = await llamar("cajaSemanal", {});
+
+    if (resumen && !resumen.error) {
+        document.getElementById("cajaHoy").textContent = formatoPlata(resumen.hoy);
+        document.getElementById("cajaSemana").textContent = formatoPlata(resumen.semana);
+        document.getElementById("cajaMes").textContent = formatoPlata(resumen.mes);
+    }
+
+    if (Array.isArray(semanal)) {
+        dibujarGraficoCaja(semanal);
+    }
+
+    const el = document.getElementById("tablaCaja");
+
+    if (!Array.isArray(movimientos) || movimientos.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay movimientos cargados.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>";
+
+    movimientos.forEach(m => {
+
+        const fecha = new Date(m.fecha);
+        const fechaTexto = isNaN(fecha) ? "-" : fecha.toLocaleDateString("es-AR");
+        const color = m.tipo === "Ingreso" ? "#5fd98a" : "#ff6b6b";
+        const signo = m.tipo === "Ingreso" ? "+" : "-";
+
+        html += `<tr>
+            <td class="mono">${fechaTexto}</td>
+            <td>${escapar(m.tipo)}</td>
+            <td>${escapar(m.descripcion)}</td>
+            <td class="mono" style="color:${color}">${signo}${formatoPlata(m.monto).replace("$","$")}</td>
+        </tr>`;
+
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+function abrirModalCaja() {
+    document.getElementById("modalCaja").classList.add("abierto");
+    document.getElementById("mensajeEstadoCaja").textContent = "";
+    elegirTipo("Ingreso");
+}
+
+function elegirTipo(tipo) {
+
+    tipoMovimiento = tipo;
+
+    document.getElementById("btnIngreso").classList.toggle("activo-ingreso", tipo === "Ingreso");
+    document.getElementById("btnEgreso").classList.toggle("activo-egreso", tipo === "Egreso");
+
+}
+
+async function guardarMovimiento() {
+
+    const descripcion = document.getElementById("mDescripcion").value.trim();
+    const monto = document.getElementById("mMonto").value.trim();
+    const estado = document.getElementById("mensajeEstadoCaja");
+
+    if (!descripcion || !monto) {
+        estado.textContent = "Completá descripción y monto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("agregarMovimiento", {
+        tipo: tipoMovimiento, descripcion, monto
+    });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Movimiento guardado!";
+    estado.style.color = "#5fd98a";
+
+    document.getElementById("mDescripcion").value = "";
+    document.getElementById("mMonto").value = "";
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarCaja();
+        cargarInicio();
+    }, 700);
+
+}
+
+// ======================================================
+// STOCK
+// ======================================================
+
+async function cargarStock() {
+
+    const productos = await llamar("listarStock", {});
+    const el = document.getElementById("tablaStock");
+
+    if (!Array.isArray(productos) || productos.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay productos cargados.</div>';
+        return;
+    }
+
+    el.innerHTML = "";
+
+    productos.forEach(p => {
+
+        const bajo = p.cantidad <= p.stockMinimo;
+
+        const fila = document.createElement("div");
+        fila.className = "fila-stock" + (bajo ? " stock-bajo" : "");
+        fila.innerHTML = `
+            <div>
+                <div class="fila-stock-nombre">${escapar(p.nombre)} ${bajo ? "⚠️" : ""}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades ${bajo ? "· stock bajo" : ""}</div>
+            </div>
+            <div class="fila-stock-botones">
+                <button class="btn-redondo" onclick="ajustarCantidad(${p.id}, -1)">-</button>
+                <span class="cantidad-numero" id="numero-${p.id}">${p.cantidad}</span>
+                <button class="btn-redondo" onclick="ajustarCantidad(${p.id}, 1)">+</button>
+                <button class="btn-chico" onclick="abrirEtiqueta(${p.id}, '${escaparComillas(p.nombre)}')">🏷️ Etiqueta</button>
+                <button class="btn-chico" onclick="abrirEdicionProducto(${p.id}, '${escaparComillas(p.nombre)}', ${p.cantidad}, ${p.stockMinimo})">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarProducto(${p.id}, '${escaparComillas(p.nombre)}')">Borrar</button>
+            </div>
+        `;
+        el.appendChild(fila);
+
+    });
+
+}
+
+function escaparComillas(s) {
+    return String(s).replace(/'/g, "\\'");
+}
+
+async function ajustarCantidad(id, delta) {
+
+    const res = await llamar("ajustarStock", { id, delta });
+
+    if (res && !res.error) {
+        document.getElementById("cantidad-" + id).textContent = res.cantidad;
+        document.getElementById("numero-" + id).textContent = res.cantidad;
+    }
+
+}
+
+function abrirModalProducto() {
+    document.getElementById("modalProducto").classList.add("abierto");
+    document.getElementById("mensajeEstadoProducto").textContent = "";
+}
+
+async function guardarProducto() {
+
+    const nombre = document.getElementById("pNombre").value.trim();
+    const cantidad = document.getElementById("pCantidad").value.trim() || "0";
+    const stockMinimo = document.getElementById("pStockMinimo").value.trim() || "3";
+    const estado = document.getElementById("mensajeEstadoProducto");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al producto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("agregarProducto", { nombre, cantidad, stockMinimo });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Producto guardado!";
+    estado.style.color = "#5fd98a";
+
+    document.getElementById("pNombre").value = "";
+    document.getElementById("pCantidad").value = "";
+    document.getElementById("pStockMinimo").value = "";
+
+    setTimeout(() => {
+        document.getElementById("modalProducto").classList.remove("abierto");
+        cargarStock();
+        cargarInicio();
+    }, 700);
+
+}
+
+function abrirEtiqueta(id, nombre) {
+
+    document.getElementById("etiquetaNombre").textContent = nombre;
+
+    const contenedor = document.getElementById("etiquetaQR");
+    contenedor.innerHTML = "";
+
+    new QRCode(contenedor, {
+        text: "KM26-STOCK-" + id,
+        width: 180,
+        height: 180
+    });
+
+    document.getElementById("modalEtiqueta").classList.add("abierto");
+
+}
+
+function abrirEdicionProducto(id, nombre, cantidad, stockMinimo) {
+
+    document.getElementById("epId").value = id;
+    document.getElementById("epNombre").value = nombre;
+    document.getElementById("epCantidad").value = cantidad;
+    document.getElementById("epStockMinimo").value = stockMinimo;
+
+    document.getElementById("mensajeEstadoEdicionProducto").textContent = "";
+    document.getElementById("modalEditarProducto").classList.add("abierto");
+
+}
+
+async function guardarEdicionProducto() {
+
+    const id = document.getElementById("epId").value;
+    const nombre = document.getElementById("epNombre").value.trim();
+    const cantidad = document.getElementById("epCantidad").value.trim() || "0";
+    const stockMinimo = document.getElementById("epStockMinimo").value.trim() || "3";
+    const estado = document.getElementById("mensajeEstadoEdicionProducto");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al producto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("editarProducto", { id, nombre, cantidad, stockMinimo });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Listo!";
+    estado.style.color = "#5fd98a";
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarStock();
+    }, 600);
+
+}
+
+async function borrarProducto(id, nombre) {
+
+    const confirmado = confirm(`¿Seguro que querés borrar "${nombre}" del stock? No se puede deshacer.`);
+    if (!confirmado) return;
+
+    await llamar("eliminarProducto", { id });
+    cargarStock();
+
+}
+
+// ---------- Escáner con cámara ----------
+
+async function abrirEscaner() {
+
+    document.getElementById("modalEscaner").classList.add("abierto");
+
+    if (typeof jsQR !== "function") {
+        document.getElementById("resultadoEscaner").innerHTML =
+            '<p style="color:#ff6b6b;font-size:13px;">⚠️ La librería lectora de QR no cargó (revisá tu conexión a internet, la necesita para descargarse la primera vez). Cerrá y probá de nuevo.</p>';
+        return;
+    }
+
+    document.getElementById("resultadoEscaner").innerHTML = "";
+
+    try {
+
+        streamCamara = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        });
+
+        const video = document.getElementById("videoEscaner");
+        video.srcObject = streamCamara;
+        await video.play();
+
+        escaneando = true;
+        requestAnimationFrame(loopEscaneo);
+
+    } catch (err) {
+        document.getElementById("resultadoEscaner").innerHTML =
+            '<p style="color:#ff6b6b;font-size:13px;">No se pudo acceder a la cámara. Revisá los permisos del navegador.</p>';
+    }
+
+}
+
+function cerrarEscaner() {
+
+    escaneando = false;
+
+    if (streamCamara) {
+        streamCamara.getTracks().forEach(t => t.stop());
+        streamCamara = null;
+    }
+
+    document.getElementById("modalEscaner").classList.remove("abierto");
+
+}
+
+function loopEscaneo() {
+
+    if (!escaneando) return;
+
+    const video = document.getElementById("videoEscaner");
+    const canvas = document.getElementById("canvasEscaner");
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imagen = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const codigo = jsQR(imagen.data, imagen.width, imagen.height, {
+            inversionAttempts: "attemptBoth"
+        });
+
+        if (codigo && codigo.data) {
+
+            if (codigo.data.startsWith("KM26-STOCK-")) {
+                procesarCodigoEscaneado(codigo.data);
+                return;
+            } else {
+                document.getElementById("resultadoEscaner").innerHTML =
+                    `<p style="color:#ffb35f;font-size:12px;">Detecté un código, pero no es de un producto: "${codigo.data}"</p>`;
+            }
+
+        }
+
+    }
+
+    requestAnimationFrame(loopEscaneo);
+
+}
+
+async function procesarCodigoEscaneado(texto) {
+
+    escaneando = false;
+
+    const id = texto.replace("KM26-STOCK-", "");
+    const producto = await llamar("obtenerProducto", { id });
+
+    const el = document.getElementById("resultadoEscaner");
+
+    if (!producto || producto.error) {
+        el.innerHTML = '<p style="color:#ff6b6b;font-size:13px;">Producto no encontrado.</p>';
+        setTimeout(() => { escaneando = true; requestAnimationFrame(loopEscaneo); }, 1500);
+        return;
+    }
+
+    el.innerHTML = `
+        <div class="fila-stock" style="margin-top:14px;">
+            <div>
+                <div class="fila-stock-nombre">${escapar(producto.nombre)}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="escaner-cantidad">${producto.cantidad}</span> unidades</div>
+            </div>
+            <div class="fila-stock-botones">
+                <button class="btn-redondo" onclick="ajustarDesdeEscaner(${producto.id}, -1)">-</button>
+                <button class="btn-redondo" onclick="ajustarDesdeEscaner(${producto.id}, 1)">+</button>
+            </div>
+        </div>
+
+        <div class="ficha-historial-form" style="margin-top:10px;">
+            <input type="number" id="ventaPrecio" placeholder="Precio de venta $">
+            <button class="btn-chico" style="background:#0d2418;border-color:#2fdb6e;color:#5fd98a;" onclick="registrarVentaDesdeEscaner(${producto.id}, '${escaparComillas(producto.nombre)}')">💰 Registrar venta</button>
+        </div>
+        <p id="ventaEstado" style="font-size:12px;margin-top:6px;"></p>
+
+        <button class="btn-chico" style="margin-top:10px;" onclick="reanudarEscaneo()">Escanear otro</button>
+    `;
+
+}
+
+async function registrarVentaDesdeEscaner(id, nombre) {
+
+    const precio = document.getElementById("ventaPrecio").value.trim();
+    const estado = document.getElementById("ventaEstado");
+
+    if (!precio || Number(precio) <= 0) {
+        estado.textContent = "Poné el precio de venta primero.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Registrando...";
+    estado.style.color = "#999";
+
+    const resStock = await llamar("ajustarStock", { id, delta: -1 });
+
+    if (resStock && resStock.error) {
+        estado.textContent = "Error: " + resStock.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    await llamar("agregarMovimiento", {
+        tipo: "Ingreso",
+        descripcion: "Venta: " + nombre,
+        monto: precio
+    });
+
+    document.getElementById("escaner-cantidad").textContent = resStock.cantidad;
+    estado.textContent = "✅ Venta registrada y stock descontado.";
+    estado.style.color = "#5fd98a";
+    document.getElementById("ventaPrecio").value = "";
+
+}
+
+async function ajustarDesdeEscaner(id, delta) {
+    const res = await llamar("ajustarStock", { id, delta });
+    if (res && !res.error) {
+        document.getElementById("escaner-cantidad").textContent = res.cantidad;
+    }
+}
+
+function reanudarEscaneo() {
+    document.getElementById("resultadoEscaner").innerHTML = "";
+    escaneando = true;
+    requestAnimationFrame(loopEscaneo);
+}
+
+// ======================================================
+// GRÁFICO DE CAJA (canvas simple, sin librerías)
+// ======================================================
+
+function dibujarGraficoCaja(datos) {
+
+    const canvas = document.getElementById("graficoCaja");
+    if (!canvas || !datos.length) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.clientWidth || 300;
+    const height = 120;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    const max = Math.max(...datos.map(d => Math.abs(d.total)), 1);
+    const barWidth = width / datos.length;
+    const zeroY = height - 22;
+    const maxBarAlto = height - 40;
+
+    datos.forEach((d, i) => {
+
+        const alto = (Math.abs(d.total) / max) * maxBarAlto;
+        const x = i * barWidth + barWidth * 0.22;
+        const w = barWidth * 0.56;
+
+        ctx.fillStyle = d.total >= 0 ? "#2fdb6e" : "#d71920";
+
+        if (d.total >= 0) {
+            ctx.fillRect(x, zeroY - alto, w, Math.max(alto, 2));
+        } else {
+            ctx.fillRect(x, zeroY, w, Math.max(alto, 2));
+        }
+
+        ctx.fillStyle = "#888";
+        ctx.font = "11px Montserrat, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(d.dia, x + w / 2, height - 6);
+
+    });
+
+}
+
+// ======================================================
+// FICHA DE CLIENTE (vehículos + historial)
+// ======================================================
+
+let fichaClienteActual = null;
+
+async function abrirFicha(clienteId, nombreCompleto) {
+
+    fichaClienteActual = clienteId;
+
+    document.getElementById("fichaTitulo").textContent = nombreCompleto;
+    document.getElementById("fichaClienteId").value = clienteId;
+    document.getElementById("vPatente").value = "";
+    document.getElementById("vMarcaModelo").value = "";
+    document.getElementById("vAnio").value = "";
+
+    document.getElementById("modalFicha").classList.add("abierto");
+
+    await cargarVehiculosFicha();
+
+}
+
+async function cargarVehiculosFicha() {
+
+    const clienteId = fichaClienteActual;
+    const el = document.getElementById("fichaVehiculos");
+    el.innerHTML = '<p style="font-size:13px;color:#999;">Cargando...</p>';
+
+    const vehiculos = await llamar("vehiculosDeCliente", { clienteId });
+
+    if (!Array.isArray(vehiculos) || vehiculos.length === 0) {
+        el.innerHTML = '<p style="font-size:13px;color:#999;">Este cliente todavía no tiene vehículos cargados.</p>';
+        return;
+    }
+
+    el.innerHTML = "";
+
+    vehiculos.forEach(v => {
+
+        const div = document.createElement("div");
+        div.className = "ficha-vehiculo";
+        div.innerHTML = `
+            <div class="ficha-vehiculo-cabecera">
+                <div>
+                    <div class="ficha-vehiculo-patente">${escapar(v.patente)}</div>
+                    <div class="ficha-vehiculo-detalle">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</div>
+                </div>
+                <div>
+                    <button class="btn-chico" onclick="abrirEdicionVehiculo(${v.id}, '${escaparComillas(v.patente)}', '${escaparComillas(v.marca || "")}', '${escaparComillas(v.modelo || "")}', '${escaparComillas(v.anio || "")}')">Editar</button>
+                    <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarVehiculo(${v.id})">Borrar</button>
+                </div>
+            </div>
+            <div class="ficha-historial" id="historial-${v.id}">
+                <p style="font-size:12px;color:#777;">Cargando historial...</p>
+            </div>
+            <div class="ficha-historial-form">
+                <input type="text" id="hDesc-${v.id}" placeholder="Cambio de aceite, service, etc.">
+                <input type="number" id="hCosto-${v.id}" placeholder="$">
+                <button class="btn-chico" onclick="agregarHistorialItem(${v.id})">+</button>
+            </div>
+        `;
+        el.appendChild(div);
+
+        cargarHistorialVehiculo(v.id);
+
+    });
+
+}
+
+async function cargarHistorialVehiculo(vehiculoId) {
+
+    const historial = await llamar("historialDeVehiculo", { vehiculoId });
+    const el = document.getElementById("historial-" + vehiculoId);
+    if (!el) return;
+
+    if (!Array.isArray(historial) || historial.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Sin trabajos registrados todavía.</p>';
+        return;
+    }
+
+    el.innerHTML = historial.map(h => {
+
+        const fecha = new Date(h.fecha);
+        const fechaTexto = isNaN(fecha) ? "" : fecha.toLocaleDateString("es-AR");
+        const costo = h.costo ? " · " + formatoPlata(h.costo) : "";
+
+        return `<div class="ficha-historial-item"><span class="ficha-historial-fecha">${fechaTexto}</span>${escapar(h.descripcion)}${costo}</div>`;
+
+    }).join("");
+
+}
+
+async function agregarHistorialItem(vehiculoId) {
+
+    const desc = document.getElementById("hDesc-" + vehiculoId).value.trim();
+    const costo = document.getElementById("hCosto-" + vehiculoId).value.trim();
+
+    if (!desc) return;
+
+    await llamar("agregarHistorial", { vehiculoId, descripcion: desc, costo });
+
+    document.getElementById("hDesc-" + vehiculoId).value = "";
+    document.getElementById("hCosto-" + vehiculoId).value = "";
+
+    cargarHistorialVehiculo(vehiculoId);
+
+}
+
+async function agregarVehiculoAFicha() {
+
+    const clienteId = document.getElementById("fichaClienteId").value;
+    const patente = document.getElementById("vPatente").value.trim();
+    const marcaModelo = document.getElementById("vMarcaModelo").value.trim();
+    const anio = document.getElementById("vAnio").value.trim();
+
+    if (!patente) {
+        alert("Ponele al menos la patente.");
+        return;
+    }
+
+    const partes = marcaModelo.split(" ");
+    const marca = partes[0] || "";
+    const modelo = partes.slice(1).join(" ") || "";
+
+    await llamar("agregarVehiculo", { clienteId, patente, marca, modelo, anio });
+
+    document.getElementById("vPatente").value = "";
+    document.getElementById("vMarcaModelo").value = "";
+    document.getElementById("vAnio").value = "";
+
+    cargarVehiculosFicha();
+    cargarInicio();
+
+}
+
+function abrirEdicionVehiculo(id, patente, marca, modelo, anio) {
+
+    document.getElementById("evId").value = id;
+    document.getElementById("evPatente").value = patente;
+    document.getElementById("evMarca").value = marca;
+    document.getElementById("evModelo").value = modelo;
+    document.getElementById("evAnio").value = anio;
+
+    document.getElementById("mensajeEstadoVehiculo").textContent = "";
+    document.getElementById("modalEditarVehiculo").classList.add("abierto");
+
+}
+
+async function guardarEdicionVehiculo() {
+
+    const id = document.getElementById("evId").value;
+    const patente = document.getElementById("evPatente").value.trim();
+    const marca = document.getElementById("evMarca").value.trim();
+    const modelo = document.getElementById("evModelo").value.trim();
+    const anio = document.getElementById("evAnio").value.trim();
+    const estado = document.getElementById("mensajeEstadoVehiculo");
+
+    if (!patente) {
+        estado.textContent = "La patente es obligatoria.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("editarVehiculo", { id, patente, marca, modelo, anio });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Listo!";
+    estado.style.color = "#5fd98a";
+
+    setTimeout(() => {
+        document.getElementById("modalEditarVehiculo").classList.remove("abierto");
+        cargarVehiculosFicha();
+    }, 500);
+
+}
+
+async function borrarVehiculo(id) {
+
+    const confirmado = confirm("¿Seguro que querés borrar este vehículo y todo su historial? No se puede deshacer.");
+    if (!confirmado) return;
+
+    await llamar("eliminarVehiculo", { id });
+    cargarVehiculosFicha();
+
+}
+
+// ======================================================
+// INICIO AUTOMÁTICO SI YA HABÍA PIN GUARDADO
+// ======================================================
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const pinGuardado = sessionStorage.getItem("km26_pin");
+
+    if (pinGuardado) {
+        document.getElementById("inputPin").value = pinGuardado;
+        entrar();
+    }
+
+});
+
+document.getElementById("inputPin").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") entrar();
+});
+
+</script>
+
+</body>
+</html>
