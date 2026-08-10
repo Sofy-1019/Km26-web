@@ -210,27 +210,38 @@ PORTADA
 .hero-confianza{
     display:flex;
     flex-wrap:wrap;
-    gap:28px 24px;
+    gap:14px;
 }
 
 .confianza-item{
     display:flex;
     align-items:center;
-    gap:10px;
-    font-size:12.5px;
+    gap:12px;
+    font-size:12px;
     font-weight:700;
-    color:#eee;
+    letter-spacing:.3px;
+    color:#e8e8e8;
     line-height:1.35;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:12px 16px;
 }
 
 .confianza-icono{
-    width:24px;
-    height:24px;
-    color:#d71920;
+    width:22px;
+    height:22px;
+    color:#ff4d55;
     flex-shrink:0;
 }
 
 /* ---- Caja de la foto ---- */
+
+.hero-foto-columna{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
 
 .hero-foto-box{
     position:relative;
@@ -267,38 +278,32 @@ PORTADA
 }
 
 .hero-info-pills{
-    position:absolute;
-    right:16px;
-    bottom:16px;
     display:flex;
-    gap:10px;
+    gap:12px;
     flex-wrap:wrap;
-    justify-content:flex-end;
-    max-width:90%;
 }
 
 .pill{
-    background:rgba(8,8,8,.72);
-    backdrop-filter:blur(6px);
-    -webkit-backdrop-filter:blur(6px);
-    color:#fff;
-    font-size:11.5px;
+    flex:1;
+    min-width:180px;
+    background:#171717;
+    color:#f0f0f0;
+    font-size:12.5px;
     font-weight:600;
-    padding:10px 14px;
-    border-radius:10px;
+    padding:14px 18px;
+    border-radius:14px;
     line-height:1.5;
-    border:1px solid rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.08);
     display:flex;
     align-items:center;
-    gap:7px;
-    white-space:nowrap;
+    gap:10px;
 }
 
 .pill svg{
-    width:15px;
-    height:15px;
+    width:18px;
+    height:18px;
     flex-shrink:0;
-    color:#ff6b6b;
+    color:#d71920;
 }
 
 .hero-tagline{
@@ -488,26 +493,44 @@ REPUESTOS
     background:#101010;
 }
 
-.marcas{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+.marcas-carrusel{
+    overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marcas-pista{
+    display:flex;
     gap:25px;
+    width:max-content;
+    animation:desfileMarcas 28s linear infinite;
+}
+
+.marcas-carrusel:hover .marcas-pista{
+    animation-play-state:paused;
+}
+
+@keyframes desfileMarcas{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
 }
 
 .marca{
     background:#1d1d1d;
-    padding:35px;
+    padding:30px 45px;
     border-radius:18px;
-    font-size:28px;
+    font-size:26px;
     font-weight:800;
     text-align:center;
+    white-space:nowrap;
+    flex-shrink:0;
     transition:.3s;
-    cursor:pointer;
+    cursor:default;
 }
 
 .marca:hover{
     background:#d71920;
-    transform:translateY(-8px);
+    transform:translateY(-6px);
 }
 
 /*==================================================
@@ -677,8 +700,13 @@ CTA
 ==================================================*/
 
 .cta{
-    background:linear-gradient(135deg,#d71920,#8f0d12);
+    background:
+        radial-gradient(circle at 30% 20%, rgba(215,25,32,.35), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(215,25,32,.25), transparent 50%),
+        #0c0c0c;
     text-align:center;
+    border-top:1px solid rgba(215,25,32,.25);
+    border-bottom:1px solid rgba(215,25,32,.25);
 }
 
 .cta-contenido{
@@ -687,14 +715,16 @@ CTA
 }
 
 .cta h2{
-    font-size:54px;
+    font-size:48px;
     font-weight:900;
+    font-style:italic;
     line-height:1.2;
-    margin-bottom:25px;
+    margin-bottom:22px;
 }
 
 .cta p{
-    font-size:22px;
+    font-size:19px;
+    color:#bbb;
     line-height:1.8;
     margin-bottom:40px;
 }
@@ -703,8 +733,23 @@ CTA
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:18px;
+    gap:16px;
     flex-wrap:wrap;
+}
+
+.btn-cta-principal,
+.btn-cta-secundario{
+    padding:17px 30px;
+    font-size:14.5px;
+}
+
+.btn-cta-secundario{
+    border-color:rgba(255,255,255,.6);
+}
+
+.cta-botones .btn-social{
+    width:52px;
+    height:52px;
 }
 
 /*==================================================
@@ -872,13 +917,32 @@ CONTACTO
 }
 
 .btn-confirmar-whatsapp{
-    display:inline-block;
-    background:linear-gradient(180deg,#2fdb6e,#1fa851);
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    background:transparent;
+    border:2px solid #2fdb6e;
+    color:#2fdb6e;
+    padding:15px 28px;
+    border-radius:50px;
+    font-weight:800;
+    font-size:14px;
+    letter-spacing:.4px;
+    transition:.3s;
+}
+
+.btn-confirmar-whatsapp svg{
+    width:19px;
+    height:19px;
+    flex-shrink:0;
 }
 
 .btn-confirmar-whatsapp:hover{
-    background:linear-gradient(180deg,#3aff82,#25c25f);
-    box-shadow:0 15px 35px rgba(37,211,102,.40);
+    background:#2fdb6e;
+    color:#0c0c0c;
+    transform:translateY(-3px);
+    box-shadow:0 15px 35px rgba(47,219,110,.35);
 }
 
 @keyframes destacarPulso{
@@ -1245,9 +1309,7 @@ RESPONSIVE
     }
 
     .hero-info-pills{
-        position:static;
-        margin-top:12px;
-        justify-content:flex-start;
+        flex-direction:column;
     }
 
     .btn-hero-principal,
