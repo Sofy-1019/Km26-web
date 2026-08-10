@@ -4,7 +4,7 @@
 // ================================================
 
 // Cambiá este PIN por el que quieras usar para entrar al panel
-const PIN = "2606";
+const PIN = "190";
 
 function doGet(e) {
 
