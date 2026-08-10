@@ -365,7 +365,7 @@ function ubicarSobreLaFoto() {
     // En celular, directo al centro, sin ningún cálculo — a prueba de errores.
     if (window.innerWidth <= 600) {
         logo.style.left = "50%";
-        logo.style.top = "8%";
+        logo.style.top = "90px";
         return;
     }
 
