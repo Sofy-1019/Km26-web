@@ -171,8 +171,8 @@ PORTADA
 }
 
 .hero-logo img{
-    width:250px;
-    max-width:70vw;
+    width:300px;
+    max-width:60vw;
     height:auto;
     display:block;
     filter:drop-shadow(0 10px 35px rgba(0,0,0,.55));
@@ -1060,7 +1060,7 @@ RESPONSIVE
     }
 
     .hero-logo img{
-        width:320px;
+        width:220px;
     }
 
     .calendario-embed{
@@ -1103,7 +1103,7 @@ RESPONSIVE
 @media (max-width:480px){
 
     .hero-logo img{
-        width:260px;
+        width:160px;
     }
 
     .btn-principal{
