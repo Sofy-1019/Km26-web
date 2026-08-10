@@ -1154,14 +1154,17 @@ function abrirModalCliente() {
 }
 
 function cerrarModales() {
-    document.getElementById("modalCliente").classList.remove("abierto");
-    document.getElementById("modalCaja").classList.remove("abierto");
-    document.getElementById("modalEditarCliente").classList.remove("abierto");
-    document.getElementById("modalFicha").classList.remove("abierto");
-    document.getElementById("modalEditarVehiculo").classList.remove("abierto");
-    document.getElementById("modalEditarProducto").classList.remove("abierto");
-    document.getElementById("modalEtiqueta").classList.remove("abierto");
-    document.getElementById("modalProducto").classList.remove("abierto");
+
+    const ids = [
+        "modalCliente", "modalCaja", "modalEditarCliente", "modalFicha",
+        "modalEditarVehiculo", "modalEditarProducto", "modalEtiqueta", "modalProducto"
+    ];
+
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("abierto");
+    });
+
 }
 
 function abrirEdicion(id, nombre, apellido, telefono, email) {
@@ -1475,8 +1478,9 @@ async function guardarProducto() {
     document.getElementById("pStockMinimo").value = "";
 
     setTimeout(() => {
-        cerrarModales();
+        document.getElementById("modalProducto").classList.remove("abierto");
         cargarStock();
+        cargarInicio();
     }, 700);
 
 }
