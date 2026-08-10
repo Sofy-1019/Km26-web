@@ -234,7 +234,8 @@ function listarStock() {
   const data = getSheet("Stock").getDataRange().getValues().slice(1);
   return data.map(r => ({
     id: r[0], nombre: r[1], cantidad: Number(r[2]) || 0,
-    stockMinimo: r[4] !== "" && r[4] !== undefined ? Number(r[4]) : 3
+    stockMinimo: r[4] !== "" && r[4] !== undefined ? Number(r[4]) : 3,
+    precio: r[5] !== "" && r[5] !== undefined ? Number(r[5]) : 0
   }));
 }
 
@@ -243,7 +244,8 @@ function agregarProducto(p) {
   const id = nextId(sheet);
   sheet.appendRow([
     id, p.nombre, parseInt(p.cantidad, 10) || 0, new Date(),
-    p.stockMinimo !== undefined && p.stockMinimo !== "" ? parseInt(p.stockMinimo, 10) : 3
+    p.stockMinimo !== undefined && p.stockMinimo !== "" ? parseInt(p.stockMinimo, 10) : 3,
+    p.precio !== undefined && p.precio !== "" ? parseFloat(p.precio) : 0
   ]);
   return { id: id };
 }
@@ -271,7 +273,10 @@ function obtenerProducto(id) {
 
   if (!fila) return { error: "Producto no encontrado" };
 
-  return { id: fila[0], nombre: fila[1], cantidad: Number(fila[2]) || 0 };
+  return {
+    id: fila[0], nombre: fila[1], cantidad: Number(fila[2]) || 0,
+    precio: fila[5] !== "" && fila[5] !== undefined ? Number(fila[5]) : 0
+  };
 }
 
 function editarProducto(p) {
@@ -285,6 +290,9 @@ function editarProducto(p) {
       sheet.getRange(i + 1, 3).setValue(parseInt(p.cantidad, 10) || 0);
       if (p.stockMinimo !== undefined && p.stockMinimo !== "") {
         sheet.getRange(i + 1, 5).setValue(parseInt(p.stockMinimo, 10));
+      }
+      if (p.precio !== undefined && p.precio !== "") {
+        sheet.getRange(i + 1, 6).setValue(parseFloat(p.precio));
       }
       return { id: id };
     }
