@@ -419,6 +419,82 @@ td.mono{
     color:#999;
 }
 
+.ficha-vehiculo{
+    background:#1e1e1e;
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.ficha-vehiculo-cabecera{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.ficha-vehiculo-patente{
+    font-weight:700;
+    font-size:14px;
+}
+
+.ficha-vehiculo-detalle{
+    font-size:12px;
+    color:#999;
+}
+
+.ficha-historial{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #2a2a2a;
+}
+
+.ficha-historial-item{
+    font-size:12px;
+    color:#ccc;
+    padding:6px 0;
+    border-bottom:1px dashed #262626;
+}
+
+.ficha-historial-fecha{
+    color:#777;
+    margin-right:6px;
+}
+
+.ficha-historial-form{
+    display:flex;
+    gap:6px;
+    margin-top:10px;
+}
+
+.ficha-historial-form input{
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#141414;
+    color:#fff;
+    font-size:12px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.ficha-historial-form input:first-child{
+    flex:1;
+}
+
+.ficha-historial-form input:nth-child(2){
+    width:90px;
+}
+
+.stock-bajo{
+    border:1px solid #7a3a12 !important;
+    background:#2a1b0d !important;
+}
+
+.stock-bajo .fila-stock-cantidad{
+    color:#ffb35f;
+}
+
 .fila-stock-botones{
     display:flex;
     align-items:center;
@@ -572,6 +648,9 @@ td.mono{
             <div class="stat-card"><div class="stat-label">Este mes</div><div class="stat-valor" id="cajaMes">-</div></div>
         </div>
 
+        <div class="fila-titulo"><h2>Últimos 7 días</h2></div>
+        <canvas id="graficoCaja" height="120" style="width:100%;margin-bottom:24px;"></canvas>
+
         <div class="fila-titulo">
             <h2>Movimientos recientes</h2>
             <button class="btn-chico" onclick="abrirModalCaja()">+ Registrar movimiento</button>
@@ -659,6 +738,61 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: ficha de cliente (vehículos + historial) ---------- -->
+<div class="overlay" id="modalFicha">
+    <div class="modal" style="max-width:560px;">
+        <h3 id="fichaTitulo">Cliente</h3>
+
+        <div id="fichaVehiculos"></div>
+
+        <div style="margin-top:18px;padding-top:18px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar vehículo a este cliente</p>
+            <input type="hidden" id="fichaClienteId">
+            <label>Patente</label>
+            <input type="text" id="vPatente" placeholder="AB123CD">
+            <label>Marca y modelo</label>
+            <input type="text" id="vMarcaModelo" placeholder="VW Gol">
+            <label>Año</label>
+            <input type="text" id="vAnio" placeholder="2020">
+            <div class="modal-botones">
+                <button class="btn-chico" style="flex:1;" onclick="agregarVehiculoAFicha()">+ Agregar vehículo</button>
+            </div>
+        </div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: editar vehículo ---------- -->
+<div class="overlay" id="modalEditarVehiculo">
+    <div class="modal">
+        <h3>Editar vehículo</h3>
+
+        <input type="hidden" id="evId">
+
+        <label>Patente</label>
+        <input type="text" id="evPatente">
+
+        <label>Marca</label>
+        <input type="text" id="evMarca">
+
+        <label>Modelo</label>
+        <input type="text" id="evModelo">
+
+        <label>Año</label>
+        <input type="text" id="evAnio">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="document.getElementById('modalEditarVehiculo').classList.remove('abierto')">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicionVehiculo()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoVehiculo"></p>
+    </div>
+</div>
+
 <!-- ---------- Modal: nuevo movimiento de caja ---------- -->
 <div class="overlay" id="modalCaja">
     <div class="modal">
@@ -694,6 +828,9 @@ td.mono{
 
         <label>Cantidad inicial</label>
         <input type="number" id="pCantidad" placeholder="10">
+
+        <label>Avisar cuando queden menos de</label>
+        <input type="number" id="pStockMinimo" placeholder="3">
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
@@ -884,6 +1021,7 @@ function renderTablaClientes(lista, contenedorId, conAcciones) {
 
         if (conAcciones) {
             html += `<td style="white-space:nowrap;">
+                <button class="btn-chico" onclick="abrirFicha(${c.id}, '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')">Ver</button>
                 <button class="btn-chico" onclick="abrirEdicion(${c.id}, '${escaparComillas(c.nombre)}', '${escaparComillas(c.apellido)}', '${escaparComillas(c.telefono || "")}', '${escaparComillas(c.email || "")}')">Editar</button>
                 <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarCliente(${c.id}, '${escaparComillas(c.nombre + " " + c.apellido)}')">Borrar</button>
             </td>`;
@@ -994,6 +1132,8 @@ function cerrarModales() {
     document.getElementById("modalCliente").classList.remove("abierto");
     document.getElementById("modalCaja").classList.remove("abierto");
     document.getElementById("modalEditarCliente").classList.remove("abierto");
+    document.getElementById("modalFicha").classList.remove("abierto");
+    document.getElementById("modalEditarVehiculo").classList.remove("abierto");
 }
 
 function abrirEdicion(id, nombre, apellido, telefono, email) {
@@ -1117,11 +1257,16 @@ async function cargarCaja() {
 
     const resumen = await llamar("resumenCaja", {});
     const movimientos = await llamar("movimientosCaja", {});
+    const semanal = await llamar("cajaSemanal", {});
 
     if (resumen && !resumen.error) {
         document.getElementById("cajaHoy").textContent = formatoPlata(resumen.hoy);
         document.getElementById("cajaSemana").textContent = formatoPlata(resumen.semana);
         document.getElementById("cajaMes").textContent = formatoPlata(resumen.mes);
+    }
+
+    if (Array.isArray(semanal)) {
+        dibujarGraficoCaja(semanal);
     }
 
     const el = document.getElementById("tablaCaja");
@@ -1226,12 +1371,14 @@ async function cargarStock() {
 
     productos.forEach(p => {
 
+        const bajo = p.cantidad <= p.stockMinimo;
+
         const fila = document.createElement("div");
-        fila.className = "fila-stock";
+        fila.className = "fila-stock" + (bajo ? " stock-bajo" : "");
         fila.innerHTML = `
             <div>
-                <div class="fila-stock-nombre">${escapar(p.nombre)}</div>
-                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades</div>
+                <div class="fila-stock-nombre">${escapar(p.nombre)} ${bajo ? "⚠️" : ""}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades ${bajo ? "· stock bajo" : ""}</div>
             </div>
             <div class="fila-stock-botones">
                 <button class="btn-redondo" onclick="ajustarCantidad(${p.id}, -1)">-</button>
@@ -1270,6 +1417,7 @@ async function guardarProducto() {
 
     const nombre = document.getElementById("pNombre").value.trim();
     const cantidad = document.getElementById("pCantidad").value.trim() || "0";
+    const stockMinimo = document.getElementById("pStockMinimo").value.trim() || "3";
     const estado = document.getElementById("mensajeEstadoProducto");
 
     if (!nombre) {
@@ -1281,7 +1429,7 @@ async function guardarProducto() {
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
 
-    const res = await llamar("agregarProducto", { nombre, cantidad });
+    const res = await llamar("agregarProducto", { nombre, cantidad, stockMinimo });
 
     if (res && res.error) {
         estado.textContent = "Error: " + res.error;
@@ -1294,6 +1442,7 @@ async function guardarProducto() {
 
     document.getElementById("pNombre").value = "";
     document.getElementById("pCantidad").value = "";
+    document.getElementById("pStockMinimo").value = "";
 
     setTimeout(() => {
         cerrarModales();
@@ -1429,6 +1578,247 @@ function reanudarEscaneo() {
     document.getElementById("resultadoEscaner").innerHTML = "";
     escaneando = true;
     requestAnimationFrame(loopEscaneo);
+}
+
+// ======================================================
+// GRÁFICO DE CAJA (canvas simple, sin librerías)
+// ======================================================
+
+function dibujarGraficoCaja(datos) {
+
+    const canvas = document.getElementById("graficoCaja");
+    if (!canvas || !datos.length) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.clientWidth || 300;
+    const height = 120;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    const max = Math.max(...datos.map(d => Math.abs(d.total)), 1);
+    const barWidth = width / datos.length;
+    const zeroY = height - 22;
+    const maxBarAlto = height - 40;
+
+    datos.forEach((d, i) => {
+
+        const alto = (Math.abs(d.total) / max) * maxBarAlto;
+        const x = i * barWidth + barWidth * 0.22;
+        const w = barWidth * 0.56;
+
+        ctx.fillStyle = d.total >= 0 ? "#2fdb6e" : "#d71920";
+
+        if (d.total >= 0) {
+            ctx.fillRect(x, zeroY - alto, w, Math.max(alto, 2));
+        } else {
+            ctx.fillRect(x, zeroY, w, Math.max(alto, 2));
+        }
+
+        ctx.fillStyle = "#888";
+        ctx.font = "11px Montserrat, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(d.dia, x + w / 2, height - 6);
+
+    });
+
+}
+
+// ======================================================
+// FICHA DE CLIENTE (vehículos + historial)
+// ======================================================
+
+let fichaClienteActual = null;
+
+async function abrirFicha(clienteId, nombreCompleto) {
+
+    fichaClienteActual = clienteId;
+
+    document.getElementById("fichaTitulo").textContent = nombreCompleto;
+    document.getElementById("fichaClienteId").value = clienteId;
+    document.getElementById("vPatente").value = "";
+    document.getElementById("vMarcaModelo").value = "";
+    document.getElementById("vAnio").value = "";
+
+    document.getElementById("modalFicha").classList.add("abierto");
+
+    await cargarVehiculosFicha();
+
+}
+
+async function cargarVehiculosFicha() {
+
+    const clienteId = fichaClienteActual;
+    const el = document.getElementById("fichaVehiculos");
+    el.innerHTML = '<p style="font-size:13px;color:#999;">Cargando...</p>';
+
+    const vehiculos = await llamar("vehiculosDeCliente", { clienteId });
+
+    if (!Array.isArray(vehiculos) || vehiculos.length === 0) {
+        el.innerHTML = '<p style="font-size:13px;color:#999;">Este cliente todavía no tiene vehículos cargados.</p>';
+        return;
+    }
+
+    el.innerHTML = "";
+
+    vehiculos.forEach(v => {
+
+        const div = document.createElement("div");
+        div.className = "ficha-vehiculo";
+        div.innerHTML = `
+            <div class="ficha-vehiculo-cabecera">
+                <div>
+                    <div class="ficha-vehiculo-patente">${escapar(v.patente)}</div>
+                    <div class="ficha-vehiculo-detalle">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</div>
+                </div>
+                <div>
+                    <button class="btn-chico" onclick="abrirEdicionVehiculo(${v.id}, '${escaparComillas(v.patente)}', '${escaparComillas(v.marca || "")}', '${escaparComillas(v.modelo || "")}', '${escaparComillas(v.anio || "")}')">Editar</button>
+                    <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarVehiculo(${v.id})">Borrar</button>
+                </div>
+            </div>
+            <div class="ficha-historial" id="historial-${v.id}">
+                <p style="font-size:12px;color:#777;">Cargando historial...</p>
+            </div>
+            <div class="ficha-historial-form">
+                <input type="text" id="hDesc-${v.id}" placeholder="Cambio de aceite, service, etc.">
+                <input type="number" id="hCosto-${v.id}" placeholder="$">
+                <button class="btn-chico" onclick="agregarHistorialItem(${v.id})">+</button>
+            </div>
+        `;
+        el.appendChild(div);
+
+        cargarHistorialVehiculo(v.id);
+
+    });
+
+}
+
+async function cargarHistorialVehiculo(vehiculoId) {
+
+    const historial = await llamar("historialDeVehiculo", { vehiculoId });
+    const el = document.getElementById("historial-" + vehiculoId);
+    if (!el) return;
+
+    if (!Array.isArray(historial) || historial.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Sin trabajos registrados todavía.</p>';
+        return;
+    }
+
+    el.innerHTML = historial.map(h => {
+
+        const fecha = new Date(h.fecha);
+        const fechaTexto = isNaN(fecha) ? "" : fecha.toLocaleDateString("es-AR");
+        const costo = h.costo ? " · " + formatoPlata(h.costo) : "";
+
+        return `<div class="ficha-historial-item"><span class="ficha-historial-fecha">${fechaTexto}</span>${escapar(h.descripcion)}${costo}</div>`;
+
+    }).join("");
+
+}
+
+async function agregarHistorialItem(vehiculoId) {
+
+    const desc = document.getElementById("hDesc-" + vehiculoId).value.trim();
+    const costo = document.getElementById("hCosto-" + vehiculoId).value.trim();
+
+    if (!desc) return;
+
+    await llamar("agregarHistorial", { vehiculoId, descripcion: desc, costo });
+
+    document.getElementById("hDesc-" + vehiculoId).value = "";
+    document.getElementById("hCosto-" + vehiculoId).value = "";
+
+    cargarHistorialVehiculo(vehiculoId);
+
+}
+
+async function agregarVehiculoAFicha() {
+
+    const clienteId = document.getElementById("fichaClienteId").value;
+    const patente = document.getElementById("vPatente").value.trim();
+    const marcaModelo = document.getElementById("vMarcaModelo").value.trim();
+    const anio = document.getElementById("vAnio").value.trim();
+
+    if (!patente) {
+        alert("Ponele al menos la patente.");
+        return;
+    }
+
+    const partes = marcaModelo.split(" ");
+    const marca = partes[0] || "";
+    const modelo = partes.slice(1).join(" ") || "";
+
+    await llamar("agregarVehiculo", { clienteId, patente, marca, modelo, anio });
+
+    document.getElementById("vPatente").value = "";
+    document.getElementById("vMarcaModelo").value = "";
+    document.getElementById("vAnio").value = "";
+
+    cargarVehiculosFicha();
+    cargarInicio();
+
+}
+
+function abrirEdicionVehiculo(id, patente, marca, modelo, anio) {
+
+    document.getElementById("evId").value = id;
+    document.getElementById("evPatente").value = patente;
+    document.getElementById("evMarca").value = marca;
+    document.getElementById("evModelo").value = modelo;
+    document.getElementById("evAnio").value = anio;
+
+    document.getElementById("mensajeEstadoVehiculo").textContent = "";
+    document.getElementById("modalEditarVehiculo").classList.add("abierto");
+
+}
+
+async function guardarEdicionVehiculo() {
+
+    const id = document.getElementById("evId").value;
+    const patente = document.getElementById("evPatente").value.trim();
+    const marca = document.getElementById("evMarca").value.trim();
+    const modelo = document.getElementById("evModelo").value.trim();
+    const anio = document.getElementById("evAnio").value.trim();
+    const estado = document.getElementById("mensajeEstadoVehiculo");
+
+    if (!patente) {
+        estado.textContent = "La patente es obligatoria.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("editarVehiculo", { id, patente, marca, modelo, anio });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Listo!";
+    estado.style.color = "#5fd98a";
+
+    setTimeout(() => {
+        document.getElementById("modalEditarVehiculo").classList.remove("abierto");
+        cargarVehiculosFicha();
+    }, 500);
+
+}
+
+async function borrarVehiculo(id) {
+
+    const confirmado = confirm("¿Seguro que querés borrar este vehículo y todo su historial? No se puede deshacer.");
+    if (!confirmado) return;
+
+    await llamar("eliminarVehiculo", { id });
+    cargarVehiculosFicha();
+
 }
 
 // ======================================================

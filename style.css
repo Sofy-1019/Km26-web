@@ -605,6 +605,69 @@ CTA
 CONTACTO
 ==================================================*/
 
+.faq{
+    background:#151515;
+}
+
+.faq-lista{
+    max-width:800px;
+    margin:0 auto;
+}
+
+.faq-item{
+    border-bottom:1px solid #262626;
+}
+
+.faq-pregunta{
+    width:100%;
+    background:none;
+    border:none;
+    color:#fff;
+    text-align:left;
+    padding:22px 4px;
+    font-size:17px;
+    font-weight:600;
+    font-family:'Montserrat',sans-serif;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+}
+
+.faq-pregunta:hover{
+    color:#ff6b6b;
+}
+
+.faq-pregunta span{
+    font-size:24px;
+    font-weight:400;
+    color:#d71920;
+    transition:.3s;
+    flex-shrink:0;
+}
+
+.faq-item.abierto .faq-pregunta span{
+    transform:rotate(45deg);
+}
+
+.faq-respuesta{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+}
+
+.faq-item.abierto .faq-respuesta{
+    max-height:200px;
+}
+
+.faq-respuesta p{
+    padding:0 4px 22px;
+    color:#bbb;
+    line-height:1.7;
+    font-size:15px;
+}
+
 .contacto{
     background:#111;
 }
@@ -799,34 +862,40 @@ footer{
 }
 
 /*==================================================
-WHATSAPP FLOTANTE (opcional, no usado actualmente)
+WHATSAPP FLOTANTE
 ==================================================*/
 
 .whatsapp-float{
     position:fixed;
-    right:25px;
-    bottom:25px;
-    width:68px;
-    height:68px;
-    border-radius:50%;
-    background:#25D366;
+    right:22px;
+    bottom:22px;
+    width:64px;
+    height:64px;
     display:flex;
     justify-content:center;
     align-items:center;
-    box-shadow:0 15px 35px rgba(0,0,0,.35);
-    z-index:9999;
+    z-index:9998;
     transition:.30s;
+    opacity:0;
+    transform:translateY(20px) scale(.8);
+    pointer-events:none;
+}
+
+.whatsapp-float.visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    pointer-events:auto;
 }
 
 .whatsapp-float:hover{
-    transform:scale(1.12);
-    box-shadow:0 20px 45px rgba(37,211,102,.45);
+    transform:scale(1.1);
 }
 
-.whatsapp-float svg{
-    width:36px;
-    height:36px;
-    fill:#fff;
+.whatsapp-float img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    filter:drop-shadow(0 8px 18px rgba(0,0,0,.45));
 }
 
 /*==================================================
@@ -1019,15 +1088,10 @@ RESPONSIVE
     }
 
     .whatsapp-float{
-        width:58px;
-        height:58px;
-        right:18px;
-        bottom:18px;
-    }
-
-    .whatsapp-float svg{
-        width:30px;
-        height:30px;
+        width:54px;
+        height:54px;
+        right:16px;
+        bottom:16px;
     }
 
 }

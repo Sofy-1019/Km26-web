@@ -23,6 +23,7 @@ function doGet(e) {
     if (action === "editarCliente") return respond(editarCliente(e.parameter));
     if (action === "eliminarCliente") return respond(eliminarCliente(e.parameter.id));
     if (action === "vehiculosDeCliente") return respond(vehiculosDeCliente(e.parameter.clienteId));
+    if (action === "agregarVehiculo") return respond(agregarVehiculoPublico(e.parameter));
     if (action === "agregarMovimiento") return respond(agregarMovimiento(e.parameter));
     if (action === "movimientosCaja") return respond(movimientosCaja());
     if (action === "resumenCaja") return respond(resumenCaja());
@@ -30,6 +31,11 @@ function doGet(e) {
     if (action === "agregarProducto") return respond(agregarProducto(e.parameter));
     if (action === "ajustarStock") return respond(ajustarStock(e.parameter));
     if (action === "obtenerProducto") return respond(obtenerProducto(e.parameter.id));
+    if (action === "editarVehiculo") return respond(editarVehiculo(e.parameter));
+    if (action === "eliminarVehiculo") return respond(eliminarVehiculo(e.parameter.id));
+    if (action === "agregarHistorial") return respond(agregarHistorial(e.parameter));
+    if (action === "historialDeVehiculo") return respond(historialDeVehiculo(e.parameter.vehiculoId));
+    if (action === "cajaSemanal") return respond(cajaSemanal());
 
     return respond({ error: "Acción no reconocida: " + action });
 
@@ -131,6 +137,11 @@ function vehiculosDeCliente(clienteId) {
     .map(v => ({ id: v[0], patente: v[2], marca: v[3], modelo: v[4], anio: v[5] }));
 }
 
+function agregarVehiculoPublico(p) {
+  const id = agregarVehiculoInterno(p.clienteId, p.patente, p.marca, p.modelo, p.anio);
+  return { id: id };
+}
+
 function editarCliente(p) {
   const sheet = getSheet("Clientes");
   const data = sheet.getDataRange().getValues();
@@ -219,13 +230,19 @@ function resumenCaja() {
 
 function listarStock() {
   const data = getSheet("Stock").getDataRange().getValues().slice(1);
-  return data.map(r => ({ id: r[0], nombre: r[1], cantidad: Number(r[2]) || 0 }));
+  return data.map(r => ({
+    id: r[0], nombre: r[1], cantidad: Number(r[2]) || 0,
+    stockMinimo: r[4] !== "" && r[4] !== undefined ? Number(r[4]) : 3
+  }));
 }
 
 function agregarProducto(p) {
   const sheet = getSheet("Stock");
   const id = nextId(sheet);
-  sheet.appendRow([id, p.nombre, parseInt(p.cantidad, 10) || 0, new Date()]);
+  sheet.appendRow([
+    id, p.nombre, parseInt(p.cantidad, 10) || 0, new Date(),
+    p.stockMinimo !== undefined && p.stockMinimo !== "" ? parseInt(p.stockMinimo, 10) : 3
+  ]);
   return { id: id };
 }
 
@@ -253,5 +270,98 @@ function obtenerProducto(id) {
   if (!fila) return { error: "Producto no encontrado" };
 
   return { id: fila[0], nombre: fila[1], cantidad: Number(fila[2]) || 0 };
+}
+
+// ---------- Vehículos (editar / borrar individual) ----------
+
+function editarVehiculo(p) {
+  const sheet = getSheet("Vehiculos");
+  const data = sheet.getDataRange().getValues();
+  const id = Number(p.id);
+
+  for (let i = 1; i < data.length; i++) {
+    if (Number(data[i][0]) === id) {
+      sheet.getRange(i + 1, 3, 1, 4).setValues([[
+        String(p.patente).toUpperCase(), p.marca || "", p.modelo || "", p.anio || ""
+      ]]);
+      return { id: id };
+    }
+  }
+
+  return { error: "Vehículo no encontrado" };
+}
+
+function eliminarVehiculo(id) {
+  id = Number(id);
+  const sheet = getSheet("Vehiculos");
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (Number(data[i][0]) === id) {
+      sheet.deleteRow(i + 1);
+      break;
+    }
+  }
+
+  // Borra también el historial de ese vehículo
+  const sheetHist = getSheet("Historial");
+  const dataHist = sheetHist.getDataRange().getValues();
+
+  for (let i = dataHist.length - 1; i >= 1; i--) {
+    if (Number(dataHist[i][1]) === id) {
+      sheetHist.deleteRow(i + 1);
+    }
+  }
+
+  return { ok: true };
+}
+
+// ---------- Historial del vehículo ----------
+
+function agregarHistorial(p) {
+  const sheet = getSheet("Historial");
+  const id = nextId(sheet);
+  sheet.appendRow([id, p.vehiculoId, new Date(), p.descripcion, p.costo || ""]);
+  return { id: id };
+}
+
+function historialDeVehiculo(vehiculoId) {
+  const data = getSheet("Historial").getDataRange().getValues().slice(1);
+  return data
+    .filter(h => h[1] == vehiculoId)
+    .map(h => ({ id: h[0], fecha: h[2], descripcion: h[3], costo: h[4] }))
+    .reverse();
+}
+
+// ---------- Caja semanal (para el gráfico) ----------
+
+function cajaSemanal() {
+  const data = getSheet("Caja").getDataRange().getValues().slice(1);
+  const dias = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    dias.push({ fecha: d, total: 0 });
+  }
+
+  data.forEach(r => {
+    const fecha = new Date(r[1]);
+    fecha.setHours(0, 0, 0, 0);
+    const signo = r[2] === "Ingreso" ? 1 : -1;
+    const monto = signo * parseFloat(r[4] || 0);
+
+    dias.forEach(dia => {
+      if (fecha.getTime() === dia.fecha.getTime()) {
+        dia.total += monto;
+      }
+    });
+  });
+
+  return dias.map(d => ({
+    dia: d.fecha.toLocaleDateString("es-AR", { weekday: "short" }),
+    total: d.total
+  }));
 }
 

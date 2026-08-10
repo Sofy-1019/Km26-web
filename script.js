@@ -143,12 +143,17 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 // ========================================
 
 const header = document.querySelector("header");
+const whatsappFlotante = document.getElementById("whatsappFlotante");
 
 window.addEventListener("scroll", () => {
 
     if (!header) return;
 
     header.classList.toggle("header-scroll", window.scrollY > 80);
+
+    if (whatsappFlotante) {
+        whatsappFlotante.classList.toggle("visible", window.scrollY > 500);
+    }
 
 });
 
@@ -319,5 +324,26 @@ portada.src = "images/portada.jpg";
 // ========================================
 // FIN
 // ========================================
+
+// ========================================
+// PREGUNTAS FRECUENTES (acordeón)
+// ========================================
+
+document.querySelectorAll(".faq-pregunta").forEach(boton => {
+
+    boton.addEventListener("click", () => {
+
+        const item = boton.closest(".faq-item");
+        const yaAbierto = item.classList.contains("abierto");
+
+        document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("abierto"));
+
+        if (!yaAbierto) {
+            item.classList.add("abierto");
+        }
+
+    });
+
+});
 
 console.log("KM26 Performance - Sitio cargado correctamente.");
