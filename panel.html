@@ -1564,6 +1564,13 @@ async function borrarProducto(id, nombre) {
 async function abrirEscaner() {
 
     document.getElementById("modalEscaner").classList.add("abierto");
+
+    if (typeof jsQR !== "function") {
+        document.getElementById("resultadoEscaner").innerHTML =
+            '<p style="color:#ff6b6b;font-size:13px;">⚠️ La librería lectora de QR no cargó (revisá tu conexión a internet, la necesita para descargarse la primera vez). Cerrá y probá de nuevo.</p>';
+        return;
+    }
+
     document.getElementById("resultadoEscaner").innerHTML = "";
 
     try {
@@ -1615,11 +1622,20 @@ function loopEscaneo() {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         const imagen = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const codigo = jsQR(imagen.data, imagen.width, imagen.height);
+        const codigo = jsQR(imagen.data, imagen.width, imagen.height, {
+            inversionAttempts: "attemptBoth"
+        });
 
-        if (codigo && codigo.data && codigo.data.startsWith("KM26-STOCK-")) {
-            procesarCodigoEscaneado(codigo.data);
-            return;
+        if (codigo && codigo.data) {
+
+            if (codigo.data.startsWith("KM26-STOCK-")) {
+                procesarCodigoEscaneado(codigo.data);
+                return;
+            } else {
+                document.getElementById("resultadoEscaner").innerHTML =
+                    `<p style="color:#ffb35f;font-size:12px;">Detecté un código, pero no es de un producto: "${codigo.data}"</p>`;
+            }
+
         }
 
     }
