@@ -174,10 +174,7 @@ const revealObserver = new IntersectionObserver((entries) => {
 
         if (entry.isIntersecting) {
 
-            entry.target.style.transition = ".7s ease";
-            entry.target.style.opacity = "1";
-            entry.target.style.transform = "translateY(0)";
-
+            entry.target.classList.add("visible");
             revealObserver.unobserve(entry.target);
 
         }
