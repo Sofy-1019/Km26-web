@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=6">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
@@ -47,78 +47,85 @@
 
 <section id="inicio" class="hero">
 
-    <img src="images/portada.jpg" class="hero-image" alt="Taller KM26 Performance" width="1536" height="1024">
+    <div class="hero-grid">
 
-    <div class="hero-overlay"></div>
+        <div class="hero-texto">
 
-    <div class="hero-logo">
-        <img src="images/logo.png" alt="KM26 Performance" width="420" height="280">
+            <h1 class="hero-titulo">
+                <span>DIAGNÓSTICO</span>
+                <span class="rojo">COMPUTARIZADO</span>
+                <span>REPUESTOS</span>
+            </h1>
+
+            <div class="hero-divisor"></div>
+
+            <p class="hero-subtitulo">
+                Tecnología, precisión y confianza para que tu auto rinda al máximo.
+            </p>
+
+            <div class="hero-botones">
+
+                <a href="#contacto" class="btn-hero-principal" id="btnTurno">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    SOLICITAR TURNO
+                </a>
+
+                <a href="https://wa.me/5491138789327?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo."
+                   target="_blank"
+                   rel="noopener"
+                   class="btn-hero-secundario">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2h-5l-4 4v-4H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    WHATSAPP
+                </a>
+
+                <a href="tel:+5491138789327"
+                   class="btn-social btn-call-top"
+                   aria-label="Llamar a KM26 Performance">
+                    <img src="images/call-icon.png" alt="" class="social-icon">
+                </a>
+
+                <a href="https://www.instagram.com/km26performance/"
+                   target="_blank"
+                   rel="noopener"
+                   class="btn-social btn-instagram-top"
+                   aria-label="Seguinos en Instagram">
+                    <img src="images/instagram-icon.png" alt="" class="social-icon">
+                </a>
+
+            </div>
+
+            <div class="hero-confianza">
+                <div class="confianza-item"><svg class="confianza-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M9 13.5L7 22l5-3 5 3-2-8.5"/></svg><span>Presupuesto<br>claro</span></div>
+                <div class="confianza-item"><svg class="confianza-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg><span>Primeras<br>marcas</span></div>
+                <div class="confianza-item"><svg class="confianza-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Turno<br>online</span></div>
+                <div class="confianza-item"><svg class="confianza-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Fácil de<br>llegar</span></div>
+            </div>
+
+        </div>
+
+        <div class="hero-foto-box">
+
+            <img src="images/portada.jpg" class="hero-foto" alt="Taller KM26 Performance" width="1536" height="1024">
+            <div class="hero-foto-overlay"></div>
+
+            <img src="images/logo.png" class="hero-foto-logo" alt="KM26 Performance">
+
+            <div class="hero-info-pills">
+                <div class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg> Berazategui, Buenos Aires</div>
+                <div class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> Lunes a Viernes<br>8:00 a 18:00 hs</div>
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="hero-buttons hero-buttons-bottom">
-
-        <a href="#contacto" class="btn-principal" id="btnTurno">
-            SOLICITAR TURNO
-        </a>
-
-        <a href="https://wa.me/5491138789327?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo."
-           target="_blank"
-           rel="noopener"
-           class="btn-social btn-whatsapp-top"
-           aria-label="Escribinos por WhatsApp">
-            <img src="images/whatsapp-icon.png" alt="" class="social-icon">
-        </a>
-
-        <a href="tel:+5491138789327"
-           class="btn-social btn-call-top"
-           aria-label="Llamar a KM26 Performance">
-            <img src="images/call-icon.png" alt="" class="social-icon">
-        </a>
-
-        <a href="https://www.instagram.com/km26performance/"
-           target="_blank"
-           rel="noopener"
-           class="btn-social btn-instagram-top"
-           aria-label="Seguinos en Instagram">
-            <img src="images/instagram-icon.png" alt="" class="social-icon">
-        </a>
-
+    <div class="hero-tagline">
+        <span class="linea"></span>
+        <p>TU VEHÍCULO MERECE UN SERVICIO DE EXCELENCIA</p>
+        <span class="linea"></span>
     </div>
 
 </section>
-
-<!-- Franja de botones exclusiva para mobile/tablet: en pantallas chicas no hay
-     lugar para superponer los botones a la foto sin taparla, así que van
-     debajo, en su propio bloque. En escritorio esto queda oculto. -->
-<div class="hero-buttons-mobile">
-
-    <a href="#contacto" class="btn-principal" id="btnTurnoMobile">
-        SOLICITAR TURNO
-    </a>
-
-    <a href="https://wa.me/5491138789327?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo."
-       target="_blank"
-       rel="noopener"
-       class="btn-social btn-whatsapp-top"
-       aria-label="Escribinos por WhatsApp">
-        <img src="images/whatsapp-icon.png" alt="" class="social-icon">
-    </a>
-
-    <a href="tel:+5491138789327"
-       class="btn-social btn-call-top"
-       aria-label="Llamar a KM26 Performance">
-        <img src="images/call-icon.png" alt="" class="social-icon">
-    </a>
-
-    <a href="https://www.instagram.com/km26performance/"
-       target="_blank"
-       rel="noopener"
-       class="btn-social btn-instagram-top"
-       aria-label="Seguinos en Instagram">
-        <img src="images/instagram-icon.png" alt="" class="social-icon">
-    </a>
-
-</div>
 
 <section id="servicios" class="servicios">
 
@@ -403,12 +410,21 @@
 </section>
 
 <section class="mapa">
-    <iframe
-        src="https://www.google.com/maps?q=Berazategui,+Buenos+Aires&output=embed"
-        loading="lazy"
-        title="Ubicación de KM26 Performance"
-        allowfullscreen>
-    </iframe>
+    <div class="mapa-contenedor">
+        <iframe
+            src="https://www.google.com/maps?q=Berazategui,+Buenos+Aires&output=embed"
+            loading="lazy"
+            title="Ubicación de KM26 Performance"
+            allowfullscreen>
+        </iframe>
+
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Berazategui,+Buenos+Aires"
+           target="_blank"
+           rel="noopener"
+           class="btn-como-llegar">
+            📍 Cómo llegar
+        </a>
+    </div>
 </section>
 
 <footer>
@@ -546,7 +562,7 @@
     <img src="images/whatsapp-icon.png" alt="" width="56" height="56" style="width:56px;height:56px;">
 </a>
 
-<script src="script.js?v=9"></script>
+<script src="script.js?v=10"></script>
 
 </body>
 </html>

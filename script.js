@@ -85,7 +85,7 @@ function cerrarMenuMobile() {
 // BOTONES SOLICITAR TURNO
 // ========================================
 
-const botonesTurno = document.querySelectorAll("#btnTurno, #btnTurno2, #btnTurnoMobile");
+const botonesTurno = document.querySelectorAll("#btnTurno, #btnTurno2");
 
 botonesTurno.forEach(btn => {
 
@@ -346,75 +346,5 @@ document.querySelectorAll(".faq-pregunta").forEach(boton => {
 
 });
 
-// ========================================
-// UBICAR LOGO Y BOTONES SOBRE LA FOTO
-// ========================================
-// Como la foto ahora se ve completa (object-fit:contain, sin recortar
-// nada), calculamos en JS dónde queda realmente la persiana y la pared
-// dentro del recuadro, para que el logo y los botones caigan siempre
-// en el lugar correcto sin importar el tamaño de pantalla.
-
-function ubicarSobreLaFoto() {
-
-    const hero = document.querySelector(".hero");
-    const logo = document.querySelector(".hero-logo");
-    const botones = document.querySelector(".hero-buttons-bottom");
-
-    if (!hero || !logo) return;
-
-    const contenedorAncho = hero.clientWidth;
-    const contenedorAlto = hero.clientHeight;
-
-    // Tamaño real de portada.jpg
-    const fotoAncho = 1536;
-    const fotoAlto = 1024;
-
-    const escala = Math.min(contenedorAncho / fotoAncho, contenedorAlto / fotoAlto);
-    const anchoVisible = fotoAncho * escala;
-    const altoVisible = fotoAlto * escala;
-
-    const margenX = (contenedorAncho - anchoVisible) / 2;
-    const margenY = (contenedorAlto - altoVisible) / 2;
-
-    // Logo: centrado sobre la persiana (29.8% del ancho de la foto),
-    // en la franja de pared antes de que empiece la apertura (10% del alto).
-    let logoX = margenX + anchoVisible * 0.298;
-    let logoY = margenY + altoVisible * 0.10;
-
-    // Seguro: que el logo nunca pueda quedar cortado por ningún borde,
-    // ni tapado por el header, sea cual sea el cálculo de arriba.
-    const mitadLogo = logo.offsetWidth / 2 || 100;
-    logoX = Math.min(Math.max(logoX, mitadLogo + 8), contenedorAncho - mitadLogo - 8);
-
-    const headerEl = document.querySelector("header");
-    const alturaHeader = headerEl ? headerEl.offsetHeight : 80;
-    logoY = Math.max(logoY, alturaHeader + 10);
-
-    logo.style.left = logoX + "px";
-    logo.style.top = logoY + "px";
-
-    // Botones: centrados sobre la pared entre la ventana y la puerta
-    // (66.6% del ancho, 68% del alto), solo cuando están visibles
-    // (en mobile/tablet se ocultan y no hace falta calcular nada).
-    if (botones && getComputedStyle(botones).display !== "none") {
-
-        let botonesX = margenX + anchoVisible * 0.72;
-        let botonesY = margenY + altoVisible * 0.87;
-
-        const mitadBotones = botones.offsetWidth / 2 || 150;
-        botonesX = Math.min(Math.max(botonesX, mitadBotones + 8), contenedorAncho - mitadBotones - 8);
-        botonesY = Math.min(botonesY, contenedorAlto - botones.offsetHeight - 12);
-
-        botones.style.left = botonesX + "px";
-        botones.style.top = botonesY + "px";
-
-    }
-
-}
-
-window.addEventListener("load", ubicarSobreLaFoto);
-window.addEventListener("resize", ubicarSobreLaFoto);
-document.addEventListener("DOMContentLoaded", ubicarSobreLaFoto);
-ubicarSobreLaFoto();
 
 console.log("KM26 Performance - Sitio cargado correctamente.");

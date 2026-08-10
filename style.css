@@ -106,127 +106,231 @@ PORTADA
 =========================*/
 
 .hero{
-    position:relative;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    background:#0f0f0f;
+    padding:150px 6% 0;
     overflow:hidden;
 }
 
-.hero-image{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    object-position:center center;
-    filter:brightness(1.35) contrast(1.10) saturate(1.12);
-    background:#0f0f0f;
-}
-
-.hero-overlay{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(
-        rgba(0,0,0,.08),
-        rgba(0,0,0,.12),
-        rgba(0,0,0,.28)
-    );
-}
-
-/* Transición suave donde termina la foto y empieza la franja de
-   botones en mobile/tablet — antes era un corte brusco. */
-.hero::after{
-    content:"";
-    position:absolute;
-    left:0;
-    bottom:0;
-    width:100%;
-    height:50px;
-    background:linear-gradient(to top, #111, transparent);
-    pointer-events:none;
-}
-
-/* El degradado oscuro grande de abajo se sacó: tapaba la parte iluminada
-   de la foto (la entrada por la persiana) y ya no hace falta para
-   legibilidad, porque los botones tienen su propio fondo de color. */
-
-/*
-   Posiciones calibradas sobre la foto real (portada.jpg, 1536x1024):
-   - Persiana abierta: horizontal 10.1%-49.5% (centro 29.8%), techo/cartel arriba: vertical 9.8%-38%
-   - Pared entre persiana y puerta (con la ventana): horizontal 49.8%-83.3% (centro 66.6%)
-   Estos porcentajes valen tal cual en pantallas anchas (PC, notebook, tablet en horizontal),
-   donde se ve la foto completa. En pantallas angostas y verticales (celular, tablet en vertical)
-   el recorte de la imagen deja ver solo una franja central, así que ahí centramos todo
-   sobre esa franja (ver media query más abajo).
-*/
-
-.hero-logo{
-    position:absolute;
-    top:150px;
-    left:29.8%;
-    transform:translateX(-50%);
-    z-index:50;
-}
-
-.hero-logo img{
-    width:300px;
-    max-width:60vw;
-    height:auto;
-    display:block;
-    filter:drop-shadow(0 10px 35px rgba(0,0,0,.55));
-}
-
-.hero-buttons{
-    display:flex;
-    justify-content:center;
+.hero-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:60px;
     align-items:center;
-    gap:18px;
+    max-width:1400px;
+    margin:0 auto;
 }
 
-.hero-buttons-bottom{
-    position:absolute;
-    left:66.6%;
-    top:68%;
-    transform:translateX(-50%);
+.hero-titulo{
+    font-size:50px;
+    font-weight:900;
+    font-style:italic;
+    line-height:1.12;
     display:flex;
+    flex-direction:column;
+    gap:0;
+    margin:0;
+}
+
+.hero-titulo .rojo{
+    color:#d71920;
+}
+
+.hero-divisor{
+    width:70px;
+    height:4px;
+    background:#d71920;
+    margin:26px 0;
+    border-radius:2px;
+}
+
+.hero-subtitulo{
+    font-size:18px;
+    color:#bbb;
+    line-height:1.7;
+    margin-bottom:32px;
+    max-width:440px;
+}
+
+.hero-botones{
+    display:flex;
+    flex-wrap:wrap;
     align-items:center;
-    justify-content:center;
-    gap:16px;
-    z-index:60;
+    gap:14px;
+    margin-bottom:40px;
 }
 
-/* Franja de botones para mobile/tablet (debajo de la foto, no encima).
-   Oculta en escritorio: ahí los botones van superpuestos a la foto (arriba). */
-.hero-buttons-mobile{
-    display:none;
-}
-
-.btn-principal{
-    background:linear-gradient(180deg,#ef2c33,#c1141b);
-    color:white;
+.btn-hero-principal,
+.btn-hero-secundario{
     text-decoration:none;
-    padding:18px 42px;
+    padding:16px 28px;
     border-radius:50px;
     font-weight:800;
+    font-size:14px;
+    letter-spacing:.5px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
     transition:.3s;
-    display:inline-block;
 }
 
-.btn-principal:hover{
-    transform:translateY(-4px);
-    background:linear-gradient(180deg,#ff3941,#d71920);
-    box-shadow:0 15px 35px rgba(215,25,32,.40);
+.btn-hero-principal svg,
+.btn-hero-secundario svg{
+    width:19px;
+    height:19px;
+    flex-shrink:0;
 }
 
-/* ---- Botones sociales (WhatsApp / Instagram) ----
-   Los íconos ya son imágenes completas (con su propio fondo/forma),
-   así que el botón solo define el tamaño y el efecto hover. */
+.btn-hero-principal{
+    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    color:#fff;
+}
+
+.btn-hero-principal:hover{
+    transform:translateY(-3px);
+    box-shadow:0 14px 30px rgba(215,25,32,.4);
+}
+
+.btn-hero-secundario{
+    background:transparent;
+    border:2px solid #fff;
+    color:#fff;
+}
+
+.btn-hero-secundario:hover{
+    background:#fff;
+    color:#111;
+    transform:translateY(-3px);
+}
+
+.hero-botones .btn-social{
+    width:50px;
+    height:50px;
+}
+
+.hero-confianza{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px 24px;
+}
+
+.confianza-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:12.5px;
+    font-weight:700;
+    color:#eee;
+    line-height:1.35;
+}
+
+.confianza-icono{
+    width:24px;
+    height:24px;
+    color:#d71920;
+    flex-shrink:0;
+}
+
+/* ---- Caja de la foto ---- */
+
+.hero-foto-box{
+    position:relative;
+    border-radius:20px;
+    overflow:hidden;
+    aspect-ratio:3/2;
+    box-shadow:0 30px 70px rgba(0,0,0,.55);
+}
+
+.hero-foto{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    filter:brightness(1.3) contrast(1.08) saturate(1.1);
+}
+
+.hero-foto-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.4));
+}
+
+.hero-foto-logo{
+    position:absolute;
+    left:29.8%;
+    top:9%;
+    transform:translateX(-50%);
+    width:26%;
+    max-width:220px;
+    height:auto;
+    display:block;
+    filter:drop-shadow(0 8px 20px rgba(0,0,0,.55));
+}
+
+.hero-info-pills{
+    position:absolute;
+    right:16px;
+    bottom:16px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    max-width:90%;
+}
+
+.pill{
+    background:rgba(8,8,8,.72);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    color:#fff;
+    font-size:11.5px;
+    font-weight:600;
+    padding:10px 14px;
+    border-radius:10px;
+    line-height:1.5;
+    border:1px solid rgba(255,255,255,.12);
+    display:flex;
+    align-items:center;
+    gap:7px;
+    white-space:nowrap;
+}
+
+.pill svg{
+    width:15px;
+    height:15px;
+    flex-shrink:0;
+    color:#ff6b6b;
+}
+
+.hero-tagline{
+    max-width:1400px;
+    margin:56px auto 0;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    padding:34px 0;
+    border-top:1px solid rgba(255,255,255,.06);
+}
+
+.hero-tagline .linea{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, transparent, #d71920, transparent);
+}
+
+.hero-tagline p{
+    font-size:12px;
+    letter-spacing:4px;
+    color:#999;
+    white-space:nowrap;
+    margin:0;
+}
+
+/* ---- Botones sociales chicos (llamada / instagram) ----
+   Los íconos ya son imágenes completas (con su propio fondo/forma). */
 
 .btn-social{
-    width:64px;
-    height:64px;
+    width:50px;
+    height:50px;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -245,6 +349,7 @@ PORTADA
     display:block;
     filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));
 }
+
 
 /*==================================================
 TÍTULOS DE SECCIÓN
@@ -799,11 +904,51 @@ MAPA
     height:500px;
 }
 
+.mapa-contenedor{
+    position:relative;
+    width:100%;
+    height:100%;
+}
+
 .mapa iframe{
     width:100%;
     height:100%;
     border:none;
     display:block;
+}
+
+.btn-como-llegar{
+    position:absolute;
+    top:20px;
+    right:20px;
+    background:#fff;
+    color:#111;
+    text-decoration:none;
+    font-weight:700;
+    font-size:14px;
+    padding:14px 22px;
+    border-radius:50px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+    transition:.25s;
+    z-index:10;
+}
+
+.btn-como-llegar:hover{
+    background:#d71920;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+@media (max-width:480px){
+
+    .btn-como-llegar{
+        top:auto;
+        bottom:20px;
+        right:20px;
+        left:20px;
+        text-align:center;
+    }
+
 }
 
 /*==================================================
@@ -1016,28 +1161,15 @@ RESPONSIVE
         border-bottom:1px solid rgba(255,255,255,.06);
     }
 
-    /*
-       Con object-fit:contain la foto siempre se ve completa (nunca se
-       recorta), así que acá solo hace falta ocultar los botones de
-       encima de la foto y mostrar la franja de abajo en su lugar.
-    */
-    .hero-logo{
-        left:50%;
+    /* Con la nueva portada de dos columnas, en mobile/tablet se apilan:
+       texto arriba, foto abajo. */
+    .hero-grid{
+        grid-template-columns:1fr;
+        gap:36px;
     }
 
-    .hero-buttons-bottom{
-        display:none;
-    }
-
-    .hero-buttons-mobile{
-        display:flex;
-        flex-wrap:wrap;
-        justify-content:center;
-        align-items:center;
-        gap:14px;
-        background:#111;
-        padding:26px 8%;
-        border-bottom:1px solid rgba(255,255,255,.06);
+    .hero{
+        padding:120px 6% 0;
     }
 
     .contacto-grid{
@@ -1053,13 +1185,16 @@ RESPONSIVE
 
 @media (max-width:768px){
 
-    .hero{
-        height:62vh;
-        max-height:560px;
+    .hero-titulo{
+        font-size:34px;
     }
 
-    .hero-logo img{
-        width:220px;
+    .hero-subtitulo{
+        font-size:16px;
+    }
+
+    .hero-foto-logo{
+        width:30%;
     }
 
     .calendario-embed{
@@ -1101,13 +1236,24 @@ RESPONSIVE
 
 @media (max-width:480px){
 
-    .hero-logo img{
-        width:160px;
+    .hero-titulo{
+        font-size:26px;
     }
 
-    .btn-principal{
+    .hero-foto-logo{
+        width:36%;
+    }
+
+    .hero-info-pills{
+        position:static;
+        margin-top:12px;
+        justify-content:flex-start;
+    }
+
+    .btn-hero-principal,
+    .btn-hero-secundario{
         width:100%;
-        text-align:center;
+        justify-content:center;
     }
 
     .btn-social{
