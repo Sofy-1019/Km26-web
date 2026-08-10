@@ -362,13 +362,6 @@ function ubicarSobreLaFoto() {
 
     if (!hero || !logo) return;
 
-    // En celular, directo al centro, sin ningún cálculo — a prueba de errores.
-    if (window.innerWidth <= 600) {
-        logo.style.left = "50%";
-        logo.style.top = "90px";
-        return;
-    }
-
     const contenedorAncho = hero.clientWidth;
     const contenedorAlto = hero.clientHeight;
 
@@ -386,15 +379,19 @@ function ubicarSobreLaFoto() {
     // Logo: centrado sobre la persiana (29.8% del ancho de la foto),
     // en la franja de pared antes de que empiece la apertura (10% del alto).
     let logoX = margenX + anchoVisible * 0.298;
-    const logoY = margenY + altoVisible * 0.10;
+    let logoY = margenY + altoVisible * 0.10;
 
     // Seguro: que el logo nunca pueda quedar cortado por ningún borde,
-    // sea cual sea el cálculo de arriba.
+    // ni tapado por el header, sea cual sea el cálculo de arriba.
     const mitadLogo = logo.offsetWidth / 2 || 100;
     logoX = Math.min(Math.max(logoX, mitadLogo + 8), contenedorAncho - mitadLogo - 8);
 
+    const headerEl = document.querySelector("header");
+    const alturaHeader = headerEl ? headerEl.offsetHeight : 80;
+    logoY = Math.max(logoY, alturaHeader + 10);
+
     logo.style.left = logoX + "px";
-    logo.style.top = Math.max(logoY, 14) + "px";
+    logo.style.top = logoY + "px";
 
     // Botones: centrados sobre la pared entre la ventana y la puerta
     // (66.6% del ancho, 68% del alto), solo cuando están visibles
@@ -402,7 +399,7 @@ function ubicarSobreLaFoto() {
     if (botones && getComputedStyle(botones).display !== "none") {
 
         let botonesX = margenX + anchoVisible * 0.666;
-        let botonesY = margenY + altoVisible * 0.90;
+        let botonesY = margenY + altoVisible * 0.85;
 
         const mitadBotones = botones.offsetWidth / 2 || 150;
         botonesX = Math.min(Math.max(botonesX, mitadBotones + 8), contenedorAncho - mitadBotones - 8);

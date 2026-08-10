@@ -1054,9 +1054,8 @@ RESPONSIVE
 @media (max-width:768px){
 
     .hero{
-        height:auto;
-        aspect-ratio:3/2;
-        max-height:80vh;
+        height:62vh;
+        max-height:560px;
     }
 
     .hero-logo img{
