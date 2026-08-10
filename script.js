@@ -398,7 +398,7 @@ function ubicarSobreLaFoto() {
     // (en mobile/tablet se ocultan y no hace falta calcular nada).
     if (botones && getComputedStyle(botones).display !== "none") {
 
-        let botonesX = margenX + anchoVisible * 0.666;
+        let botonesX = margenX + anchoVisible * 0.72;
         let botonesY = margenY + altoVisible * 0.87;
 
         const mitadBotones = botones.offsetWidth / 2 || 150;
