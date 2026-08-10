@@ -134,22 +134,9 @@ PORTADA
     );
 }
 
-.hero::after{
-    content:"";
-    position:absolute;
-    left:0;
-    bottom:0;
-    width:100%;
-    height:220px;
-    background:linear-gradient(
-        to top,
-        #111 0%,
-        rgba(17,17,17,.85) 35%,
-        rgba(17,17,17,.25) 70%,
-        transparent 100%
-    );
-    pointer-events:none;
-}
+/* El degradado oscuro de abajo se sacó: tapaba la parte iluminada
+   de la foto (la entrada por la persiana) y ya no hace falta para
+   legibilidad, porque los botones tienen su propio fondo de color. */
 
 /*
    Posiciones calibradas sobre la foto real (portada.jpg, 1536x1024):
