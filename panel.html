@@ -900,7 +900,7 @@ td.mono{
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
 
 // ======================================================
@@ -1574,6 +1574,7 @@ async function abrirEscaner() {
 
         const video = document.getElementById("videoEscaner");
         video.srcObject = streamCamara;
+        await video.play();
 
         escaneando = true;
         requestAnimationFrame(loopEscaneo);
