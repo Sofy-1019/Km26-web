@@ -31,6 +31,8 @@ function doGet(e) {
     if (action === "agregarProducto") return respond(agregarProducto(e.parameter));
     if (action === "ajustarStock") return respond(ajustarStock(e.parameter));
     if (action === "obtenerProducto") return respond(obtenerProducto(e.parameter.id));
+    if (action === "editarProducto") return respond(editarProducto(e.parameter));
+    if (action === "eliminarProducto") return respond(eliminarProducto(e.parameter.id));
     if (action === "editarVehiculo") return respond(editarVehiculo(e.parameter));
     if (action === "eliminarVehiculo") return respond(eliminarVehiculo(e.parameter.id));
     if (action === "agregarHistorial") return respond(agregarHistorial(e.parameter));
@@ -270,6 +272,40 @@ function obtenerProducto(id) {
   if (!fila) return { error: "Producto no encontrado" };
 
   return { id: fila[0], nombre: fila[1], cantidad: Number(fila[2]) || 0 };
+}
+
+function editarProducto(p) {
+  const sheet = getSheet("Stock");
+  const data = sheet.getDataRange().getValues();
+  const id = Number(p.id);
+
+  for (let i = 1; i < data.length; i++) {
+    if (Number(data[i][0]) === id) {
+      sheet.getRange(i + 1, 2).setValue(p.nombre);
+      sheet.getRange(i + 1, 3).setValue(parseInt(p.cantidad, 10) || 0);
+      if (p.stockMinimo !== undefined && p.stockMinimo !== "") {
+        sheet.getRange(i + 1, 5).setValue(parseInt(p.stockMinimo, 10));
+      }
+      return { id: id };
+    }
+  }
+
+  return { error: "Producto no encontrado" };
+}
+
+function eliminarProducto(id) {
+  id = Number(id);
+  const sheet = getSheet("Stock");
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (Number(data[i][0]) === id) {
+      sheet.deleteRow(i + 1);
+      break;
+    }
+  }
+
+  return { ok: true };
 }
 
 // ---------- Vehículos (editar / borrar individual) ----------

@@ -841,6 +841,31 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: editar producto ---------- -->
+<div class="overlay" id="modalEditarProducto">
+    <div class="modal">
+        <h3>Editar producto</h3>
+
+        <input type="hidden" id="epId">
+
+        <label>Nombre</label>
+        <input type="text" id="epNombre">
+
+        <label>Cantidad</label>
+        <input type="number" id="epCantidad">
+
+        <label>Avisar cuando queden menos de</label>
+        <input type="number" id="epStockMinimo">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicionProducto()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoEdicionProducto"></p>
+    </div>
+</div>
+
 <!-- ---------- Modal: etiqueta imprimible ---------- -->
 <div class="overlay" id="modalEtiqueta">
     <div class="modal">
@@ -1134,6 +1159,7 @@ function cerrarModales() {
     document.getElementById("modalEditarCliente").classList.remove("abierto");
     document.getElementById("modalFicha").classList.remove("abierto");
     document.getElementById("modalEditarVehiculo").classList.remove("abierto");
+    document.getElementById("modalEditarProducto").classList.remove("abierto");
 }
 
 function abrirEdicion(id, nombre, apellido, telefono, email) {
@@ -1385,6 +1411,8 @@ async function cargarStock() {
                 <span class="cantidad-numero" id="numero-${p.id}">${p.cantidad}</span>
                 <button class="btn-redondo" onclick="ajustarCantidad(${p.id}, 1)">+</button>
                 <button class="btn-chico" onclick="abrirEtiqueta(${p.id}, '${escaparComillas(p.nombre)}')">🏷️ Etiqueta</button>
+                <button class="btn-chico" onclick="abrirEdicionProducto(${p.id}, '${escaparComillas(p.nombre)}', ${p.cantidad}, ${p.stockMinimo})">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarProducto(${p.id}, '${escaparComillas(p.nombre)}')">Borrar</button>
             </div>
         `;
         el.appendChild(fila);
@@ -1465,6 +1493,63 @@ function abrirEtiqueta(id, nombre) {
     });
 
     document.getElementById("modalEtiqueta").classList.add("abierto");
+
+}
+
+function abrirEdicionProducto(id, nombre, cantidad, stockMinimo) {
+
+    document.getElementById("epId").value = id;
+    document.getElementById("epNombre").value = nombre;
+    document.getElementById("epCantidad").value = cantidad;
+    document.getElementById("epStockMinimo").value = stockMinimo;
+
+    document.getElementById("mensajeEstadoEdicionProducto").textContent = "";
+    document.getElementById("modalEditarProducto").classList.add("abierto");
+
+}
+
+async function guardarEdicionProducto() {
+
+    const id = document.getElementById("epId").value;
+    const nombre = document.getElementById("epNombre").value.trim();
+    const cantidad = document.getElementById("epCantidad").value.trim() || "0";
+    const stockMinimo = document.getElementById("epStockMinimo").value.trim() || "3";
+    const estado = document.getElementById("mensajeEstadoEdicionProducto");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al producto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("editarProducto", { id, nombre, cantidad, stockMinimo });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Listo!";
+    estado.style.color = "#5fd98a";
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarStock();
+    }, 600);
+
+}
+
+async function borrarProducto(id, nombre) {
+
+    const confirmado = confirm(`¿Seguro que querés borrar "${nombre}" del stock? No se puede deshacer.`);
+    if (!confirmado) return;
+
+    await llamar("eliminarProducto", { id });
+    cargarStock();
 
 }
 
