@@ -362,6 +362,13 @@ function ubicarSobreLaFoto() {
 
     if (!hero || !logo) return;
 
+    // En celular, directo al centro, sin ningún cálculo — a prueba de errores.
+    if (window.innerWidth <= 600) {
+        logo.style.left = "50%";
+        logo.style.top = "8%";
+        return;
+    }
+
     const contenedorAncho = hero.clientWidth;
     const contenedorAlto = hero.clientHeight;
 
