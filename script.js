@@ -399,7 +399,7 @@ function ubicarSobreLaFoto() {
     if (botones && getComputedStyle(botones).display !== "none") {
 
         let botonesX = margenX + anchoVisible * 0.666;
-        let botonesY = margenY + altoVisible * 0.85;
+        let botonesY = margenY + altoVisible * 0.87;
 
         const mitadBotones = botones.offsetWidth / 2 || 150;
         botonesX = Math.min(Math.max(botonesX, mitadBotones + 8), contenedorAncho - mitadBotones - 8);
