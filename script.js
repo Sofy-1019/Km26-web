@@ -346,4 +346,62 @@ document.querySelectorAll(".faq-pregunta").forEach(boton => {
 
 });
 
+// ========================================
+// UBICAR LOGO Y BOTONES SOBRE LA FOTO
+// ========================================
+// Como la foto ahora se ve completa (object-fit:contain, sin recortar
+// nada), calculamos en JS dónde queda realmente la persiana y la pared
+// dentro del recuadro, para que el logo y los botones caigan siempre
+// en el lugar correcto sin importar el tamaño de pantalla.
+
+function ubicarSobreLaFoto() {
+
+    const hero = document.querySelector(".hero");
+    const logo = document.querySelector(".hero-logo");
+    const botones = document.querySelector(".hero-buttons-bottom");
+
+    if (!hero || !logo) return;
+
+    const contenedorAncho = hero.clientWidth;
+    const contenedorAlto = hero.clientHeight;
+
+    // Tamaño real de portada.jpg
+    const fotoAncho = 1536;
+    const fotoAlto = 1024;
+
+    const escala = Math.min(contenedorAncho / fotoAncho, contenedorAlto / fotoAlto);
+    const anchoVisible = fotoAncho * escala;
+    const altoVisible = fotoAlto * escala;
+
+    const margenX = (contenedorAncho - anchoVisible) / 2;
+    const margenY = (contenedorAlto - altoVisible) / 2;
+
+    // Logo: centrado sobre la persiana (29.8% del ancho de la foto),
+    // en la franja de pared antes de que empiece la apertura (10% del alto).
+    const logoX = margenX + anchoVisible * 0.298;
+    const logoY = margenY + altoVisible * 0.10;
+
+    logo.style.left = logoX + "px";
+    logo.style.top = Math.max(logoY, 14) + "px";
+
+    // Botones: centrados sobre la pared entre la ventana y la puerta
+    // (66.6% del ancho, 68% del alto), solo cuando están visibles
+    // (en mobile/tablet se ocultan y no hace falta calcular nada).
+    if (botones && getComputedStyle(botones).display !== "none") {
+
+        const botonesX = margenX + anchoVisible * 0.666;
+        const botonesY = margenY + altoVisible * 0.68;
+
+        botones.style.left = botonesX + "px";
+        botones.style.top = botonesY + "px";
+
+    }
+
+}
+
+window.addEventListener("load", ubicarSobreLaFoto);
+window.addEventListener("resize", ubicarSobreLaFoto);
+document.addEventListener("DOMContentLoaded", ubicarSobreLaFoto);
+ubicarSobreLaFoto();
+
 console.log("KM26 Performance - Sitio cargado correctamente.");

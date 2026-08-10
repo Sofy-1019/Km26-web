@@ -119,9 +119,10 @@ PORTADA
     inset:0;
     width:100%;
     height:100%;
-    object-fit:cover;
-    object-position:center 6%;
+    object-fit:contain;
+    object-position:center center;
     filter:brightness(1.35) contrast(1.10) saturate(1.12);
+    background:#0f0f0f;
 }
 
 .hero-overlay{
@@ -1016,16 +1017,10 @@ RESPONSIVE
     }
 
     /*
-       En pantallas angostas y verticales, object-fit:cover solo deja ver
-       una franja central de la foto (no entra el ancho completo).
-       Corremos el encuadre para que esa franja muestre la persiana y el logo.
-       Los botones acá NO van superpuestos a la foto (se tapaban entre sí
-       con el texto largo) -> se ocultan y aparece la franja de abajo.
+       Con object-fit:contain la foto siempre se ve completa (nunca se
+       recorta), así que acá solo hace falta ocultar los botones de
+       encima de la foto y mostrar la franja de abajo en su lugar.
     */
-    .hero-image{
-        object-position:24% 10%;
-    }
-
     .hero-logo{
         left:50%;
     }
@@ -1059,11 +1054,9 @@ RESPONSIVE
 @media (max-width:768px){
 
     .hero{
-        height:66vh;
-    }
-
-    .hero-logo{
-        top:85px;
+        height:auto;
+        aspect-ratio:3/2;
+        max-height:80vh;
     }
 
     .hero-logo img{
