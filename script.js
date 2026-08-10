@@ -89,7 +89,10 @@ const botonesTurno = document.querySelectorAll("#btnTurno, #btnTurno2");
 
 botonesTurno.forEach(btn => {
 
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
 
         if (motorSound) {
 
@@ -200,7 +203,7 @@ revealItems.forEach(item => {
 // ========================================
 
 const botonesSociales = document.querySelectorAll(
-    ".btn-whatsapp-top, .whatsapp-float, .btn-instagram-top, .btn-call-top"
+    ".btn-hero-secundario, .btn-cta-secundario, .whatsapp-float, .btn-social, .btn-confirmar-whatsapp"
 );
 
 botonesSociales.forEach(btn => {
