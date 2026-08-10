@@ -631,6 +631,34 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: editar cliente ---------- -->
+<div class="overlay" id="modalEditarCliente">
+    <div class="modal">
+        <h3>Editar cliente</h3>
+
+        <input type="hidden" id="eId">
+
+        <label>Nombre</label>
+        <input type="text" id="eNombre">
+
+        <label>Apellido</label>
+        <input type="text" id="eApellido">
+
+        <label>Teléfono</label>
+        <input type="tel" id="eTelefono">
+
+        <label>Email</label>
+        <input type="email" id="eEmail">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicion()">Guardar cambios</button>
+        </div>
+
+        <p id="mensajeEstadoEdicion"></p>
+    </div>
+</div>
+
 <!-- ---------- Modal: nuevo movimiento de caja ---------- -->
 <div class="overlay" id="modalCaja">
     <div class="modal">
@@ -833,7 +861,7 @@ async function cargarInicio() {
 
 }
 
-function renderTablaClientes(lista, contenedorId) {
+function renderTablaClientes(lista, contenedorId, conAcciones) {
 
     const el = document.getElementById(contenedorId);
 
@@ -842,14 +870,27 @@ function renderTablaClientes(lista, contenedorId) {
         return;
     }
 
-    let html = "<table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Email</th></tr></thead><tbody>";
+    let encabezado = "<th>Cliente</th><th>Teléfono</th><th>Email</th>";
+    if (conAcciones) encabezado += "<th></th>";
+
+    let html = `<table><thead><tr>${encabezado}</tr></thead><tbody>`;
 
     lista.forEach(c => {
+
         html += `<tr>
             <td>${escapar(c.apellido)}, ${escapar(c.nombre)}</td>
             <td class="mono">${escapar(c.telefono || "-")}</td>
-            <td class="mono">${escapar(c.email || "-")}</td>
-        </tr>`;
+            <td class="mono">${escapar(c.email || "-")}</td>`;
+
+        if (conAcciones) {
+            html += `<td style="white-space:nowrap;">
+                <button class="btn-chico" onclick="abrirEdicion(${c.id}, '${escaparComillas(c.nombre)}', '${escaparComillas(c.apellido)}', '${escaparComillas(c.telefono || "")}', '${escaparComillas(c.email || "")}')">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarCliente(${c.id}, '${escaparComillas(c.nombre + " " + c.apellido)}')">Borrar</button>
+            </td>`;
+        }
+
+        html += `</tr>`;
+
     });
 
     html += "</tbody></table>";
@@ -891,7 +932,7 @@ document.getElementById("buscador").addEventListener("input", function () {
 async function cargarClientesRecientes() {
     document.getElementById("tituloClientes").textContent = "Últimos clientes";
     const clientes = await llamar("listarClientes", {});
-    renderTablaClientes(clientes, "tablaClientes");
+    renderTablaClientes(clientes, "tablaClientes", true);
 }
 
 async function buscarYRenderizar(q) {
@@ -905,7 +946,7 @@ async function buscarYRenderizar(q) {
         return;
     }
 
-    let html = "<table><thead><tr><th>Patente</th><th>Cliente</th><th>Vehículo</th><th>Teléfono</th></tr></thead><tbody>";
+    let html = "<table><thead><tr><th>Patente</th><th>Cliente</th><th>Vehículo</th><th>Teléfono</th><th></th></tr></thead><tbody>";
 
     resultados.forEach(r => {
 
@@ -915,6 +956,10 @@ async function buscarYRenderizar(q) {
                 <td>${escapar(r.clienteNombre)}</td>
                 <td class="mono">${escapar(r.marca)} ${escapar(r.modelo)} ${escapar(r.anio || "")}</td>
                 <td class="mono">${escapar(r.clienteTelefono || "-")}</td>
+                <td style="white-space:nowrap;">
+                    <button class="btn-chico" onclick="abrirEdicion(${r.clienteId}, '${escaparComillas(r.clienteNombreSolo)}', '${escaparComillas(r.clienteApellido)}', '${escaparComillas(r.clienteTelefono || "")}', '${escaparComillas(r.clienteEmail || "")}')">Editar</button>
+                    <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarCliente(${r.clienteId}, '${escaparComillas(r.clienteNombre)}')">Borrar</button>
+                </td>
             </tr>`;
         } else {
             html += `<tr>
@@ -922,6 +967,10 @@ async function buscarYRenderizar(q) {
                 <td>${escapar(r.apellido)}, ${escapar(r.nombre)}</td>
                 <td class="mono">-</td>
                 <td class="mono">${escapar(r.telefono || "-")}</td>
+                <td style="white-space:nowrap;">
+                    <button class="btn-chico" onclick="abrirEdicion(${r.id}, '${escaparComillas(r.nombre)}', '${escaparComillas(r.apellido)}', '${escaparComillas(r.telefono || "")}', '${escaparComillas(r.email || "")}')">Editar</button>
+                    <button class="btn-chico" style="color:#ff6b6b;border-color:#5a1f1f;" onclick="borrarCliente(${r.id}, '${escaparComillas(r.nombre + " " + r.apellido)}')">Borrar</button>
+                </td>
             </tr>`;
         }
 
@@ -944,6 +993,70 @@ function abrirModalCliente() {
 function cerrarModales() {
     document.getElementById("modalCliente").classList.remove("abierto");
     document.getElementById("modalCaja").classList.remove("abierto");
+    document.getElementById("modalEditarCliente").classList.remove("abierto");
+}
+
+function abrirEdicion(id, nombre, apellido, telefono, email) {
+
+    document.getElementById("eId").value = id;
+    document.getElementById("eNombre").value = nombre;
+    document.getElementById("eApellido").value = apellido;
+    document.getElementById("eTelefono").value = telefono;
+    document.getElementById("eEmail").value = email;
+
+    document.getElementById("mensajeEstadoEdicion").textContent = "";
+    document.getElementById("modalEditarCliente").classList.add("abierto");
+
+}
+
+async function guardarEdicion() {
+
+    const id = document.getElementById("eId").value;
+    const nombre = document.getElementById("eNombre").value.trim();
+    const apellido = document.getElementById("eApellido").value.trim();
+    const telefono = document.getElementById("eTelefono").value.trim();
+    const email = document.getElementById("eEmail").value.trim();
+    const estado = document.getElementById("mensajeEstadoEdicion");
+
+    if (!nombre || !apellido) {
+        estado.textContent = "Nombre y apellido son obligatorios.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("editarCliente", { id, nombre, apellido, telefono, email });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Listo!";
+    estado.style.color = "#5fd98a";
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarInicio();
+        cargarClientesRecientes();
+    }, 600);
+
+}
+
+async function borrarCliente(id, nombreCompleto) {
+
+    const confirmado = confirm(`¿Seguro que querés borrar a ${nombreCompleto}? También se van a borrar sus vehículos asociados. Esta acción no se puede deshacer.`);
+
+    if (!confirmado) return;
+
+    await llamar("eliminarCliente", { id });
+
+    cargarInicio();
+    cargarClientesRecientes();
+
 }
 
 async function guardarCliente() {

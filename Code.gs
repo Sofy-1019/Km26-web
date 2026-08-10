@@ -20,6 +20,8 @@ function doGet(e) {
     if (action === "listarClientes") return respond(listarClientes());
     if (action === "buscar") return respond(buscar(e.parameter.q || ""));
     if (action === "agregarCliente") return respond(agregarCliente(e.parameter));
+    if (action === "editarCliente") return respond(editarCliente(e.parameter));
+    if (action === "eliminarCliente") return respond(eliminarCliente(e.parameter.id));
     if (action === "vehiculosDeCliente") return respond(vehiculosDeCliente(e.parameter.clienteId));
     if (action === "agregarMovimiento") return respond(agregarMovimiento(e.parameter));
     if (action === "movimientosCaja") return respond(movimientosCaja());
@@ -91,7 +93,10 @@ function buscar(q) {
         tipo: "vehiculo", id: v[0], patente: v[2], marca: v[3], modelo: v[4], anio: v[5],
         clienteId: v[1],
         clienteNombre: cliente ? (cliente[1] + " " + cliente[2]) : "(sin datos)",
-        clienteTelefono: cliente ? cliente[3] : ""
+        clienteNombreSolo: cliente ? cliente[1] : "",
+        clienteApellido: cliente ? cliente[2] : "",
+        clienteTelefono: cliente ? cliente[3] : "",
+        clienteEmail: cliente ? cliente[4] : ""
       });
     }
   });
@@ -124,6 +129,47 @@ function vehiculosDeCliente(clienteId) {
   return data
     .filter(v => v[1] == clienteId)
     .map(v => ({ id: v[0], patente: v[2], marca: v[3], modelo: v[4], anio: v[5] }));
+}
+
+function editarCliente(p) {
+  const sheet = getSheet("Clientes");
+  const data = sheet.getDataRange().getValues();
+  const id = Number(p.id);
+
+  for (let i = 1; i < data.length; i++) {
+    if (Number(data[i][0]) === id) {
+      sheet.getRange(i + 1, 2, 1, 4).setValues([[p.nombre, p.apellido, p.telefono, p.email || ""]]);
+      return { id: id };
+    }
+  }
+
+  return { error: "Cliente no encontrado" };
+}
+
+function eliminarCliente(id) {
+  id = Number(id);
+
+  const sheetClientes = getSheet("Clientes");
+  const dataClientes = sheetClientes.getDataRange().getValues();
+
+  for (let i = 1; i < dataClientes.length; i++) {
+    if (Number(dataClientes[i][0]) === id) {
+      sheetClientes.deleteRow(i + 1);
+      break;
+    }
+  }
+
+  // Borra también los vehículos asociados a ese cliente
+  const sheetVehiculos = getSheet("Vehiculos");
+  const dataVehiculos = sheetVehiculos.getDataRange().getValues();
+
+  for (let i = dataVehiculos.length - 1; i >= 1; i--) {
+    if (Number(dataVehiculos[i][1]) === id) {
+      sheetVehiculos.deleteRow(i + 1);
+    }
+  }
+
+  return { ok: true };
 }
 
 // ---------- Caja ----------
