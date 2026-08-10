@@ -398,6 +398,114 @@ td.mono{
     #buscador{max-width:none;}
 }
 
+.fila-stock{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#161616;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+}
+
+.fila-stock-nombre{
+    font-weight:600;
+    font-size:14px;
+}
+
+.fila-stock-cantidad{
+    font-size:12px;
+    color:#999;
+}
+
+.fila-stock-botones{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.btn-redondo{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-redondo:hover{
+    border-color:#d71920;
+}
+
+.cantidad-numero{
+    min-width:28px;
+    text-align:center;
+    font-weight:700;
+    font-size:15px;
+}
+
+/* Etiqueta imprimible */
+
+#modalEtiqueta .modal{
+    text-align:center;
+}
+
+#etiquetaContenido{
+    background:#fff;
+    color:#000;
+    border-radius:12px;
+    padding:24px;
+    margin:16px 0;
+}
+
+#etiquetaNombre{
+    font-weight:800;
+    font-size:16px;
+    margin-bottom:14px;
+    word-break:break-word;
+}
+
+#etiquetaQR{
+    display:flex;
+    justify-content:center;
+}
+
+@media print{
+    body *{
+        visibility:hidden;
+    }
+    #etiquetaContenido, #etiquetaContenido *{
+        visibility:visible;
+    }
+    #etiquetaContenido{
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+    }
+}
+
+/* Escáner */
+
+#videoEscaner{
+    width:100%;
+    border-radius:12px;
+    background:#000;
+}
+
+#resultadoEscaner{
+    margin-top:16px;
+}
+
 </style>
 </head>
 
@@ -432,6 +540,7 @@ td.mono{
         <button class="activo" data-tab="inicio" onclick="cambiarTab('inicio')">Inicio</button>
         <button data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
         <button data-tab="caja" onclick="cambiarTab('caja')">Caja</button>
+        <button data-tab="stock" onclick="cambiarTab('stock')">Stock</button>
     </nav>
 
     <!-- INICIO -->
@@ -468,6 +577,20 @@ td.mono{
             <button class="btn-chico" onclick="abrirModalCaja()">+ Registrar movimiento</button>
         </div>
         <div id="tablaCaja"></div>
+
+    </section>
+
+    <!-- STOCK -->
+    <section class="seccion" id="tab-stock">
+
+        <div class="fila-titulo">
+            <h2>Productos</h2>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-chico" onclick="abrirEscaner()">📷 Escanear</button>
+                <button class="btn-chico" onclick="abrirModalProducto()">+ Nuevo producto</button>
+            </div>
+        </div>
+        <div id="tablaStock"></div>
 
     </section>
 
@@ -533,6 +656,61 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: nuevo producto ---------- -->
+<div class="overlay" id="modalProducto">
+    <div class="modal">
+        <h3>Nuevo producto</h3>
+
+        <label>Nombre</label>
+        <input type="text" id="pNombre" placeholder="Perfume Glade">
+
+        <label>Cantidad inicial</label>
+        <input type="number" id="pCantidad" placeholder="10">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarProducto()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoProducto"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: etiqueta imprimible ---------- -->
+<div class="overlay" id="modalEtiqueta">
+    <div class="modal">
+        <h3>Etiqueta para imprimir</h3>
+
+        <div id="etiquetaContenido">
+            <div id="etiquetaNombre"></div>
+            <div id="etiquetaQR"></div>
+        </div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+            <button class="btn-red" onclick="window.print()">Imprimir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: escáner ---------- -->
+<div class="overlay" id="modalEscaner">
+    <div class="modal">
+        <h3>Escanear producto</h3>
+
+        <video id="videoEscaner" autoplay playsinline muted></video>
+        <canvas id="canvasEscaner" style="display:none;"></canvas>
+
+        <div id="resultadoEscaner"></div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarEscaner()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
 <script>
 
 // ======================================================
@@ -543,6 +721,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyGF2JEog_2U5xLWG-Mg1Ap
 
 let PIN_GUARDADO = "";
 let tipoMovimiento = "Ingreso";
+let streamCamara = null;
+let escaneando = false;
 
 // ======================================================
 // PIN / ACCESO
@@ -624,6 +804,10 @@ function cambiarTab(tab) {
 
     if (tab === "clientes" && !document.getElementById("buscador").value) {
         cargarClientesRecientes();
+    }
+
+    if (tab === "stock") {
+        cargarStock();
     }
 
 }
@@ -909,6 +1093,229 @@ async function guardarMovimiento() {
         cargarInicio();
     }, 700);
 
+}
+
+// ======================================================
+// STOCK
+// ======================================================
+
+async function cargarStock() {
+
+    const productos = await llamar("listarStock", {});
+    const el = document.getElementById("tablaStock");
+
+    if (!Array.isArray(productos) || productos.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay productos cargados.</div>';
+        return;
+    }
+
+    el.innerHTML = "";
+
+    productos.forEach(p => {
+
+        const fila = document.createElement("div");
+        fila.className = "fila-stock";
+        fila.innerHTML = `
+            <div>
+                <div class="fila-stock-nombre">${escapar(p.nombre)}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades</div>
+            </div>
+            <div class="fila-stock-botones">
+                <button class="btn-redondo" onclick="ajustarCantidad(${p.id}, -1)">-</button>
+                <span class="cantidad-numero" id="numero-${p.id}">${p.cantidad}</span>
+                <button class="btn-redondo" onclick="ajustarCantidad(${p.id}, 1)">+</button>
+                <button class="btn-chico" onclick="abrirEtiqueta(${p.id}, '${escaparComillas(p.nombre)}')">🏷️ Etiqueta</button>
+            </div>
+        `;
+        el.appendChild(fila);
+
+    });
+
+}
+
+function escaparComillas(s) {
+    return String(s).replace(/'/g, "\\'");
+}
+
+async function ajustarCantidad(id, delta) {
+
+    const res = await llamar("ajustarStock", { id, delta });
+
+    if (res && !res.error) {
+        document.getElementById("cantidad-" + id).textContent = res.cantidad;
+        document.getElementById("numero-" + id).textContent = res.cantidad;
+    }
+
+}
+
+function abrirModalProducto() {
+    document.getElementById("modalProducto").classList.add("abierto");
+    document.getElementById("mensajeEstadoProducto").textContent = "";
+}
+
+async function guardarProducto() {
+
+    const nombre = document.getElementById("pNombre").value.trim();
+    const cantidad = document.getElementById("pCantidad").value.trim() || "0";
+    const estado = document.getElementById("mensajeEstadoProducto");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al producto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    const res = await llamar("agregarProducto", { nombre, cantidad });
+
+    if (res && res.error) {
+        estado.textContent = "Error: " + res.error;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "¡Producto guardado!";
+    estado.style.color = "#5fd98a";
+
+    document.getElementById("pNombre").value = "";
+    document.getElementById("pCantidad").value = "";
+
+    setTimeout(() => {
+        cerrarModales();
+        cargarStock();
+    }, 700);
+
+}
+
+function abrirEtiqueta(id, nombre) {
+
+    document.getElementById("etiquetaNombre").textContent = nombre;
+
+    const contenedor = document.getElementById("etiquetaQR");
+    contenedor.innerHTML = "";
+
+    new QRCode(contenedor, {
+        text: "KM26-STOCK-" + id,
+        width: 180,
+        height: 180
+    });
+
+    document.getElementById("modalEtiqueta").classList.add("abierto");
+
+}
+
+// ---------- Escáner con cámara ----------
+
+async function abrirEscaner() {
+
+    document.getElementById("modalEscaner").classList.add("abierto");
+    document.getElementById("resultadoEscaner").innerHTML = "";
+
+    try {
+
+        streamCamara = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        });
+
+        const video = document.getElementById("videoEscaner");
+        video.srcObject = streamCamara;
+
+        escaneando = true;
+        requestAnimationFrame(loopEscaneo);
+
+    } catch (err) {
+        document.getElementById("resultadoEscaner").innerHTML =
+            '<p style="color:#ff6b6b;font-size:13px;">No se pudo acceder a la cámara. Revisá los permisos del navegador.</p>';
+    }
+
+}
+
+function cerrarEscaner() {
+
+    escaneando = false;
+
+    if (streamCamara) {
+        streamCamara.getTracks().forEach(t => t.stop());
+        streamCamara = null;
+    }
+
+    document.getElementById("modalEscaner").classList.remove("abierto");
+
+}
+
+function loopEscaneo() {
+
+    if (!escaneando) return;
+
+    const video = document.getElementById("videoEscaner");
+    const canvas = document.getElementById("canvasEscaner");
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imagen = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const codigo = jsQR(imagen.data, imagen.width, imagen.height);
+
+        if (codigo && codigo.data && codigo.data.startsWith("KM26-STOCK-")) {
+            procesarCodigoEscaneado(codigo.data);
+            return;
+        }
+
+    }
+
+    requestAnimationFrame(loopEscaneo);
+
+}
+
+async function procesarCodigoEscaneado(texto) {
+
+    escaneando = false;
+
+    const id = texto.replace("KM26-STOCK-", "");
+    const producto = await llamar("obtenerProducto", { id });
+
+    const el = document.getElementById("resultadoEscaner");
+
+    if (!producto || producto.error) {
+        el.innerHTML = '<p style="color:#ff6b6b;font-size:13px;">Producto no encontrado.</p>';
+        setTimeout(() => { escaneando = true; requestAnimationFrame(loopEscaneo); }, 1500);
+        return;
+    }
+
+    el.innerHTML = `
+        <div class="fila-stock" style="margin-top:14px;">
+            <div>
+                <div class="fila-stock-nombre">${escapar(producto.nombre)}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="escaner-cantidad">${producto.cantidad}</span> unidades</div>
+            </div>
+            <div class="fila-stock-botones">
+                <button class="btn-redondo" onclick="ajustarDesdeEscaner(${producto.id}, -1)">-</button>
+                <button class="btn-redondo" onclick="ajustarDesdeEscaner(${producto.id}, 1)">+</button>
+            </div>
+        </div>
+        <button class="btn-chico" style="margin-top:10px;" onclick="reanudarEscaneo()">Escanear otro</button>
+    `;
+
+}
+
+async function ajustarDesdeEscaner(id, delta) {
+    const res = await llamar("ajustarStock", { id, delta });
+    if (res && !res.error) {
+        document.getElementById("escaner-cantidad").textContent = res.cantidad;
+    }
+}
+
+function reanudarEscaneo() {
+    document.getElementById("resultadoEscaner").innerHTML = "";
+    escaneando = true;
+    requestAnimationFrame(loopEscaneo);
 }
 
 // ======================================================
