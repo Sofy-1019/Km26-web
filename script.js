@@ -378,8 +378,13 @@ function ubicarSobreLaFoto() {
 
     // Logo: centrado sobre la persiana (29.8% del ancho de la foto),
     // en la franja de pared antes de que empiece la apertura (10% del alto).
-    const logoX = margenX + anchoVisible * 0.298;
+    let logoX = margenX + anchoVisible * 0.298;
     const logoY = margenY + altoVisible * 0.10;
+
+    // Seguro: que el logo nunca pueda quedar cortado por ningún borde,
+    // sea cual sea el cálculo de arriba.
+    const mitadLogo = logo.offsetWidth / 2 || 100;
+    logoX = Math.min(Math.max(logoX, mitadLogo + 8), contenedorAncho - mitadLogo - 8);
 
     logo.style.left = logoX + "px";
     logo.style.top = Math.max(logoY, 14) + "px";
@@ -389,8 +394,11 @@ function ubicarSobreLaFoto() {
     // (en mobile/tablet se ocultan y no hace falta calcular nada).
     if (botones && getComputedStyle(botones).display !== "none") {
 
-        const botonesX = margenX + anchoVisible * 0.666;
+        let botonesX = margenX + anchoVisible * 0.666;
         const botonesY = margenY + altoVisible * 0.68;
+
+        const mitadBotones = botones.offsetWidth / 2 || 150;
+        botonesX = Math.min(Math.max(botonesX, mitadBotones + 8), contenedorAncho - mitadBotones - 8);
 
         botones.style.left = botonesX + "px";
         botones.style.top = botonesY + "px";
