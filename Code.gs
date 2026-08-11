@@ -38,6 +38,7 @@ function doGet(e) {
     if (action === "agregarHistorial") return respond(agregarHistorial(e.parameter));
     if (action === "historialDeVehiculo") return respond(historialDeVehiculo(e.parameter.vehiculoId));
     if (action === "cajaSemanal") return respond(cajaSemanal());
+    if (action === "topVentas") return respond(topVentas());
 
     return respond({ error: "Acción no reconocida: " + action });
 
@@ -409,3 +410,30 @@ function cajaSemanal() {
   }));
 }
 
+// ---------- Top productos más vendidos ----------
+
+function topVentas() {
+  const data = getSheet("Caja").getDataRange().getValues().slice(1);
+  const conteo = {};
+
+  data.forEach(r => {
+    const tipo = r[2];
+    const descripcion = String(r[3] || "");
+
+    if (tipo === "Ingreso" && descripcion.indexOf("Venta: ") === 0) {
+      const nombre = descripcion.substring(7).trim();
+      const monto = parseFloat(r[4] || 0);
+
+      if (!conteo[nombre]) {
+        conteo[nombre] = { nombre: nombre, cantidad: 0, total: 0 };
+      }
+
+      conteo[nombre].cantidad += 1;
+      conteo[nombre].total += monto;
+    }
+  });
+
+  return Object.values(conteo)
+    .sort((a, b) => b.cantidad - a.cantidad)
+    .slice(0, 5);
+}
