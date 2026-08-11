@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de gestión · KM26 Performance</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="images/apple-touch-icon-panel.png">
+<meta name="theme-color" content="#0f0f0f">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Racing+Sans+One&display=swap" rel="stylesheet">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+h1,h2,h3,
+.marca-nombre,
+nav.tabs button,
+.fila-titulo h2{
+    font-family:'Racing Sans One','Montserrat',sans-serif;
+    letter-spacing:.5px;
+}
+
+body{
+    background:#0f0f0f;
+    color:#fff;
+    min-height:100vh;
+}
+
+/* ---------- Login ---------- */
+
+#pantallaLogin{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    text-align:center;
+}
+
+#pantallaLogin img{
+    width:90px;
+    height:90px;
+    margin-bottom:18px;
+    filter:drop-shadow(0 8px 20px rgba(215,25,32,.35));
+}
+
+#pantallaLogin h1{
+    font-size:26px;
+    margin-bottom:6px;
+}
+
+#pantallaLogin p{
+    color:#999;
+    margin-bottom:26px;
+    font-size:14px;
+}
+
+#pantallaLogin input{
+    width:100%;
+    max-width:300px;
+    padding:14px 16px;
+    font-size:15px;
+    border-radius:12px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    margin-bottom:12px;
+}
+
+#pantallaLogin input:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.btn-red{
+    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    color:#fff;
+    border:none;
+    padding:14px 32px;
+    border-radius:50px;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-red:hover{
+    background:linear-gradient(180deg,#ff3941,#d71920);
+}
+
+#errorLogin{
+    color:#ff6b6b;
+    font-size:13px;
+    margin-top:14px;
+    min-height:18px;
+}
+
+/* ---------- App ---------- */
+
+#app{
+    display:none;
+    max-width:1000px;
+    margin:0 auto;
+    padding:20px;
+}
+
+header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+}
+
+.marca{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.marca-logo-img{
+    width:46px;
+    height:46px;
+    filter:drop-shadow(0 4px 12px rgba(215,25,32,.35));
+}
+
+.marca-nombre{
+    font-weight:700;
+    font-size:16px;
+}
+
+.marca-sub{
+    font-size:12px;
+    color:#888;
+}
+
+.badge-tiempo-real{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#0d2418;
+    color:#5fd98a;
+    font-size:11px;
+    font-weight:700;
+    padding:5px 12px;
+    border-radius:20px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.punto-verde{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#5fd98a;
+    animation:pulso 1.6s infinite;
+}
+
+@keyframes pulso{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.3; }
+}
+
+#buscador{
+    flex:1;
+    min-width:180px;
+    max-width:320px;
+    padding:12px 16px;
+    border-radius:10px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+}
+
+#buscador:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.btn-salir{
+    background:none;
+    border:1px solid #333;
+    color:#999;
+    padding:10px 16px;
+    border-radius:20px;
+    font-size:12px;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+nav.tabs{
+    display:flex;
+    gap:4px;
+    border-bottom:1px solid #262626;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+}
+
+nav.tabs button{
+    background:none;
+    border:none;
+    color:#999;
+    font-size:14px;
+    padding:10px 16px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+}
+
+nav.tabs button.activo{
+    color:#ff6b6b;
+    border-bottom-color:#d71920;
+}
+
+nav.tabs button.proximamente{
+    color:#555;
+    cursor:default;
+}
+
+.seccion{
+    display:none;
+}
+
+.seccion.activa{
+    display:block;
+}
+
+.fila-titulo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.btn-chico{
+    background:#1a1a1a;
+    border:1px solid #333;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-chico:hover{
+    border-color:#d71920;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#161616;
+    border-radius:12px;
+    overflow:hidden;
+    font-size:13px;
+    margin-bottom:24px;
+}
+
+th{
+    text-align:left;
+    padding:12px 14px;
+    background:#1e1e1e;
+    color:#999;
+    font-weight:600;
+    font-size:12px;
+}
+
+td{
+    padding:12px 14px;
+    border-top:1px solid #262626;
+}
+
+td.mono{
+    color:#bbb;
+}
+
+.vacio{
+    text-align:center;
+    color:#666;
+    padding:30px;
+    font-size:13px;
+}
+
+.aviso-migracion{
+    background:#1a1608;
+    border:1px solid #4d3d0a;
+    color:#e0c05a;
+    padding:14px 18px;
+    border-radius:12px;
+    font-size:13px;
+    margin-bottom:20px;
+    line-height:1.6;
+}
+
+/* ---------- Modal ---------- */
+
+.overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+    padding:20px;
+}
+
+.overlay.abierto{
+    display:flex;
+}
+
+.modal{
+    background:#161616;
+    border-radius:16px;
+    padding:24px;
+    max-width:420px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+}
+
+.modal h3{
+    font-size:17px;
+    margin-bottom:18px;
+}
+
+.modal label{
+    display:block;
+    font-size:12px;
+    color:#999;
+    margin-bottom:6px;
+    margin-top:14px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.modal input{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+}
+
+.modal input:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.modal-botones{
+    display:flex;
+    gap:10px;
+    margin-top:22px;
+}
+
+.btn-cancelar{
+    flex:1;
+    background:none;
+    border:1px solid #333;
+    color:#ccc;
+    padding:12px;
+    border-radius:50px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.modal .btn-red{
+    flex:1;
+}
+
+#mensajeEstado{
+    font-size:13px;
+    text-align:center;
+    margin-top:14px;
+    min-height:18px;
+}
+
+@media (max-width:600px){
+    header{flex-direction:column;align-items:stretch;}
+    #buscador{max-width:none;}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ---------- Login ---------- -->
+<div id="pantallaLogin">
+    <img src="images/icon-192.png" alt="KM26">
+    <h1>Panel de gestión</h1>
+    <p>KM26 Performance</p>
+    <input type="text" id="loginEmail" placeholder="Usuario (ej: admin@km26.com)">
+    <input type="password" id="loginPassword" placeholder="Contraseña">
+    <br>
+    <button class="btn-red" onclick="iniciarSesion()">Ingresar</button>
+    <p id="errorLogin"></p>
+</div>
+
+<!-- ---------- App ---------- -->
+<div id="app">
+
+    <header>
+        <div class="marca">
+            <img src="images/icon-192.png" alt="KM26" class="marca-logo-img">
+            <div>
+                <div class="marca-nombre">KM26 Performance</div>
+                <div class="marca-sub">Panel de gestión</div>
+            </div>
+        </div>
+        <span class="badge-tiempo-real"><span class="punto-verde"></span> En vivo</span>
+        <input type="text" id="buscador" placeholder="Buscar cliente por nombre...">
+        <button class="btn-red" onclick="abrirModalCliente()">+ Nuevo cliente</button>
+        <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+    </header>
+
+    <div class="aviso-migracion">
+        🚧 <strong>Panel en migración a Firebase.</strong> Por ahora solo "Clientes" funciona acá, ya en tiempo real entre dispositivos. El resto de los módulos (Vehículos, Caja, Stock, Historial) siguen en el panel de siempre hasta que los migremos.
+    </div>
+
+    <nav class="tabs">
+        <button class="activo" data-tab="clientes">Clientes</button>
+        <button class="proximamente" disabled>Vehículos (próx.)</button>
+        <button class="proximamente" disabled>Caja (próx.)</button>
+        <button class="proximamente" disabled>Stock (próx.)</button>
+    </nav>
+
+    <section class="seccion activa" id="tab-clientes">
+        <div class="fila-titulo"><h2>Clientes</h2></div>
+        <div id="tablaClientes"></div>
+    </section>
+
+</div>
+
+<!-- ---------- Modal: nuevo/editar cliente ---------- -->
+<div class="overlay" id="modalCliente">
+    <div class="modal">
+        <h3 id="modalClienteTitulo">Nuevo cliente</h3>
+
+        <input type="hidden" id="cId">
+
+        <label>Nombre</label>
+        <input type="text" id="cNombre" placeholder="Juan">
+
+        <label>Apellido</label>
+        <input type="text" id="cApellido" placeholder="Pérez">
+
+        <label>Teléfono</label>
+        <input type="tel" id="cTelefono" placeholder="11 5555-1234">
+
+        <label>Email (opcional)</label>
+        <input type="email" id="cEmail" placeholder="juan@mail.com">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarCliente()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstado"></p>
+    </div>
+</div>
+
+<!-- Firebase (SDK vía CDN, sin necesidad de instalar nada) -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+    getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+    onSnapshot, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyB8W3x4-b0JEaxwEXBY09qWWFPRc2q98CA",
+    authDomain: "km26-gestion.firebaseapp.com",
+    projectId: "km26-gestion",
+    storageBucket: "km26-gestion.firebasestorage.app",
+    messagingSenderId: "1006314454164",
+    appId: "1:1006314454164:web:7a4e49c99e54d125038881"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let clientesCache = [];
+let editandoId = null;
+
+// ---------- Login ----------
+
+window.iniciarSesion = function () {
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const pass = document.getElementById("loginPassword").value;
+    const error = document.getElementById("errorLogin");
+
+    error.textContent = "";
+
+    signInWithEmailAndPassword(auth, email, pass)
+        .catch(() => {
+            error.textContent = "Email o contraseña incorrectos.";
+        });
+
+};
+
+window.cerrarSesion = function () {
+    signOut(auth);
+};
+
+onAuthStateChanged(auth, (user) => {
+
+    if (user) {
+        document.getElementById("pantallaLogin").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        escucharClientes();
+    } else {
+        document.getElementById("pantallaLogin").style.display = "flex";
+        document.getElementById("app").style.display = "none";
+    }
+
+});
+
+document.getElementById("loginPassword").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") window.iniciarSesion();
+});
+
+// ---------- Clientes en tiempo real ----------
+
+function escucharClientes() {
+
+    const q = query(collection(db, "clientes"), orderBy("apellido"));
+
+    onSnapshot(q, (snapshot) => {
+
+        clientesCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderClientes(clientesCache);
+
+    });
+
+}
+
+function renderClientes(lista) {
+
+    const el = document.getElementById("tablaClientes");
+
+    if (!lista || lista.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay clientes cargados.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Email</th><th></th></tr></thead><tbody>";
+
+    lista.forEach(c => {
+        html += `<tr>
+            <td>${escapar(c.apellido)}, ${escapar(c.nombre)}</td>
+            <td class="mono">${escapar(c.telefono || "-")}</td>
+            <td class="mono">${escapar(c.email || "-")}</td>
+            <td style="white-space:nowrap;">
+                <button class="btn-chico" onclick="editarCliente('${c.id}')">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')">Borrar</button>
+            </td>
+        </tr>`;
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+function escapar(s) {
+    if (s === undefined || s === null) return "";
+    return String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function escaparComillas(s) {
+    return String(s).replace(/'/g, "\\'");
+}
+
+document.getElementById("buscador").addEventListener("input", function () {
+
+    const q = this.value.trim().toLowerCase();
+
+    if (!q) {
+        renderClientes(clientesCache);
+        return;
+    }
+
+    const filtrados = clientesCache.filter(c =>
+        (c.nombre + " " + c.apellido).toLowerCase().includes(q) ||
+        (c.telefono || "").includes(q)
+    );
+
+    renderClientes(filtrados);
+
+});
+
+// ---------- Modal nuevo/editar cliente ----------
+
+window.abrirModalCliente = function () {
+
+    editandoId = null;
+    document.getElementById("modalClienteTitulo").textContent = "Nuevo cliente";
+    document.getElementById("cId").value = "";
+    document.getElementById("cNombre").value = "";
+    document.getElementById("cApellido").value = "";
+    document.getElementById("cTelefono").value = "";
+    document.getElementById("cEmail").value = "";
+    document.getElementById("mensajeEstado").textContent = "";
+    document.getElementById("modalCliente").classList.add("abierto");
+
+};
+
+window.editarCliente = function (id) {
+
+    const c = clientesCache.find(x => x.id === id);
+    if (!c) return;
+
+    editandoId = id;
+    document.getElementById("modalClienteTitulo").textContent = "Editar cliente";
+    document.getElementById("cNombre").value = c.nombre || "";
+    document.getElementById("cApellido").value = c.apellido || "";
+    document.getElementById("cTelefono").value = c.telefono || "";
+    document.getElementById("cEmail").value = c.email || "";
+    document.getElementById("mensajeEstado").textContent = "";
+    document.getElementById("modalCliente").classList.add("abierto");
+
+};
+
+window.cerrarModales = function () {
+    document.getElementById("modalCliente").classList.remove("abierto");
+};
+
+window.guardarCliente = async function () {
+
+    const nombre = document.getElementById("cNombre").value.trim();
+    const apellido = document.getElementById("cApellido").value.trim();
+    const telefono = document.getElementById("cTelefono").value.trim();
+    const email = document.getElementById("cEmail").value.trim();
+    const estado = document.getElementById("mensajeEstado");
+
+    if (!nombre || !apellido) {
+        estado.textContent = "Nombre y apellido son obligatorios.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        if (editandoId) {
+
+            await updateDoc(doc(db, "clientes", editandoId), {
+                nombre, apellido, telefono, email
+            });
+
+        } else {
+
+            await addDoc(collection(db, "clientes"), {
+                nombre, apellido, telefono, email,
+                creado: serverTimestamp()
+            });
+
+        }
+
+        estado.textContent = "¡Listo!";
+        estado.style.color = "#5fd98a";
+
+        setTimeout(() => {
+            window.cerrarModales();
+        }, 500);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.borrarCliente = async function (id, nombreCompleto) {
+
+    const confirmado = confirm(`¿Seguro que querés borrar a ${nombreCompleto}? No se puede deshacer.`);
+    if (!confirmado) return;
+
+    await deleteDoc(doc(db, "clientes", id));
+
+};
+
+</script>
+
+</body>
+</html>

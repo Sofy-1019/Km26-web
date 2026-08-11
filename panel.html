@@ -6,10 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel de gestión · KM26 Performance</title>
 <meta name="robots" content="noindex, nofollow">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="images/apple-touch-icon-panel.png">
+<meta name="theme-color" content="#0f0f0f">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Racing+Sans+One&display=swap" rel="stylesheet">
 <style>
 
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+h1,h2,h3,
+.marca-nombre,
+nav.tabs button,
+.fila-titulo h2{
+    font-family:'Racing Sans One','Montserrat',sans-serif;
+    letter-spacing:.5px;
+}
 
 body{
     background:#0f0f0f;
@@ -105,17 +116,11 @@ header{
     gap:10px;
 }
 
-.marca-logo{
-    width:38px;
-    height:38px;
-    border-radius:8px;
-    background:#2a0a0b;
-    color:#ff6b6b;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:800;
-    font-size:13px;
+.marca-logo-img{
+    width:46px;
+    height:46px;
+    display:block;
+    filter:drop-shadow(0 4px 12px rgba(215,25,32,.35));
 }
 
 .marca-nombre{
@@ -602,7 +607,7 @@ td.mono{
 
     <header>
         <div class="marca">
-            <div class="marca-logo">KM</div>
+            <img src="images/icon-192.png" alt="KM26 Performance" class="marca-logo-img">
             <div>
                 <div class="marca-nombre">KM26 Performance</div>
                 <div class="marca-sub">Panel de gestión</div>
@@ -627,6 +632,9 @@ td.mono{
             <div class="stat-card verde"><div class="stat-label">Caja de hoy</div><div class="stat-valor" id="statCajaHoy">-</div></div>
             <div class="stat-card"><div class="stat-label">Caja del mes</div><div class="stat-valor" id="statCajaMes">-</div></div>
         </div>
+
+        <div class="fila-titulo"><h2>🏆 Top productos más vendidos</h2></div>
+        <div id="tablaTopVentas"></div>
 
         <div class="fila-titulo"><h2>Clientes recientes</h2></div>
         <div id="tablaInicio"></div>
@@ -1016,6 +1024,7 @@ async function cargarInicio() {
 
     const clientes = await llamar("listarClientes", {});
     const resumen = await llamar("resumenCaja", {});
+    const topVentas = await llamar("topVentas", {});
 
     if (Array.isArray(clientes)) {
         document.getElementById("statClientes").textContent = clientes.length + "+";
@@ -1026,6 +1035,35 @@ async function cargarInicio() {
         document.getElementById("statCajaHoy").textContent = formatoPlata(resumen.hoy);
         document.getElementById("statCajaMes").textContent = formatoPlata(resumen.mes);
     }
+
+    renderTopVentas(topVentas);
+
+}
+
+function renderTopVentas(lista) {
+
+    const el = document.getElementById("tablaTopVentas");
+
+    if (!Array.isArray(lista) || lista.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay ventas registradas (se cargan desde el escáner de Stock).</div>';
+        return;
+    }
+
+    const medallas = ["🥇", "🥈", "🥉", "4°", "5°"];
+
+    let html = "<table><thead><tr><th></th><th>Producto</th><th>Vendidos</th><th>Recaudado</th></tr></thead><tbody>";
+
+    lista.forEach((p, i) => {
+        html += `<tr>
+            <td class="mono">${medallas[i] || (i + 1) + "°"}</td>
+            <td>${escapar(p.nombre)}</td>
+            <td class="mono">${p.cantidad}</td>
+            <td class="mono">${formatoPlata(p.total)}</td>
+        </tr>`;
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
 
 }
 
