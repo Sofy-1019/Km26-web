@@ -226,6 +226,67 @@ header{
     font-family:'Montserrat',sans-serif;
 }
 
+.btn-cuenta{
+    background:linear-gradient(180deg,#2fdb6e,#1fa851);
+    color:#fff;
+    border:none;
+    padding:12px 22px;
+    border-radius:20px;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-cuenta:hover{
+    background:linear-gradient(180deg,#3aff82,#25c25f);
+}
+
+.cuenta-item-fila{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#242428;
+    border-radius:10px;
+    padding:10px 14px;
+    margin-bottom:8px;
+    font-size:13px;
+}
+
+.cuenta-item-nombre{
+    flex:1;
+}
+
+.cuenta-item-monto{
+    font-weight:700;
+    font-family:'Montserrat',sans-serif;
+    white-space:nowrap;
+}
+
+.cuenta-item-quitar{
+    background:none;
+    border:none;
+    color:#ff6b6b;
+    font-size:18px;
+    cursor:pointer;
+    padding:0 4px;
+    line-height:1;
+}
+
+#modalCuenta select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+    font-family:'Montserrat',sans-serif;
+    margin-top:6px;
+}
+
 
 nav.tabs{
     display:flex;
@@ -823,6 +884,7 @@ td.mono{
         </div>
         <span class="badge-tiempo-real"><span class="punto-verde"></span> En vivo</span>
         <input type="text" id="buscador" placeholder="Buscar por nombre o patente...">
+        <button class="btn-cuenta" onclick="abrirModalCuenta()">💰 Nueva cuenta</button>
         <button class="btn-red" onclick="abrirModalCliente()">+ Nuevo cliente</button>
         <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
     </header>
@@ -898,7 +960,7 @@ td.mono{
         <div class="fila-titulo">
             <h2>Stock</h2>
             <div style="display:flex;gap:8px;">
-                <button class="btn-chico" onclick="abrirEscaner()">📷 Escanear</button>
+                <button class="btn-chico" onclick="modoEscaner='venta'; abrirEscaner()">📷 Escanear</button>
                 <button class="btn-chico" onclick="abrirModalProducto()">+ Nuevo producto</button>
             </div>
         </div>
@@ -1143,6 +1205,42 @@ td.mono{
         </div>
 
         <p id="mensajeEstadoTurno"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: Nueva cuenta (varios ítems, un solo cobro) ---------- -->
+<div class="overlay" id="modalCuenta">
+    <div class="modal" style="max-width:520px;">
+        <h3>💰 Nueva cuenta</h3>
+
+        <label>Cliente</label>
+        <select id="cuentaCliente" onchange="actualizarVehiculosCuenta()"></select>
+
+        <label>Vehículo (opcional, para sumar la mano de obra a su historia clínica)</label>
+        <select id="cuentaVehiculo"></select>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar ítem (mano de obra, servicio, etc.)</p>
+            <div class="ficha-historial-form">
+                <input type="text" id="itemDescripcion" placeholder="Ej: cambio de rótulas">
+                <input type="number" id="itemMonto" placeholder="$">
+                <button class="btn-chico" onclick="agregarItemManual()">+ Agregar</button>
+            </div>
+            <button class="btn-chico" style="width:100%;margin-top:10px;" onclick="abrirEscanerParaCuenta()">📷 Escanear producto</button>
+        </div>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Ítems de esta cuenta</p>
+            <div id="listaCuentaItems"></div>
+            <div id="cuentaTotal" style="text-align:right;font-size:20px;font-weight:800;margin-top:12px;font-family:'Montserrat',sans-serif;"></div>
+        </div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModalCuenta()">Cancelar</button>
+            <button class="btn-confirmar-gasto" style="flex:1;" onclick="cobrarCuenta()">💰 Cobrar todo</button>
+        </div>
+
+        <p id="mensajeEstadoCuenta"></p>
     </div>
 </div>
 
@@ -1431,6 +1529,7 @@ window.cerrarModales = function () {
     document.getElementById("modalEditarProducto").classList.remove("abierto");
     document.getElementById("modalEtiqueta").classList.remove("abierto");
     document.getElementById("modalTurno").classList.remove("abierto");
+    document.getElementById("modalCuenta").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -2166,6 +2265,8 @@ window.agregarHistorial = async function (vehiculoId) {
 // ---------- Stock en tiempo real ----------
 
 let stockCache = [];
+let cuentaItems = [];
+let modoEscaner = "venta";
 let streamCamara = null;
 let escaneando = false;
 
@@ -2440,6 +2541,24 @@ function procesarCodigoEscaneado(texto) {
         return;
     }
 
+    // Modo "cuenta": en vez de vender directo, se agrega como ítem a la cuenta actual
+    if (modoEscaner === "cuenta") {
+
+        cuentaItems.push({
+            tipo: "stock",
+            stockId: producto.id,
+            descripcion: producto.nombre,
+            monto: Number(producto.precio) || 0
+        });
+
+        window.cerrarEscaner();
+        document.getElementById("modalCuenta").classList.add("abierto");
+        renderListaCuentaItems();
+
+        return;
+
+    }
+
     el.innerHTML = `
         <div class="fila-stock" style="margin-top:14px;">
             <div>
@@ -2705,6 +2824,178 @@ window.borrarTurno = async function (id) {
     if (!confirmado) return;
 
     await deleteDoc(doc(db, "turnos", id));
+
+};
+
+// ---------- Cuenta / cobro combinado ----------
+
+window.abrirModalCuenta = function () {
+
+    cuentaItems = [];
+
+    const selectCliente = document.getElementById("cuentaCliente");
+    selectCliente.innerHTML = clientesCache
+        .map(c => `<option value="${c.id}">${escapar(c.apellido)}, ${escapar(c.nombre)}</option>`)
+        .join("");
+
+    window.actualizarVehiculosCuenta();
+    renderListaCuentaItems();
+
+    document.getElementById("itemDescripcion").value = "";
+    document.getElementById("itemMonto").value = "";
+    document.getElementById("mensajeEstadoCuenta").textContent = "";
+
+    document.getElementById("modalCuenta").classList.add("abierto");
+
+};
+
+window.actualizarVehiculosCuenta = function () {
+
+    const clienteId = document.getElementById("cuentaCliente").value;
+    const vehiculos = vehiculosCache.filter(v => v.clienteId === clienteId);
+
+    const selectVehiculo = document.getElementById("cuentaVehiculo");
+    selectVehiculo.innerHTML = '<option value="">Sin especificar</option>' +
+        vehiculos.map(v => `<option value="${v.id}">${escapar(v.patente)} - ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</option>`).join("");
+
+};
+
+window.agregarItemManual = function () {
+
+    const descripcion = document.getElementById("itemDescripcion").value.trim();
+    const monto = parseFloat(document.getElementById("itemMonto").value);
+
+    if (!descripcion || !monto) {
+        alert("Completá descripción y monto.");
+        return;
+    }
+
+    cuentaItems.push({ tipo: "manual", descripcion, monto });
+
+    document.getElementById("itemDescripcion").value = "";
+    document.getElementById("itemMonto").value = "";
+
+    renderListaCuentaItems();
+
+};
+
+window.quitarItemCuenta = function (index) {
+    cuentaItems.splice(index, 1);
+    renderListaCuentaItems();
+};
+
+function renderListaCuentaItems() {
+
+    const el = document.getElementById("listaCuentaItems");
+    const totalEl = document.getElementById("cuentaTotal");
+
+    if (cuentaItems.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Todavía no agregaste ningún ítem.</p>';
+        totalEl.textContent = "";
+        return;
+    }
+
+    let total = 0;
+
+    el.innerHTML = cuentaItems.map((item, i) => {
+        total += item.monto;
+        const icono = item.tipo === "stock" ? "📦 " : "🔧 ";
+        return `<div class="cuenta-item-fila">
+            <span class="cuenta-item-nombre">${icono}${escapar(item.descripcion)}</span>
+            <span class="cuenta-item-monto">${formatoPlata(item.monto)}</span>
+            <button class="cuenta-item-quitar" onclick="quitarItemCuenta(${i})">✕</button>
+        </div>`;
+    }).join("");
+
+    totalEl.textContent = "Total: " + formatoPlata(total);
+
+}
+
+window.abrirEscanerParaCuenta = function () {
+    modoEscaner = "cuenta";
+    document.getElementById("modalCuenta").classList.remove("abierto");
+    window.abrirEscaner();
+};
+
+window.cerrarModalCuenta = function () {
+    cuentaItems = [];
+    document.getElementById("modalCuenta").classList.remove("abierto");
+};
+
+window.cobrarCuenta = async function () {
+
+    const clienteId = document.getElementById("cuentaCliente").value;
+    const vehiculoId = document.getElementById("cuentaVehiculo").value;
+    const estado = document.getElementById("mensajeEstadoCuenta");
+
+    if (cuentaItems.length === 0) {
+        estado.textContent = "Agregá al menos un ítem.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    const cliente = clientesCache.find(c => c.id === clienteId);
+    if (!cliente) {
+        estado.textContent = "Elegí un cliente.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Cobrando...";
+    estado.style.color = "#999";
+
+    try {
+
+        const total = cuentaItems.reduce((suma, item) => suma + item.monto, 0);
+        const nombreCliente = `${cliente.nombre} ${cliente.apellido}`;
+        const descripciones = cuentaItems.map(i => i.descripcion).join(" + ");
+
+        // Descuenta stock de cada ítem escaneado
+        for (const item of cuentaItems) {
+            if (item.tipo === "stock" && item.stockId) {
+                const producto = stockCache.find(p => p.id === item.stockId);
+                if (producto) {
+                    const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) - 1);
+                    await updateDoc(doc(db, "stock", item.stockId), { cantidad: nuevaCantidad });
+                }
+            }
+        }
+
+        // Un solo ingreso combinado en Caja
+        await addDoc(collection(db, "caja"), {
+            tipo: "Ingreso",
+            descripcion: `${descripciones} - ${nombreCliente}`,
+            monto: total,
+            clienteId,
+            fecha: serverTimestamp()
+        });
+
+        // Si eligió vehículo, la mano de obra (ítems manuales) queda en su historia clínica
+        if (vehiculoId) {
+            for (const item of cuentaItems) {
+                if (item.tipo === "manual") {
+                    await addDoc(collection(db, "historial"), {
+                        vehiculoId,
+                        descripcion: item.descripcion,
+                        costo: item.monto,
+                        fecha: serverTimestamp()
+                    });
+                }
+            }
+        }
+
+        estado.textContent = "✅ ¡Cuenta cobrada! Total: " + formatoPlata(total);
+        estado.style.color = "#5fd98a";
+
+        setTimeout(() => {
+            cuentaItems = [];
+            document.getElementById("modalCuenta").classList.remove("abierto");
+        }, 1200);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
 
 };
 
