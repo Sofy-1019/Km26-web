@@ -488,6 +488,48 @@ td.mono{
     color:#999;
 }
 
+.ficha-historial{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #2a2a2a;
+}
+
+.ficha-historial-item{
+    font-size:12px;
+    color:#ccc;
+    padding:6px 0;
+    border-bottom:1px dashed #262626;
+}
+
+.ficha-historial-fecha{
+    color:#777;
+    margin-right:6px;
+}
+
+.ficha-historial-form{
+    display:flex;
+    gap:6px;
+    margin-top:10px;
+}
+
+.ficha-historial-form input{
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#141414;
+    color:#fff;
+    font-size:12px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.ficha-historial-form input:first-child{
+    flex:1;
+}
+
+.ficha-historial-form input:nth-child(2){
+    width:90px;
+}
+
 @media (max-width:600px){
     header{flex-direction:column;align-items:stretch;}
     #buscador{max-width:none;}
@@ -812,6 +854,7 @@ onAuthStateChanged(auth, (user) => {
         escucharClientes();
         escucharVehiculos();
         escucharCaja();
+        escucharHistorial();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -1121,10 +1164,22 @@ function renderFichaVehiculos() {
                     <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarVehiculo('${v.id}')">Borrar</button>
                 </div>
             </div>
+
+            <div class="ficha-historial" id="historial-${v.id}">
+                <p style="font-size:12px;color:#777;">Cargando historial...</p>
+            </div>
+
+            <div class="ficha-historial-form">
+                <input type="text" id="hDesc-${v.id}" placeholder="Cambio de aceite, service, etc.">
+                <input type="number" id="hCosto-${v.id}" placeholder="$">
+                <button class="btn-chico" onclick="agregarHistorial('${v.id}')">+</button>
+            </div>
         </div>`;
     });
 
     el.innerHTML = html;
+
+    vehiculos.forEach(v => renderHistorialVehiculo(v.id));
 
 }
 
@@ -1215,6 +1270,7 @@ window.borrarVehiculo = async function (id) {
 // ---------- Caja en tiempo real ----------
 
 let cajaCache = [];
+let historialCache = [];
 let tipoMovimiento = "Ingreso";
 
 function formatoPlata(n) {
@@ -1565,6 +1621,69 @@ window.addEventListener("resize", () => {
         dibujarGraficoAnual();
     }
 });
+
+// ---------- Historial del vehículo, en tiempo real ----------
+
+function escucharHistorial() {
+
+    const q = query(collection(db, "historial"), orderBy("fecha", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+
+        historialCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // Si hay una ficha abierta, se refresca sola
+        if (fichaClienteActual) {
+            const vehiculos = vehiculosCache.filter(v => v.clienteId === fichaClienteActual);
+            vehiculos.forEach(v => renderHistorialVehiculo(v.id));
+        }
+
+    });
+
+}
+
+function renderHistorialVehiculo(vehiculoId) {
+
+    const el = document.getElementById("historial-" + vehiculoId);
+    if (!el) return;
+
+    const historial = historialCache.filter(h => h.vehiculoId === vehiculoId);
+
+    if (historial.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Sin trabajos registrados todavía.</p>';
+        return;
+    }
+
+    el.innerHTML = historial.map(h => {
+
+        const fecha = h.fecha && h.fecha.toDate ? h.fecha.toDate() : null;
+        const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") : "";
+        const costo = h.costo ? " · " + formatoPlata(h.costo) : "";
+
+        return `<div class="ficha-historial-item"><span class="ficha-historial-fecha">${fechaTexto}</span>${escapar(h.descripcion)}${costo}</div>`;
+
+    }).join("");
+
+}
+
+window.agregarHistorial = async function (vehiculoId) {
+
+    const desc = document.getElementById("hDesc-" + vehiculoId).value.trim();
+    const costo = document.getElementById("hCosto-" + vehiculoId).value.trim();
+
+    if (!desc) return;
+
+    await addDoc(collection(db, "historial"), {
+        vehiculoId,
+        descripcion: desc,
+        costo: costo ? parseFloat(costo) : null,
+        fecha: serverTimestamp()
+    });
+
+    document.getElementById("hDesc-" + vehiculoId).value = "";
+    document.getElementById("hCosto-" + vehiculoId).value = "";
+
+};
 
 </script>
 
