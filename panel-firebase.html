@@ -837,7 +837,8 @@ td.mono{
 .badge-estado.estado-rechazado{ background:#2a0a0b; color:#ff6b6b; }
 .badge-estado.estado-vencido{ background:#2a1b0d; color:#ffb35f; }
 
-#modalPresupuesto select{
+#modalPresupuesto select,
+#modalUsuario select{
     width:100%;
     padding:12px;
     border-radius:8px;
@@ -848,6 +849,40 @@ td.mono{
     font-family:'Montserrat',sans-serif;
     margin-top:6px;
 }
+
+.usuario-fila{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#242428;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+}
+
+.usuario-nombre{
+    font-weight:600;
+    font-size:14px;
+}
+
+.usuario-email{
+    font-size:12px;
+    color:#999;
+}
+
+.badge-rol{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:12px;
+    text-transform:capitalize;
+}
+
+.badge-rol.admin{ background:#2a0a0b; color:#ff6b6b; }
+.badge-rol.recepcion{ background:#0d2038; color:#6ab6ff; }
+.badge-rol.mecanico{ background:#0d2418; color:#5fd98a; }
 
 #modalInspeccion input[type="file"]{
     width:100%;
@@ -1051,12 +1086,13 @@ td.mono{
     </div>
 
     <nav class="tabs">
-        <button class="activo" data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
-        <button data-tab="vehiculos" onclick="cambiarTab('vehiculos')">Vehículos</button>
-        <button data-tab="turnos" onclick="cambiarTab('turnos')">Turnos</button>
-        <button data-tab="presupuestos" onclick="cambiarTab('presupuestos')">Presupuestos</button>
-        <button data-tab="caja" onclick="cambiarTab('caja')">Caja</button>
-        <button data-tab="stock" onclick="cambiarTab('stock')">Stock</button>
+        <button class="activo" data-tab="clientes" data-roles="admin,recepcion" onclick="cambiarTab('clientes')">Clientes</button>
+        <button data-tab="vehiculos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos')">Vehículos</button>
+        <button data-tab="turnos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('turnos')">Turnos</button>
+        <button data-tab="presupuestos" data-roles="admin,recepcion" onclick="cambiarTab('presupuestos')">Presupuestos</button>
+        <button data-tab="caja" data-roles="admin,recepcion" onclick="cambiarTab('caja')">Caja</button>
+        <button data-tab="stock" data-roles="admin,recepcion" onclick="cambiarTab('stock')">Stock</button>
+        <button data-tab="usuarios" data-roles="admin" onclick="cambiarTab('usuarios')">👤 Usuarios</button>
     </nav>
 
     <section class="seccion activa" id="tab-clientes">
@@ -1131,6 +1167,21 @@ td.mono{
             </div>
         </div>
         <div id="tablaStock"></div>
+
+    </section>
+
+    <section class="seccion" id="tab-usuarios">
+
+        <div class="fila-titulo">
+            <h2>👤 Usuarios y permisos</h2>
+            <button class="btn-red" onclick="abrirModalUsuario()">+ Agregar usuario</button>
+        </div>
+
+        <div class="aviso-migracion" style="border-color:#0d2038;background:#0a1a2a;color:#6ab6ff;">
+            💡 Antes de agregar a alguien acá, primero tenés que crearle su usuario y contraseña en Firebase → Authentication (mismo paso que hicimos para vos). Recién después asignale el rol acá.
+        </div>
+
+        <div id="listaUsuarios"></div>
 
     </section>
 
@@ -1459,6 +1510,33 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: agregar/editar usuario del equipo ---------- -->
+<div class="overlay" id="modalUsuario">
+    <div class="modal">
+        <h3>👤 Usuario del equipo</h3>
+
+        <label>Email (el mismo que usa para iniciar sesión)</label>
+        <input type="text" id="usuarioEmail" placeholder="ej: mecanico@km26.com">
+
+        <label>Nombre</label>
+        <input type="text" id="usuarioNombre" placeholder="Nombre y apellido">
+
+        <label>Rol</label>
+        <select id="usuarioRol">
+            <option value="admin">Admin (ve todo)</option>
+            <option value="recepcion">Recepción</option>
+            <option value="mecanico">Mecánico</option>
+        </select>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" style="flex:1;" onclick="guardarUsuario()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoUsuario"></p>
+    </div>
+</div>
+
 <!-- ---------- Modal: nuevo presupuesto ---------- -->
 <div class="overlay" id="modalPresupuesto">
     <div class="modal" style="max-width:520px;">
@@ -1540,7 +1618,7 @@ import {
     getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
-    getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+    getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, setDoc,
     onSnapshot, query, orderBy, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {
@@ -1647,6 +1725,7 @@ window.cerrarSesion = function () {
 onAuthStateChanged(auth, (user) => {
 
     if (user) {
+        usuarioActual = user;
         document.getElementById("pantallaLogin").style.display = "none";
         document.getElementById("app").style.display = "block";
         escucharClientes();
@@ -1657,6 +1736,7 @@ onAuthStateChanged(auth, (user) => {
         escucharTurnos();
         escucharPresupuestos();
         escucharInspecciones();
+        escucharUsuarios();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -1802,6 +1882,7 @@ window.cerrarModales = function () {
     document.getElementById("modalPresupuesto").classList.remove("abierto");
     document.getElementById("modalHistorialDirecto").classList.remove("abierto");
     document.getElementById("modalInspeccion").classList.remove("abierto");
+    document.getElementById("modalUsuario").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -3792,6 +3873,178 @@ window.guardarInspeccion = async function () {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
     }
+
+};
+
+// ---------- Usuarios y permisos ----------
+
+let usuarioActual = null;
+let usuariosCache = [];
+let rolActual = null;
+
+const PERMISOS_DEFECTO = {
+    admin: "Ve y usa todo el panel.",
+    recepcion: "Clientes, Vehículos, Turnos, Presupuestos, Caja y Stock.",
+    mecanico: "Solo Vehículos (Historia clínica e Inspecciones) y Turnos."
+};
+
+function escucharUsuarios() {
+
+    const q = query(collection(db, "usuarios"), orderBy("nombre"));
+
+    onSnapshot(q, async (snapshot) => {
+
+        usuariosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        if (usuariosCache.length === 0) {
+            // Nadie tiene rol asignado todavía: el primero en entrar queda como admin automáticamente
+            await setDoc(doc(db, "usuarios", usuarioActual.email), {
+                email: usuarioActual.email,
+                nombre: "Admin",
+                rol: "admin",
+                creado: serverTimestamp()
+            });
+            return; // el propio onSnapshot se vuelve a disparar solo con el dato nuevo
+        }
+
+        determinarRolActual();
+        renderUsuarios();
+
+    });
+
+}
+
+function determinarRolActual() {
+
+    const miUsuario = usuariosCache.find(u => u.email === usuarioActual.email);
+
+    if (!miUsuario) {
+        // Está autenticado en Firebase pero nadie le asignó un rol todavía: no entra
+        alert("Tu usuario todavía no tiene un rol asignado en el panel. Pedile a un administrador que te agregue en la sección 'Usuarios'.");
+        window.cerrarSesion();
+        return;
+    }
+
+    rolActual = miUsuario.rol;
+    aplicarPermisosUI();
+
+}
+
+function aplicarPermisosUI() {
+
+    document.querySelectorAll("nav.tabs button[data-roles]").forEach(btn => {
+
+        const rolesPermitidos = btn.dataset.roles.split(",");
+
+        if (rolesPermitidos.includes(rolActual)) {
+            btn.style.display = "";
+        } else {
+            btn.style.display = "none";
+        }
+
+    });
+
+    // Si la pestaña activa quedó oculta por el rol, volvemos a Clientes o Vehículos (lo primero visible)
+    const activaOculta = document.querySelector("nav.tabs button.activo")?.style.display === "none";
+
+    if (activaOculta) {
+        const primeraVisible = [...document.querySelectorAll("nav.tabs button[data-roles]")]
+            .find(b => b.style.display !== "none");
+        if (primeraVisible) window.cambiarTab(primeraVisible.dataset.tab);
+    }
+
+}
+
+function renderUsuarios() {
+
+    const el = document.getElementById("listaUsuarios");
+    if (!el) return;
+
+    el.innerHTML = usuariosCache.map(u => `
+        <div class="usuario-fila">
+            <div>
+                <div class="usuario-nombre">${escapar(u.nombre)}</div>
+                <div class="usuario-email">${escapar(u.email)}</div>
+            </div>
+            <span class="badge-rol ${u.rol}">${u.rol}</span>
+            <button class="btn-chico" onclick="abrirModalUsuario('${u.id}')">Editar</button>
+            <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarUsuario('${u.id}', '${escaparComillas(u.nombre)}')">Quitar</button>
+        </div>
+    `).join("");
+
+}
+
+window.abrirModalUsuario = function (id) {
+
+    if (id) {
+        const u = usuariosCache.find(x => x.id === id);
+        document.getElementById("usuarioEmail").value = u.email;
+        document.getElementById("usuarioEmail").disabled = true;
+        document.getElementById("usuarioNombre").value = u.nombre;
+        document.getElementById("usuarioRol").value = u.rol;
+        document.getElementById("modalUsuario").dataset.editandoId = id;
+    } else {
+        document.getElementById("usuarioEmail").value = "";
+        document.getElementById("usuarioEmail").disabled = false;
+        document.getElementById("usuarioNombre").value = "";
+        document.getElementById("usuarioRol").value = "recepcion";
+        document.getElementById("modalUsuario").dataset.editandoId = "";
+    }
+
+    document.getElementById("mensajeEstadoUsuario").textContent = "";
+    document.getElementById("modalUsuario").classList.add("abierto");
+
+};
+
+window.guardarUsuario = async function () {
+
+    const email = document.getElementById("usuarioEmail").value.trim().toLowerCase();
+    const nombre = document.getElementById("usuarioNombre").value.trim();
+    const rol = document.getElementById("usuarioRol").value;
+    const editandoId = document.getElementById("modalUsuario").dataset.editandoId;
+    const estado = document.getElementById("mensajeEstadoUsuario");
+
+    if (!email || !nombre) {
+        estado.textContent = "Completá el email y el nombre.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        if (editandoId) {
+            // El email es el identificador: nunca se cambia al editar, solo nombre y rol
+            await updateDoc(doc(db, "usuarios", editandoId), { nombre, rol });
+        } else {
+            await setDoc(doc(db, "usuarios", email), { email, nombre, rol, creado: serverTimestamp() });
+        }
+
+        estado.textContent = "¡Listo!";
+        estado.style.color = "#5fd98a";
+
+        setTimeout(() => window.cerrarModales(), 500);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.borrarUsuario = async function (id, nombre) {
+
+    if (usuariosCache.length <= 1) {
+        alert("No podés quitar al único usuario del panel.");
+        return;
+    }
+
+    const confirmado = confirm(`¿Quitar a ${nombre} del panel? Ya no va a poder entrar (aunque su login de Firebase siga existiendo).`);
+    if (!confirmado) return;
+
+    await deleteDoc(doc(db, "usuarios", id));
 
 };
 
