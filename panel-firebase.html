@@ -884,15 +884,35 @@ td.mono{
 .badge-rol.recepcion{ background:#0d2038; color:#6ab6ff; }
 .badge-rol.mecanico{ background:#0d2418; color:#5fd98a; }
 
-#modalInspeccion input[type="file"]{
+.btn-camara{
     width:100%;
-    padding:12px;
-    border-radius:8px;
-    border:1px dashed #444;
-    background:#1a1a1a;
-    color:#ccc;
-    font-size:13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:16px;
+    border-radius:12px;
+    border:1px dashed #555;
+    background:#1a1a1c;
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
     margin-top:6px;
+    font-family:'Montserrat',sans-serif;
+    transition:.2s;
+}
+
+.btn-camara:hover{
+    border-color:#d71920;
+    background:#2a0a0b;
+}
+
+.btn-camara svg{
+    width:22px;
+    height:22px;
+    color:#ff6b6b;
+    flex-shrink:0;
 }
 
 .inspeccion-preview-img{
@@ -1302,8 +1322,13 @@ td.mono{
 
         <input type="hidden" id="inspeccionVehiculoId">
 
-        <label>Fotos del auto (varias a la vez, tocá para usar la cámara)</label>
-        <input type="file" id="inspeccionFotos" accept="image/*" capture="environment" multiple>
+        <label>Fotos del auto</label>
+        <input type="file" id="inspeccionFotos" accept="image/*" capture="environment" multiple style="display:none;">
+        <button type="button" class="btn-camara" onclick="document.getElementById('inspeccionFotos').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Sacar / elegir fotos
+        </button>
+        <p id="cantidadFotosTexto" style="font-size:11px;color:#777;margin-top:6px;"></p>
 
         <div id="inspeccionPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
 
@@ -3746,6 +3771,7 @@ window.abrirInspeccion = function (vehiculoId, patente) {
     document.getElementById("inspeccionVehiculoId").value = vehiculoId;
     document.getElementById("inspeccionFotos").value = "";
     document.getElementById("inspeccionPreview").innerHTML = "";
+    document.getElementById("cantidadFotosTexto").textContent = "";
     document.getElementById("inspeccionNotas").value = "";
     document.getElementById("mensajeEstadoInspeccion").textContent = "";
 
@@ -3768,6 +3794,11 @@ document.getElementById("inspeccionFotos").addEventListener("change", function (
         img.src = URL.createObjectURL(archivo);
         preview.appendChild(img);
     });
+
+    const texto = document.getElementById("cantidadFotosTexto");
+    texto.textContent = fotosSeleccionadas.length === 0
+        ? ""
+        : `${fotosSeleccionadas.length} foto${fotosSeleccionadas.length > 1 ? "s" : ""} lista${fotosSeleccionadas.length > 1 ? "s" : ""} para guardar`;
 
 });
 
@@ -3867,6 +3898,7 @@ window.guardarInspeccion = async function () {
         fotosSeleccionadas = [];
         document.getElementById("inspeccionFotos").value = "";
         document.getElementById("inspeccionPreview").innerHTML = "";
+        document.getElementById("cantidadFotosTexto").textContent = "";
         document.getElementById("inspeccionNotas").value = "";
 
     } catch (err) {
