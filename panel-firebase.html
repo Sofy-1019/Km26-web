@@ -1070,6 +1070,449 @@ td.mono{
     #buscador{max-width:none;}
 }
 
+/* ======================================================================
+   REDISEÑO "APP MODERNA" — look tipo mockup (nav inferior + dashboard)
+   ====================================================================== */
+
+#app{
+    max-width:480px;
+    padding:16px 16px 100px;
+}
+
+@media (min-width:760px){
+    #app{
+        max-width:1000px;
+        padding:24px 24px 110px;
+    }
+}
+
+/* ---- Header tipo app ---- */
+
+header{
+    margin-bottom:18px;
+    gap:14px;
+}
+
+.header-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.header-logo-wrap{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    overflow:hidden;
+    flex-shrink:0;
+    box-shadow:0 4px 14px rgba(215,25,32,.35);
+    border:2px solid #333;
+}
+
+.header-logo-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.header-saludo{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:17px;
+    color:#fff;
+    letter-spacing:0;
+}
+
+.header-fecha{
+    font-size:11px;
+    color:#888;
+    margin-top:2px;
+}
+
+.header-acciones{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.btn-icono-header{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#ccc;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.btn-icono-header:hover{
+    border-color:#d71920;
+    color:#ff8a7a;
+}
+
+.btn-icono-header svg{
+    width:19px;
+    height:19px;
+}
+
+.buscador-wrap{
+    display:none;
+    margin-top:14px;
+}
+
+.buscador-wrap.activo{
+    display:block;
+}
+
+/* ---- Contenido: quitamos el título grande tipo Orbitron en h2 de sección
+   para que se vea más "app", salvo donde lo queremos conservar ---- */
+
+.fila-titulo h2{
+    font-size:19px;
+}
+
+/* ---- Nav inferior fija (Inicio / Turnos / + / Clientes / Más) ---- */
+
+.nav-inferior{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:500;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    background:#1a1a1c;
+    border-top:1px solid #2c2c2e;
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+}
+
+.nav-inferior-btn{
+    background:none;
+    border:none;
+    color:#888;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    font-size:10.5px;
+    font-weight:600;
+    font-family:'Montserrat',sans-serif;
+    cursor:pointer;
+    padding:4px 8px;
+    flex:1;
+}
+
+.nav-inferior-btn svg{
+    width:22px;
+    height:22px;
+}
+
+.nav-inferior-btn.activo{
+    color:#ff6b6b;
+}
+
+.nav-inferior-mas{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:-22px;
+    box-shadow:0 6px 16px rgba(215,25,32,.5);
+    border:4px solid #2a2a2e;
+    cursor:pointer;
+}
+
+.nav-inferior-mas svg{
+    width:24px;
+    height:24px;
+}
+
+/* ---- Dashboard ---- */
+
+.dash-saludo{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:21px;
+    margin-bottom:2px;
+}
+
+.dash-fecha{
+    font-size:12px;
+    color:#888;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.dash-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:22px;
+}
+
+.dash-card{
+    background:#1a1a1a;
+    border-radius:14px;
+    padding:14px 16px;
+}
+
+.dash-card-label{
+    font-size:11.5px;
+    color:#999;
+    margin-bottom:6px;
+}
+
+.dash-card-valor{
+    font-size:19px;
+    font-weight:800;
+    font-family:'Montserrat',sans-serif;
+}
+
+.dash-card-sub{
+    font-size:10.5px;
+    color:#5fd98a;
+    margin-top:4px;
+}
+
+.dash-seccion-titulo{
+    font-size:13px;
+    font-weight:700;
+    color:#999;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin:22px 0 10px;
+}
+
+.dash-atencion-fila{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#242428;
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:8px;
+    font-size:13px;
+    cursor:pointer;
+    border-left:4px solid #555;
+}
+
+.dash-atencion-fila:hover{
+    border-left-color:#d71920;
+}
+
+.dash-atencion-badge{
+    background:#2a0a0b;
+    color:#ff8a7a;
+    font-weight:800;
+    font-size:12px;
+    border-radius:20px;
+    padding:3px 11px;
+    min-width:26px;
+    text-align:center;
+}
+
+.dash-proximo-turno{
+    background:#242428;
+    border-radius:14px;
+    padding:16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border-left:4px solid #2fdb6e;
+}
+
+.dash-proximo-turno-hora{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:18px;
+    color:#5fd98a;
+    min-width:60px;
+}
+
+.dash-proximo-turno-info{
+    flex:1;
+}
+
+.dash-proximo-turno-cliente{
+    font-weight:700;
+    font-size:14px;
+}
+
+.dash-proximo-turno-detalle{
+    font-size:12px;
+    color:#999;
+}
+
+/* ---- Listas tipo "card" (Clientes, Vehículos) con avatar ---- */
+
+.lista-cards{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:20px;
+}
+
+.item-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#1a1a1a;
+    border-radius:14px;
+    padding:12px 14px;
+}
+
+.item-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#d71920,#8f0f14);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:14px;
+    flex-shrink:0;
+    font-family:'Montserrat',sans-serif;
+}
+
+.item-icono-auto{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:#242428;
+    color:#ff8a7a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.item-icono-auto svg{
+    width:22px;
+    height:22px;
+}
+
+.item-info{
+    flex:1;
+    min-width:0;
+}
+
+.item-titulo{
+    font-weight:700;
+    font-size:14px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.item-sub{
+    font-size:12px;
+    color:#999;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.item-acciones{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+}
+
+/* ---- Overlay "Más opciones" ---- */
+
+#overlayMas .modal{
+    max-width:400px;
+}
+
+.mas-lista{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.mas-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:none;
+    border:none;
+    color:#fff;
+    padding:13px 6px;
+    font-size:14.5px;
+    font-weight:600;
+    font-family:'Montserrat',sans-serif;
+    cursor:pointer;
+    border-radius:10px;
+    text-align:left;
+    width:100%;
+}
+
+.mas-item:hover{
+    background:#242428;
+}
+
+.mas-item svg{
+    width:20px;
+    height:20px;
+    color:#ff6b6b;
+    flex-shrink:0;
+}
+
+.mas-item.salir{
+    color:#ff6b6b;
+    border-top:1px solid #262626;
+    margin-top:8px;
+    padding-top:16px;
+}
+
+/* ---- Overlay "acción rápida" (botón +) ---- */
+
+#overlayRapido .modal{
+    max-width:340px;
+}
+
+.rapido-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#1e1e1e;
+    border:none;
+    color:#fff;
+    padding:14px 16px;
+    font-size:14.5px;
+    font-weight:700;
+    font-family:'Montserrat',sans-serif;
+    cursor:pointer;
+    border-radius:12px;
+    width:100%;
+    margin-bottom:8px;
+}
+
+.rapido-item:hover{
+    background:#242428;
+}
+
+.rapido-item svg{
+    width:20px;
+    height:20px;
+    color:#ff6b6b;
+    flex-shrink:0;
+}
+
 </style>
 </head>
 
@@ -1098,25 +1541,33 @@ td.mono{
 <div id="app">
 
     <header>
-        <div class="marca">
-            <img src="images/icon-192.png" alt="KM26" class="marca-logo-img">
-            <div>
-                <div class="marca-nombre">KM26 Performance</div>
-                <div class="marca-sub">Panel de gestión</div>
+        <div class="header-top">
+            <div class="marca" style="gap:12px;">
+                <div class="header-logo-wrap">
+                    <img src="images/icon-192.png" alt="KM26">
+                </div>
+                <div>
+                    <div class="header-saludo" id="headerSaludo">¡Hola!</div>
+                    <div class="header-fecha" id="headerFecha"></div>
+                </div>
+            </div>
+            <div class="header-acciones">
+                <button class="btn-icono-header" onclick="toggleBuscador()" title="Buscar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+                <button class="btn-icono-header" onclick="cerrarSesion()" title="Salir">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
             </div>
         </div>
-        <span class="badge-tiempo-real"><span class="punto-verde"></span> En vivo</span>
-        <input type="text" id="buscador" placeholder="Buscar por nombre o patente...">
-        <button class="btn-cuenta" onclick="abrirModalCuenta()">💰 Nueva cuenta</button>
-        <button class="btn-red" onclick="abrirModalCliente()">+ Nuevo cliente</button>
-        <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+        <div class="buscador-wrap" id="buscadorWrap">
+            <input type="text" id="buscador" placeholder="Buscar por nombre o patente..." style="max-width:none;">
+        </div>
     </header>
 
-    <div class="aviso-migracion">
-        🚧 <strong>Panel en migración a Firebase.</strong> Ya todo funciona acá en tiempo real: Clientes, Vehículos, Historia clínica, Caja y Stock.
-    </div>
-
-    <nav class="tabs">
+    <!-- Nav superior original: se conserva intacta (mismos onclick/data-roles) pero
+         ahora vive dentro del overlay "Más opciones" en vez de mostrarse como barra -->
+    <nav class="tabs" style="display:none;">
         <button class="activo" data-tab="clientes" data-roles="admin,recepcion" onclick="cambiarTab('clientes')">Clientes</button>
         <button data-tab="vehiculos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos')">Vehículos</button>
         <button data-tab="turnos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('turnos')">Turnos</button>
@@ -1127,7 +1578,40 @@ td.mono{
         <button data-tab="reportes" data-roles="admin" onclick="cambiarTab('reportes')">📊 Reportes</button>
     </nav>
 
-    <section class="seccion activa" id="tab-clientes">
+    <section class="seccion activa" id="tab-dashboard">
+
+        <div class="dash-fecha" id="dashFechaLinea">
+            <span class="badge-tiempo-real"><span class="punto-verde"></span> En vivo</span>
+        </div>
+
+        <div class="dash-grid" id="dashGrid">
+            <div class="dash-card">
+                <div class="dash-card-label">Facturación hoy</div>
+                <div class="dash-card-valor" id="dashFacturacionHoy">-</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-label">Turnos hoy</div>
+                <div class="dash-card-valor" id="dashTurnosHoy">-</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-label">Pendiente de cobro</div>
+                <div class="dash-card-valor" id="dashPendienteCobro">-</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-label">Stock bajo</div>
+                <div class="dash-card-valor" id="dashStockBajo">-</div>
+            </div>
+        </div>
+
+        <div class="dash-seccion-titulo">Requiere atención</div>
+        <div id="dashAtencion"></div>
+
+        <div class="dash-seccion-titulo">Próximo turno</div>
+        <div id="dashProximoTurno"></div>
+
+    </section>
+
+    <section class="seccion" id="tab-clientes">
         <div class="fila-titulo"><h2>Clientes</h2></div>
         <div id="tablaClientes"></div>
     </section>
@@ -1247,6 +1731,92 @@ td.mono{
 
     </section>
 
+</div>
+
+<!-- ---------- Nav inferior fija ---------- -->
+<nav class="nav-inferior" id="navInferior">
+    <button class="nav-inferior-btn activo" data-nav="dashboard" onclick="cambiarTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Inicio
+    </button>
+    <button class="nav-inferior-btn" data-nav="turnos" onclick="cambiarTab('turnos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Turnos
+    </button>
+    <button class="nav-inferior-mas" onclick="abrirOverlayRapido()" title="Acción rápida">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <button class="nav-inferior-btn" data-nav="clientes" data-roles="admin,recepcion" onclick="cambiarTab('clientes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Clientes
+    </button>
+    <button class="nav-inferior-btn" onclick="abrirOverlayMas()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        Más
+    </button>
+</nav>
+
+<!-- ---------- Overlay: Más opciones (agrupa las secciones que no están en la nav inferior) ---------- -->
+<div class="overlay" id="overlayMas">
+    <div class="modal">
+        <h3>Más opciones</h3>
+        <div class="mas-lista" id="masLista">
+            <button class="mas-item" data-roles="admin,recepcion,mecanico" onclick="cerrarOverlayMas(); cambiarTab('vehiculos')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2M5 17a2 2 0 002 2h1a2 2 0 002-2M17 17a2 2 0 002 2h1a2 2 0 002-2"/></svg>
+                Vehículos
+            </button>
+            <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('presupuestos')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+                Presupuestos
+            </button>
+            <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('caja')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Caja
+            </button>
+            <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('stock')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                Stock
+            </button>
+            <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('usuarios')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Usuarios
+            </button>
+            <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('reportes')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Reportes
+            </button>
+            <button class="mas-item salir" onclick="cerrarOverlayMas(); cerrarSesion()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Cerrar sesión
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Overlay: acción rápida (botón + de la nav inferior) ---------- -->
+<div class="overlay" id="overlayRapido">
+    <div class="modal">
+        <h3>Acción rápida</h3>
+        <button class="rapido-item" onclick="cerrarOverlayRapido(); abrirModalCuenta()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Nueva cuenta / cobro
+        </button>
+        <button class="rapido-item" onclick="cerrarOverlayRapido(); abrirModalCliente()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            Nuevo cliente
+        </button>
+        <button class="rapido-item" onclick="cerrarOverlayRapido(); abrirModalTurno()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Nuevo turno
+        </button>
+        <button class="rapido-item" onclick="cerrarOverlayRapido(); abrirModalPresupuesto()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Nuevo presupuesto
+        </button>
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarOverlayRapido()">Cerrar</button>
+        </div>
+    </div>
 </div>
 
 <!-- ---------- Modal: nuevo/editar cliente ---------- -->
@@ -1795,6 +2365,7 @@ onAuthStateChanged(auth, (user) => {
         usuarioActual = user;
         document.getElementById("pantallaLogin").style.display = "none";
         document.getElementById("app").style.display = "block";
+        actualizarSaludoYFecha();
         escucharClientes();
         escucharVehiculos();
         escucharCaja();
@@ -1839,22 +2410,23 @@ function renderClientes(lista) {
         return;
     }
 
-    let html = "<table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Email</th><th></th></tr></thead><tbody>";
+    let html = '<div class="lista-cards">';
 
     lista.forEach(c => {
-        html += `<tr>
-            <td>${escapar(c.apellido)}, ${escapar(c.nombre)}</td>
-            <td class="mono">${escapar(c.telefono || "-")}</td>
-            <td class="mono">${escapar(c.email || "-")}</td>
-            <td style="white-space:nowrap;">
-                <button class="btn-chico" onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')">Ver</button>
+        html += `<div class="item-card">
+            <div class="item-avatar">${getIniciales(c.nombre, c.apellido)}</div>
+            <div class="item-info" onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')" style="cursor:pointer;">
+                <div class="item-titulo">${escapar(c.apellido)}, ${escapar(c.nombre)}</div>
+                <div class="item-sub">${escapar(c.telefono || c.email || "Sin datos de contacto")}</div>
+            </div>
+            <div class="item-acciones">
                 <button class="btn-chico" onclick="editarCliente('${c.id}')">Editar</button>
-                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')">Borrar</button>
-            </td>
-        </tr>`;
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')">✕</button>
+            </div>
+        </div>`;
     });
 
-    html += "</tbody></table>";
+    html += "</div>";
     el.innerHTML = html;
 
 }
@@ -2013,11 +2585,23 @@ window.borrarCliente = async function (id, nombreCompleto) {
 
 window.cambiarTab = function (tab) {
 
+    // La nav.tabs original (ahora oculta, vive dentro de "Más opciones") solo tiene
+    // botones para clientes/vehiculos/turnos/presupuestos/caja/stock/usuarios/reportes.
+    // "dashboard" es nueva y no tiene botón ahí, así que nos cubrimos con un chequeo.
     document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => b.classList.remove("activo"));
-    document.querySelector(`nav.tabs button[data-tab="${tab}"]`).classList.add("activo");
+    const btnNavTabs = document.querySelector(`nav.tabs button[data-tab="${tab}"]`);
+    if (btnNavTabs) btnNavTabs.classList.add("activo");
 
     document.querySelectorAll(".seccion").forEach(s => s.classList.remove("activa"));
     document.getElementById("tab-" + tab).classList.add("activa");
+
+    // Nav inferior: marca activo Inicio/Turnos/Clientes; para cualquier otra sección
+    // (que vive dentro de "Más"), no marcamos ninguno de esos tres.
+    document.querySelectorAll(".nav-inferior-btn[data-nav]").forEach(b => b.classList.remove("activo"));
+    const btnNavInferior = document.querySelector(`.nav-inferior-btn[data-nav="${tab}"]`);
+    if (btnNavInferior) btnNavInferior.classList.add("activo");
+
+    window.cerrarOverlayMas();
 
     if (tab === "caja" && typeof dibujarGraficoCaja === "function") {
         setTimeout(() => {
@@ -2032,6 +2616,161 @@ window.cambiarTab = function (tab) {
     }
 
 };
+
+// ---------- Header: saludo dinámico + buscador colapsable ----------
+
+window.toggleBuscador = function () {
+    document.getElementById("buscadorWrap").classList.toggle("activo");
+    if (document.getElementById("buscadorWrap").classList.contains("activo")) {
+        document.getElementById("buscador").focus();
+    }
+};
+
+function actualizarSaludoYFecha() {
+
+    const hora = new Date().getHours();
+    let saludo = "¡Buenas noches!";
+    if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
+    else if (hora >= 12 && hora < 20) saludo = "¡Buenas tardes!";
+
+    document.getElementById("headerSaludo").textContent = saludo;
+
+    const fechaTexto = new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+    document.getElementById("headerFecha").textContent = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
+
+}
+
+// ---------- Overlay "Más opciones" ----------
+
+window.abrirOverlayMas = function () {
+    document.getElementById("overlayMas").classList.add("abierto");
+};
+
+window.cerrarOverlayMas = function () {
+    const el = document.getElementById("overlayMas");
+    if (el) el.classList.remove("abierto");
+};
+
+// ---------- Overlay "acción rápida" (botón + de la nav inferior) ----------
+
+window.abrirOverlayRapido = function () {
+    document.getElementById("overlayRapido").classList.add("abierto");
+};
+
+window.cerrarOverlayRapido = function () {
+    document.getElementById("overlayRapido").classList.remove("abierto");
+};
+
+// ---------- Iniciales para el avatar circular de Clientes ----------
+
+function getIniciales(nombre, apellido) {
+    const n = (nombre || "").trim().charAt(0);
+    const a = (apellido || "").trim().charAt(0);
+    return ((n + a) || "?").toUpperCase();
+}
+
+// ---------- Dashboard: se recalcula solo cuando cambian caja/turnos/stock/presupuestos ----------
+
+function renderDashboard() {
+
+    const elFactHoy = document.getElementById("dashFacturacionHoy");
+    if (!elFactHoy) return; // el DOM del dashboard todavía no existe (raro, pero por las dudas)
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const mananaInicio = new Date(hoy);
+    mananaInicio.setDate(hoy.getDate() + 1);
+
+    // Facturación de hoy (ingresos de Caja)
+    let facturacionHoy = 0;
+    cajaCache.forEach(m => {
+        if (!m.fecha || !m.fecha.toDate) return;
+        const f = m.fecha.toDate();
+        if (f >= hoy && m.tipo === "Ingreso") facturacionHoy += Number(m.monto) || 0;
+    });
+    elFactHoy.textContent = formatoPlata(facturacionHoy);
+
+    // Turnos de hoy
+    const turnosHoy = turnosCache.filter(t => {
+        if (!t.fechaHora || !t.fechaHora.toDate) return false;
+        const f = t.fechaHora.toDate();
+        return f >= hoy && f < mananaInicio && t.estado !== "Cancelado";
+    });
+    document.getElementById("dashTurnosHoy").textContent = turnosHoy.length;
+
+    // Pendiente de cobro: presupuestos aprobados todavía no cobrados
+    const presuPendientes = presupuestosCache.filter(p => p.estado === "Aprobado");
+    const totalPendiente = presuPendientes.reduce((s, p) => s + (Number(p.total) || 0), 0);
+    document.getElementById("dashPendienteCobro").textContent = formatoPlata(totalPendiente);
+
+    // Stock bajo
+    const stockBajo = stockCache.filter(p => {
+        const min = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
+        return (Number(p.cantidad) || 0) <= min;
+    });
+    document.getElementById("dashStockBajo").textContent = stockBajo.length;
+
+    // "Requiere atención"
+    const elAtencion = document.getElementById("dashAtencion");
+    const filas = [];
+
+    if (presuPendientes.length > 0) {
+        filas.push({ texto: "Presupuestos aprobados sin cobrar", badge: presuPendientes.length, tab: "presupuestos" });
+    }
+
+    if (stockBajo.length > 0) {
+        filas.push({ texto: "Productos con stock bajo", badge: stockBajo.length, tab: "stock" });
+    }
+
+    const clientesConSaldo = clientesCache.length; // sin cuenta corriente propia todavía: se deja preparado
+    void clientesConSaldo;
+
+    if (turnosHoy.length > 0) {
+        filas.push({ texto: "Turnos para hoy", badge: turnosHoy.length, tab: "turnos" });
+    }
+
+    if (filas.length === 0) {
+        elAtencion.innerHTML = '<div class="vacio">Todo al día, no hay nada urgente 🎉</div>';
+    } else {
+        elAtencion.innerHTML = filas.map(f => `
+            <div class="dash-atencion-fila" onclick="cambiarTab('${f.tab}')">
+                <span>${escapar(f.texto)}</span>
+                <span class="dash-atencion-badge">${f.badge}</span>
+            </div>
+        `).join("");
+    }
+
+    // Próximo turno
+    const elProximo = document.getElementById("dashProximoTurno");
+    const ahora = new Date();
+    const proximo = turnosCache
+        .filter(t => t.fechaHora && t.fechaHora.toDate && t.fechaHora.toDate() >= ahora && t.estado !== "Cancelado")
+        .sort((a, b) => a.fechaHora.toDate() - b.fechaHora.toDate())[0];
+
+    if (!proximo) {
+        elProximo.innerHTML = '<div class="vacio">No hay turnos próximos.</div>';
+    } else {
+        const fecha = proximo.fechaHora.toDate();
+        const cliente = clientesCache.find(c => c.id === proximo.clienteId);
+        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
+        const vehiculo = vehiculosCache.find(v => v.id === proximo.vehiculoId);
+        const detalleVehiculo = vehiculo ? ` · ${escapar(vehiculo.patente)}` : "";
+        const hora = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+        const esHoy = fecha >= hoy && fecha < mananaInicio;
+        const diaTexto = esHoy ? "Hoy" : fecha.toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" });
+
+        elProximo.innerHTML = `
+            <div class="dash-proximo-turno">
+                <div class="dash-proximo-turno-hora">${hora}<br><span style="font-size:10px;color:#888;">${diaTexto}</span></div>
+                <div class="dash-proximo-turno-info">
+                    <div class="dash-proximo-turno-cliente">${escapar(nombreCliente)}${detalleVehiculo}</div>
+                    <div class="dash-proximo-turno-detalle">${escapar(proximo.servicio || "")}</div>
+                </div>
+            </div>
+        `;
+    }
+
+}
 
 // ---------- Vehículos en tiempo real ----------
 
@@ -2062,32 +2801,34 @@ function renderVehiculos(lista) {
         return;
     }
 
-    let html = "<table><thead><tr><th>Patente</th><th>Vehículo</th><th>Dueño</th><th>Teléfono</th><th></th></tr></thead><tbody>";
+    let html = '<div class="lista-cards">';
 
     lista.forEach(v => {
 
         const cliente = clientesCache.find(c => c.id === v.clienteId);
         const nombreCliente = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "(sin datos)";
-        const telefono = cliente ? cliente.telefono : "";
 
-        html += `<tr>
-            <td class="mono">${escapar(v.patente)}</td>
-            <td class="mono">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</td>
-            <td>${escapar(nombreCliente)}</td>
-            <td class="mono">${escapar(telefono || "-")}</td>
-            <td>
+        html += `<div class="item-card">
+            <div class="item-icono-auto">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2M5 17a2 2 0 002 2h1a2 2 0 002-2M17 17a2 2 0 002 2h1a2 2 0 002-2"/></svg>
+            </div>
+            <div class="item-info">
+                <div class="item-titulo">${escapar(v.patente)} · ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
+                <div class="item-sub">${escapar(nombreCliente)}</div>
+            </div>
+            <div class="item-acciones">
                 <button class="btn-carpeta" onclick="abrirHistorialDirecto('${v.id}', '${escaparComillas(v.patente)}')" title="Historia clínica">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
                 </button>
                 <button class="btn-carpeta" onclick="abrirInspeccion('${v.id}', '${escaparComillas(v.patente)}')" title="Inspección de ingreso">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 </button>
-            </td>
-        </tr>`;
+            </div>
+        </div>`;
 
     });
 
-    html += "</tbody></table>";
+    html += "</div>";
     el.innerHTML = html;
 
 }
@@ -2335,6 +3076,7 @@ function renderCaja() {
     dibujarGraficoMensual();
     dibujarGraficoAnual();
     renderTablaCaja();
+    if (typeof renderDashboard === "function") renderDashboard();
 
 }
 
@@ -2740,6 +3482,7 @@ function escucharStock() {
 
         stockCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderStock();
+        if (typeof renderDashboard === "function") renderDashboard();
 
     });
 
@@ -3138,6 +3881,7 @@ function escucharTurnos() {
 
         turnosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderTurnos();
+        if (typeof renderDashboard === "function") renderDashboard();
 
     });
 
@@ -3510,6 +4254,7 @@ function escucharPresupuestos() {
 
         presupuestosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderPresupuestos();
+        if (typeof renderDashboard === "function") renderDashboard();
 
     });
 
@@ -4010,7 +4755,9 @@ function determinarRolActual() {
 
 function aplicarPermisosUI() {
 
-    document.querySelectorAll("nav.tabs button[data-roles]").forEach(btn => {
+    // Aplica el mismo criterio de roles a: la nav.tabs original (oculta, dentro de "Más"),
+    // los botones de la nav inferior y las filas del menú "Más opciones".
+    document.querySelectorAll("nav.tabs button[data-roles], .nav-inferior-btn[data-roles], .mas-item[data-roles]").forEach(btn => {
 
         const rolesPermitidos = btn.dataset.roles.split(",");
 
@@ -4022,7 +4769,7 @@ function aplicarPermisosUI() {
 
     });
 
-    // Si la pestaña activa quedó oculta por el rol, volvemos a Clientes o Vehículos (lo primero visible)
+    // Si la pestaña activa quedó oculta por el rol, volvemos a la primera visible
     const activaOculta = document.querySelector("nav.tabs button.activo")?.style.display === "none";
 
     if (activaOculta) {
