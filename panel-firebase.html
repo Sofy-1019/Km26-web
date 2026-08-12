@@ -20,6 +20,8 @@ nav.tabs button,
 .fila-titulo h2{
     font-family:'Orbitron','Montserrat',sans-serif;
     letter-spacing:.3px;
+    font-size:26px;
+    color:#ff6b6b;
 }
 
 body{
@@ -300,14 +302,23 @@ nav.tabs button{
     background:none;
     border:none;
     color:#999;
-    font-size:14px;
-    padding:10px 16px;
+    font-size:16px;
+    font-weight:700;
+    padding:12px 20px;
     cursor:pointer;
-    border-bottom:2px solid transparent;
+    border-bottom:3px solid transparent;
+    border-radius:8px 8px 0 0;
+    transition:.2s;
+}
+
+nav.tabs button:hover{
+    color:#ddd;
+    background:rgba(255,255,255,.04);
 }
 
 nav.tabs button.activo{
-    color:#ff6b6b;
+    color:#ff8a7a;
+    background:rgba(215,25,32,.12);
     border-bottom-color:#d71920;
 }
 
@@ -353,21 +364,21 @@ table{
     background:#161616;
     border-radius:12px;
     overflow:hidden;
-    font-size:13px;
+    font-size:15px;
     margin-bottom:24px;
 }
 
 th{
     text-align:left;
-    padding:12px 14px;
+    padding:14px 16px;
     background:#1e1e1e;
-    color:#999;
-    font-weight:600;
-    font-size:12px;
+    color:#aaa;
+    font-weight:700;
+    font-size:13px;
 }
 
 td{
-    padding:12px 14px;
+    padding:14px 16px;
     border-top:1px solid #262626;
 }
 
@@ -1113,6 +1124,7 @@ td.mono{
         <button data-tab="caja" data-roles="admin,recepcion" onclick="cambiarTab('caja')">Caja</button>
         <button data-tab="stock" data-roles="admin,recepcion" onclick="cambiarTab('stock')">Stock</button>
         <button data-tab="usuarios" data-roles="admin" onclick="cambiarTab('usuarios')">👤 Usuarios</button>
+        <button data-tab="reportes" data-roles="admin" onclick="cambiarTab('reportes')">📊 Reportes</button>
     </nav>
 
     <section class="seccion activa" id="tab-clientes">
@@ -1202,6 +1214,36 @@ td.mono{
         </div>
 
         <div id="listaUsuarios"></div>
+
+    </section>
+
+    <section class="seccion" id="tab-reportes">
+
+        <div class="fila-titulo"><h2>📊 Reportes</h2></div>
+
+        <div class="subtabs">
+            <button class="activo" data-periodo="hoy" onclick="cambiarPeriodoReporte('hoy')">Hoy</button>
+            <button data-periodo="semana" onclick="cambiarPeriodoReporte('semana')">Semana</button>
+            <button data-periodo="mes" onclick="cambiarPeriodoReporte('mes')">Mes</button>
+            <button data-periodo="anio" onclick="cambiarPeriodoReporte('anio')">Año</button>
+        </div>
+
+        <div class="grid-stats" style="margin-top:20px;">
+            <div class="stat-card verde"><div class="stat-label">Facturación</div><div class="stat-valor" id="repFacturacion">-</div></div>
+            <div class="stat-card"><div class="stat-label">Egresos</div><div class="stat-valor" id="repEgresos">-</div></div>
+            <div class="stat-card"><div class="stat-label">Resultado</div><div class="stat-valor" id="repResultado">-</div></div>
+            <div class="stat-card"><div class="stat-label">Ticket promedio</div><div class="stat-valor" id="repTicket">-</div></div>
+            <div class="stat-card"><div class="stat-label">Clientes nuevos</div><div class="stat-valor" id="repClientesNuevos">-</div></div>
+            <div class="stat-card"><div class="stat-label">Vehículos atendidos</div><div class="stat-valor" id="repVehiculos">-</div></div>
+            <div class="stat-card verde"><div class="stat-label">Presupuestos aprobados</div><div class="stat-valor" id="repPresuAprobados">-</div></div>
+            <div class="stat-card"><div class="stat-label">Conversión de presupuestos</div><div class="stat-valor" id="repConversion">-</div></div>
+        </div>
+
+        <div class="fila-titulo" style="margin-top:28px;"><h2 style="font-size:19px;">🏆 Más vendidos en el período</h2></div>
+        <div id="repMasVendidos"></div>
+
+        <div class="fila-titulo" style="margin-top:28px;"><h2 style="font-size:19px;">🚗 Vehículos atendidos en el período</h2></div>
+        <div id="repListaVehiculos"></div>
 
     </section>
 
@@ -1983,6 +2025,10 @@ window.cambiarTab = function (tab) {
             dibujarGraficoMensual();
             dibujarGraficoAnual();
         }, 30);
+    }
+
+    if (tab === "reportes" && typeof calcularReportes === "function") {
+        setTimeout(calcularReportes, 30);
     }
 
 };
@@ -4079,6 +4125,152 @@ window.borrarUsuario = async function (id, nombre) {
     await deleteDoc(doc(db, "usuarios", id));
 
 };
+
+// ---------- Reportes ----------
+
+let periodoReporteActual = "hoy";
+
+window.cambiarPeriodoReporte = function (periodo) {
+
+    periodoReporteActual = periodo;
+
+    document.querySelectorAll("#tab-reportes .subtabs button").forEach(b => b.classList.remove("activo"));
+    document.querySelector(`#tab-reportes .subtabs button[data-periodo="${periodo}"]`).classList.add("activo");
+
+    calcularReportes();
+
+};
+
+function calcularRangoPeriodo(periodo) {
+
+    const ahora = new Date();
+    let desde = new Date();
+    desde.setHours(0, 0, 0, 0);
+
+    if (periodo === "semana") {
+        desde.setDate(desde.getDate() - desde.getDay());
+    } else if (periodo === "mes") {
+        desde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    } else if (periodo === "anio") {
+        desde = new Date(ahora.getFullYear(), 0, 1);
+    }
+
+    return { desde, hasta: ahora };
+
+}
+
+function extraerItemsDeDescripcion(descripcion) {
+
+    if (descripcion.startsWith("Venta: ")) {
+        return [descripcion.substring(7).trim()];
+    }
+
+    const partes = descripcion.split(" - ");
+
+    if (partes.length > 1) {
+        const itemsTexto = partes.slice(0, -1).join(" - ");
+        return itemsTexto.split(" + ").map(s => s.trim()).filter(Boolean);
+    }
+
+    return [descripcion.trim()];
+
+}
+
+function calcularReportes() {
+
+    if (!document.getElementById("tab-reportes").classList.contains("activa")) return;
+
+    const { desde, hasta } = calcularRangoPeriodo(periodoReporteActual);
+
+    const cajaEnRango = cajaCache.filter(m => {
+        if (!m.fecha || !m.fecha.toDate) return false;
+        const f = m.fecha.toDate();
+        return f >= desde && f <= hasta;
+    });
+
+    const ingresos = cajaEnRango.filter(m => m.tipo === "Ingreso");
+    const egresos = cajaEnRango.filter(m => m.tipo === "Egreso");
+
+    const totalIngresos = ingresos.reduce((s, m) => s + (Number(m.monto) || 0), 0);
+    const totalEgresos = egresos.reduce((s, m) => s + (Number(m.monto) || 0), 0);
+    const ticketPromedio = ingresos.length > 0 ? totalIngresos / ingresos.length : 0;
+
+    document.getElementById("repFacturacion").textContent = formatoPlata(totalIngresos);
+    document.getElementById("repEgresos").textContent = formatoPlata(totalEgresos);
+    document.getElementById("repResultado").textContent = formatoPlata(totalIngresos - totalEgresos);
+    document.getElementById("repTicket").textContent = formatoPlata(ticketPromedio);
+
+    // Clientes nuevos
+    const clientesNuevos = clientesCache.filter(c => {
+        if (!c.creado || !c.creado.toDate) return false;
+        const f = c.creado.toDate();
+        return f >= desde && f <= hasta;
+    });
+    document.getElementById("repClientesNuevos").textContent = clientesNuevos.length;
+
+    // Vehículos atendidos (con algún trabajo cargado en el período)
+    const trabajosEnRango = historialCache.filter(h => {
+        if (!h.fecha || !h.fecha.toDate) return false;
+        const f = h.fecha.toDate();
+        return f >= desde && f <= hasta;
+    });
+    const vehiculosIdsAtendidos = [...new Set(trabajosEnRango.map(h => h.vehiculoId))];
+    document.getElementById("repVehiculos").textContent = vehiculosIdsAtendidos.length;
+
+    const elVehiculos = document.getElementById("repListaVehiculos");
+    if (vehiculosIdsAtendidos.length === 0) {
+        elVehiculos.innerHTML = '<div class="vacio">Sin vehículos atendidos en este período.</div>';
+    } else {
+        elVehiculos.innerHTML = "<table><thead><tr><th>Patente</th><th>Vehículo</th><th>Trabajos en el período</th></tr></thead><tbody>" +
+            vehiculosIdsAtendidos.map(vid => {
+                const v = vehiculosCache.find(x => x.id === vid);
+                const cantidad = trabajosEnRango.filter(h => h.vehiculoId === vid).length;
+                if (!v) return "";
+                return `<tr><td class="mono">${escapar(v.patente)}</td><td>${escapar(v.marca || "")} ${escapar(v.modelo || "")}</td><td class="mono">${cantidad}</td></tr>`;
+            }).join("") + "</tbody></table>";
+    }
+
+    // Presupuestos
+    const presuEnRango = presupuestosCache.filter(p => {
+        if (!p.fecha || !p.fecha.toDate) return false;
+        const f = p.fecha.toDate();
+        return f >= desde && f <= hasta;
+    });
+    const aprobados = presuEnRango.filter(p => p.estado === "Aprobado").length;
+    const rechazados = presuEnRango.filter(p => p.estado === "Rechazado").length;
+    const decididos = aprobados + rechazados;
+    const conversion = decididos > 0 ? Math.round((aprobados / decididos) * 100) : 0;
+
+    document.getElementById("repPresuAprobados").textContent = aprobados;
+    document.getElementById("repConversion").textContent = decididos > 0 ? conversion + "%" : "-";
+
+    // Más vendidos (a partir de los ingresos de Caja: ventas de Stock + Cuentas combinadas)
+    const conteo = {};
+
+    ingresos.forEach(m => {
+        extraerItemsDeDescripcion(m.descripcion || "").forEach(item => {
+            if (!item) return;
+            conteo[item] = (conteo[item] || 0) + 1;
+        });
+    });
+
+    const topVendidos = Object.entries(conteo)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    const elVendidos = document.getElementById("repMasVendidos");
+
+    if (topVendidos.length === 0) {
+        elVendidos.innerHTML = '<div class="vacio">Sin ventas registradas en este período.</div>';
+    } else {
+        const medallas = ["🥇", "🥈", "🥉", "4°", "5°"];
+        elVendidos.innerHTML = "<table><thead><tr><th></th><th>Ítem</th><th>Veces vendido</th></tr></thead><tbody>" +
+            topVendidos.map(([nombre, cant], i) =>
+                `<tr><td class="mono">${medallas[i]}</td><td>${escapar(nombre)}</td><td class="mono">${cant}</td></tr>`
+            ).join("") + "</tbody></table>";
+    }
+
+}
 
 </script>
 
