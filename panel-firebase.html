@@ -1544,7 +1544,7 @@ import {
     onSnapshot, query, orderBy, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {
-    getStorage, ref, uploadBytes, getDownloadURL
+    getStorage, ref, uploadBytes, getDownloadURL, deleteObject
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -3706,7 +3706,10 @@ function renderInspeccionesAnteriores(vehiculoId) {
         const fotos = (i.fotos || []).map(url => `<img src="${url}" onclick="window.open('${url}','_blank')">`).join("");
 
         return `<div class="inspeccion-anterior">
-            <div class="inspeccion-anterior-fecha">${fecha}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="inspeccion-anterior-fecha">${fecha}</div>
+                <button class="btn-chico" style="color:#ff6b6b;font-size:11px;padding:4px 10px;" onclick="borrarInspeccion('${i.id}')">🗑️ Borrar fotos</button>
+            </div>
             ${i.notas ? `<div class="inspeccion-anterior-notas">${escapar(i.notas)}</div>` : ""}
             <div class="inspeccion-anterior-fotos">${fotos}</div>
         </div>`;
@@ -3714,6 +3717,28 @@ function renderInspeccionesAnteriores(vehiculoId) {
     }).join("");
 
 }
+
+window.borrarInspeccion = async function (inspeccionId) {
+
+    const confirmado = confirm("¿Borrar esta inspección y sus fotos? No se puede deshacer.");
+    if (!confirmado) return;
+
+    const inspeccion = inspeccionesCache.find(i => i.id === inspeccionId);
+    if (!inspeccion) return;
+
+    // Borra cada foto de Storage (libera el espacio de verdad)
+    for (const url of (inspeccion.fotos || [])) {
+        try {
+            const fotoRef = ref(storage, url);
+            await deleteObject(fotoRef);
+        } catch (err) {
+            console.log("No se pudo borrar una foto (puede que ya no exista):", err.message);
+        }
+    }
+
+    await deleteDoc(doc(db, "inspecciones", inspeccionId));
+
+};
 
 window.guardarInspeccion = async function () {
 
