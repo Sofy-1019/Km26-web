@@ -286,6 +286,74 @@ td.mono{
     font-size:13px;
 }
 
+.grid-stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin-bottom:24px;
+}
+
+.stat-card{
+    background:#1a1a1a;
+    border-radius:12px;
+    padding:16px;
+}
+
+.stat-card.verde{
+    background:#0d2418;
+}
+
+.stat-label{
+    font-size:12px;
+    color:#999;
+    margin-bottom:6px;
+}
+
+.stat-card.verde .stat-label{
+    color:#5fd98a;
+}
+
+.stat-valor{
+    font-size:22px;
+    font-weight:700;
+    font-family:'Montserrat',sans-serif;
+}
+
+.stat-card.verde .stat-valor{
+    color:#5fd98a;
+}
+
+.tipo-toggle{
+    display:flex;
+    gap:8px;
+    margin-top:6px;
+}
+
+.tipo-toggle button{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#999;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.tipo-toggle button.activo-ingreso{
+    background:#0d2418;
+    border-color:#2fdb6e;
+    color:#5fd98a;
+}
+
+.tipo-toggle button.activo-egreso{
+    background:#2a0a0b;
+    border-color:#d71920;
+    color:#ff6b6b;
+}
+
 .aviso-migracion{
     background:#1a1608;
     border:1px solid #4d3d0a;
@@ -448,13 +516,13 @@ td.mono{
     </header>
 
     <div class="aviso-migracion">
-        🚧 <strong>Panel en migración a Firebase.</strong> Clientes y Vehículos ya funcionan acá en tiempo real. Caja, Stock e Historial siguen en el panel de siempre hasta que los migremos.
+        🚧 <strong>Panel en migración a Firebase.</strong> Clientes, Vehículos y Caja ya funcionan acá en tiempo real. Stock e Historial siguen en el panel de siempre hasta que los migremos.
     </div>
 
     <nav class="tabs">
         <button class="activo" data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
         <button data-tab="vehiculos" onclick="cambiarTab('vehiculos')">Vehículos</button>
-        <button class="proximamente" disabled>Caja (próx.)</button>
+        <button data-tab="caja" onclick="cambiarTab('caja')">Caja</button>
         <button class="proximamente" disabled>Stock (próx.)</button>
     </nav>
 
@@ -466,6 +534,25 @@ td.mono{
     <section class="seccion" id="tab-vehiculos">
         <div class="fila-titulo"><h2>Vehículos</h2></div>
         <div id="tablaVehiculos"></div>
+    </section>
+
+    <section class="seccion" id="tab-caja">
+
+        <div class="grid-stats">
+            <div class="stat-card verde"><div class="stat-label">Hoy</div><div class="stat-valor" id="cajaHoy">-</div></div>
+            <div class="stat-card"><div class="stat-label">Esta semana</div><div class="stat-valor" id="cajaSemana">-</div></div>
+            <div class="stat-card"><div class="stat-label">Este mes</div><div class="stat-valor" id="cajaMes">-</div></div>
+        </div>
+
+        <div class="fila-titulo"><h2>Últimos 7 días</h2></div>
+        <canvas id="graficoCaja" height="120" style="width:100%;margin-bottom:24px;"></canvas>
+
+        <div class="fila-titulo">
+            <h2>Movimientos recientes</h2>
+            <button class="btn-chico" onclick="abrirModalCaja()">+ Registrar movimiento</button>
+        </div>
+        <div id="tablaCaja"></div>
+
     </section>
 
 </div>
@@ -549,6 +636,31 @@ td.mono{
         </div>
 
         <p id="mensajeEstadoVehiculo"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: nuevo movimiento de caja ---------- -->
+<div class="overlay" id="modalCaja">
+    <div class="modal">
+        <h3>Registrar movimiento</h3>
+
+        <div class="tipo-toggle">
+            <button id="btnIngreso" class="activo-ingreso" onclick="elegirTipo('Ingreso')">Ingreso</button>
+            <button id="btnEgreso" onclick="elegirTipo('Egreso')">Egreso</button>
+        </div>
+
+        <label>Descripción</label>
+        <input type="text" id="mDescripcion" placeholder="Cambio de aceite - Gol">
+
+        <label>Monto</label>
+        <input type="number" id="mMonto" placeholder="15000">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarMovimiento()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoCaja"></p>
     </div>
 </div>
 
@@ -676,6 +788,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById("app").style.display = "block";
         escucharClientes();
         escucharVehiculos();
+        escucharCaja();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -811,6 +924,7 @@ window.cerrarModales = function () {
     document.getElementById("modalCliente").classList.remove("abierto");
     document.getElementById("modalFicha").classList.remove("abierto");
     document.getElementById("modalEditarVehiculo").classList.remove("abierto");
+    document.getElementById("modalCaja").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -879,6 +993,10 @@ window.cambiarTab = function (tab) {
 
     document.querySelectorAll(".seccion").forEach(s => s.classList.remove("activa"));
     document.getElementById("tab-" + tab).classList.add("activa");
+
+    if (tab === "caja" && typeof dibujarGraficoCaja === "function") {
+        setTimeout(dibujarGraficoCaja, 30);
+    }
 
 };
 
@@ -1066,6 +1184,229 @@ window.borrarVehiculo = async function (id) {
     await deleteDoc(doc(db, "vehiculos", id));
 
 };
+
+// ---------- Caja en tiempo real ----------
+
+let cajaCache = [];
+let tipoMovimiento = "Ingreso";
+
+function formatoPlata(n) {
+    n = Number(n) || 0;
+    const signo = n < 0 ? "-" : "";
+    return signo + "$" + Math.abs(Math.round(n)).toLocaleString("es-AR");
+}
+
+function escucharCaja() {
+
+    const q = query(collection(db, "caja"), orderBy("fecha", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+
+        cajaCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCaja();
+
+    });
+
+}
+
+function renderCaja() {
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const inicioSemana = new Date(hoy);
+    inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    let totalHoy = 0, totalSemana = 0, totalMes = 0;
+
+    cajaCache.forEach(m => {
+
+        if (!m.fecha || !m.fecha.toDate) return;
+
+        const fecha = m.fecha.toDate();
+        const signo = m.tipo === "Ingreso" ? 1 : -1;
+        const monto = signo * (Number(m.monto) || 0);
+
+        if (fecha >= hoy) totalHoy += monto;
+        if (fecha >= inicioSemana) totalSemana += monto;
+        if (fecha >= inicioMes) totalMes += monto;
+
+    });
+
+    document.getElementById("cajaHoy").textContent = formatoPlata(totalHoy);
+    document.getElementById("cajaSemana").textContent = formatoPlata(totalSemana);
+    document.getElementById("cajaMes").textContent = formatoPlata(totalMes);
+
+    dibujarGraficoCaja();
+    renderTablaCaja();
+
+}
+
+function renderTablaCaja() {
+
+    const el = document.getElementById("tablaCaja");
+    const lista = cajaCache.slice(0, 15);
+
+    if (lista.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay movimientos cargados.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>";
+
+    lista.forEach(m => {
+
+        const fecha = m.fecha && m.fecha.toDate ? m.fecha.toDate() : null;
+        const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") : "-";
+        const color = m.tipo === "Ingreso" ? "#5fd98a" : "#ff6b6b";
+        const signo = m.tipo === "Ingreso" ? "+" : "-";
+
+        html += `<tr>
+            <td class="mono">${fechaTexto}</td>
+            <td>${escapar(m.tipo)}</td>
+            <td>${escapar(m.descripcion)}</td>
+            <td class="mono" style="color:${color}">${signo}${formatoPlata(m.monto)}</td>
+        </tr>`;
+
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+function dibujarGraficoCaja() {
+
+    const canvas = document.getElementById("graficoCaja");
+    if (!canvas) return;
+
+    const dias = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        d.setHours(0, 0, 0, 0);
+        dias.push({ fecha: d, total: 0 });
+    }
+
+    cajaCache.forEach(m => {
+
+        if (!m.fecha || !m.fecha.toDate) return;
+
+        const fecha = m.fecha.toDate();
+        fecha.setHours(0, 0, 0, 0);
+        const signo = m.tipo === "Ingreso" ? 1 : -1;
+        const monto = signo * (Number(m.monto) || 0);
+
+        dias.forEach(dia => {
+            if (fecha.getTime() === dia.fecha.getTime()) {
+                dia.total += monto;
+            }
+        });
+
+    });
+
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.clientWidth || 300;
+    const height = 120;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    const max = Math.max(...dias.map(d => Math.abs(d.total)), 1);
+    const barWidth = width / dias.length;
+    const zeroY = height - 22;
+    const maxBarAlto = height - 40;
+
+    dias.forEach((d, i) => {
+
+        const alto = (Math.abs(d.total) / max) * maxBarAlto;
+        const x = i * barWidth + barWidth * 0.22;
+        const w = barWidth * 0.56;
+
+        ctx.fillStyle = d.total >= 0 ? "#2fdb6e" : "#d71920";
+
+        if (d.total >= 0) {
+            ctx.fillRect(x, zeroY - alto, w, Math.max(alto, 2));
+        } else {
+            ctx.fillRect(x, zeroY, w, Math.max(alto, 2));
+        }
+
+        ctx.fillStyle = "#888";
+        ctx.font = "11px Montserrat, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(d.fecha.toLocaleDateString("es-AR", { weekday: "short" }), x + w / 2, height - 6);
+
+    });
+
+}
+
+window.abrirModalCaja = function () {
+    document.getElementById("modalCaja").classList.add("abierto");
+    document.getElementById("mensajeEstadoCaja").textContent = "";
+    window.elegirTipo("Ingreso");
+};
+
+window.elegirTipo = function (tipo) {
+
+    tipoMovimiento = tipo;
+
+    document.getElementById("btnIngreso").classList.toggle("activo-ingreso", tipo === "Ingreso");
+    document.getElementById("btnEgreso").classList.toggle("activo-egreso", tipo === "Egreso");
+
+};
+
+window.guardarMovimiento = async function () {
+
+    const descripcion = document.getElementById("mDescripcion").value.trim();
+    const monto = document.getElementById("mMonto").value.trim();
+    const estado = document.getElementById("mensajeEstadoCaja");
+
+    if (!descripcion || !monto) {
+        estado.textContent = "Completá descripción y monto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await addDoc(collection(db, "caja"), {
+            tipo: tipoMovimiento,
+            descripcion,
+            monto: parseFloat(monto),
+            fecha: serverTimestamp()
+        });
+
+        estado.textContent = "¡Movimiento guardado!";
+        estado.style.color = "#5fd98a";
+
+        document.getElementById("mDescripcion").value = "";
+        document.getElementById("mMonto").value = "";
+
+        setTimeout(() => {
+            window.cerrarModales();
+        }, 600);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.addEventListener("resize", () => {
+    if (document.getElementById("tab-caja").classList.contains("activa")) {
+        dibujarGraficoCaja();
+    }
+});
 
 </script>
 
