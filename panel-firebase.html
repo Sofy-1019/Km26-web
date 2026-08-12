@@ -1232,6 +1232,13 @@ td.mono{
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
             <p style="font-size:12px;color:#999;margin-bottom:10px;">Ítems de esta cuenta</p>
             <div id="listaCuentaItems"></div>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-top:14px;">
+                <label style="margin:0;white-space:nowrap;">🏷️ Descuento</label>
+                <input type="number" id="cuentaDescuento" placeholder="0" min="0" max="100" style="max-width:90px;margin:0;" oninput="renderListaCuentaItems()">
+                <span style="color:#999;font-size:13px;">%</span>
+            </div>
+
             <div id="cuentaTotal" style="text-align:right;font-size:20px;font-weight:800;margin-top:12px;font-family:'Montserrat',sans-serif;"></div>
         </div>
 
@@ -2843,6 +2850,7 @@ window.abrirModalCuenta = function () {
 
     document.getElementById("itemDescripcion").value = "";
     document.getElementById("itemMonto").value = "";
+    document.getElementById("cuentaDescuento").value = "";
     document.getElementById("mensajeEstadoCuenta").textContent = "";
 
     document.getElementById("modalCuenta").classList.add("abierto");
@@ -2884,6 +2892,16 @@ window.quitarItemCuenta = function (index) {
     renderListaCuentaItems();
 };
 
+function calcularTotalConDescuento() {
+
+    const subtotal = cuentaItems.reduce((suma, item) => suma + item.monto, 0);
+    const descuentoPorc = Math.min(100, Math.max(0, Number(document.getElementById("cuentaDescuento").value) || 0));
+    const totalFinal = subtotal - (subtotal * descuentoPorc / 100);
+
+    return { subtotal, descuentoPorc, totalFinal };
+
+}
+
 function renderListaCuentaItems() {
 
     const el = document.getElementById("listaCuentaItems");
@@ -2891,14 +2909,11 @@ function renderListaCuentaItems() {
 
     if (cuentaItems.length === 0) {
         el.innerHTML = '<p style="font-size:12px;color:#777;">Todavía no agregaste ningún ítem.</p>';
-        totalEl.textContent = "";
+        totalEl.innerHTML = "";
         return;
     }
 
-    let total = 0;
-
     el.innerHTML = cuentaItems.map((item, i) => {
-        total += item.monto;
         const icono = item.tipo === "stock" ? "📦 " : "🔧 ";
         return `<div class="cuenta-item-fila">
             <span class="cuenta-item-nombre">${icono}${escapar(item.descripcion)}</span>
@@ -2907,7 +2922,17 @@ function renderListaCuentaItems() {
         </div>`;
     }).join("");
 
-    totalEl.textContent = "Total: " + formatoPlata(total);
+    const { subtotal, descuentoPorc, totalFinal } = calcularTotalConDescuento();
+
+    if (descuentoPorc > 0) {
+        totalEl.innerHTML = `
+            <div style="font-size:13px;font-weight:500;color:#999;">Subtotal: ${formatoPlata(subtotal)}</div>
+            <div style="font-size:13px;font-weight:500;color:#5fd98a;">Descuento ${descuentoPorc}%: -${formatoPlata(subtotal - totalFinal)}</div>
+            <div>Total: ${formatoPlata(totalFinal)}</div>
+        `;
+    } else {
+        totalEl.textContent = "Total: " + formatoPlata(totalFinal);
+    }
 
 }
 
@@ -2946,9 +2971,10 @@ window.cobrarCuenta = async function () {
 
     try {
 
-        const total = cuentaItems.reduce((suma, item) => suma + item.monto, 0);
+        const { subtotal, descuentoPorc, totalFinal } = calcularTotalConDescuento();
         const nombreCliente = `${cliente.nombre} ${cliente.apellido}`;
         const descripciones = cuentaItems.map(i => i.descripcion).join(" + ");
+        const sufijoDescuento = descuentoPorc > 0 ? ` (desc. ${descuentoPorc}%)` : "";
 
         // Descuenta stock de cada ítem escaneado
         for (const item of cuentaItems) {
@@ -2961,11 +2987,11 @@ window.cobrarCuenta = async function () {
             }
         }
 
-        // Un solo ingreso combinado en Caja
+        // Un solo ingreso combinado en Caja (ya con el descuento aplicado)
         await addDoc(collection(db, "caja"), {
             tipo: "Ingreso",
-            descripcion: `${descripciones} - ${nombreCliente}`,
-            monto: total,
+            descripcion: `${descripciones} - ${nombreCliente}${sufijoDescuento}`,
+            monto: totalFinal,
             clienteId,
             fecha: serverTimestamp()
         });
@@ -2984,7 +3010,7 @@ window.cobrarCuenta = async function () {
             }
         }
 
-        estado.textContent = "✅ ¡Cuenta cobrada! Total: " + formatoPlata(total);
+        estado.textContent = "✅ ¡Cuenta cobrada! Total: " + formatoPlata(totalFinal);
         estado.style.color = "#5fd98a";
 
         setTimeout(() => {
