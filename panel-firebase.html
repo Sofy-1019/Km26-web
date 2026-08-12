@@ -519,6 +519,86 @@ td.mono{
     background:linear-gradient(180deg,#3aff82,#25c25f);
 }
 
+.fila-stock{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#242428;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+}
+
+.fila-stock-nombre{
+    font-weight:600;
+    font-size:14px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.fila-stock-cantidad{
+    font-size:12px;
+    color:#999;
+}
+
+.fila-stock-botones{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.btn-redondo{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid #3a3a3e;
+    background:#1a1a1c;
+    color:#fff;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-redondo:hover{
+    border-color:#d71920;
+}
+
+.cantidad-numero{
+    min-width:28px;
+    text-align:center;
+    font-weight:700;
+    font-size:15px;
+}
+
+.stock-bajo{
+    border:1px solid #7a3a12 !important;
+    background:#2a1b0d !important;
+}
+
+.stock-bajo .fila-stock-cantidad{
+    color:#ffb35f;
+}
+
+@media print{
+    body *{
+        visibility:hidden;
+    }
+    #etiquetaContenido, #etiquetaContenido *{
+        visibility:visible;
+    }
+    #etiquetaContenido{
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+    }
+}
+
 .ficha-vehiculo{
     background:#1e1e1e;
     border-radius:12px;
@@ -627,14 +707,14 @@ td.mono{
     </header>
 
     <div class="aviso-migracion">
-        🚧 <strong>Panel en migración a Firebase.</strong> Clientes, Vehículos y Caja ya funcionan acá en tiempo real. Stock e Historial siguen en el panel de siempre hasta que los migremos.
+        🚧 <strong>Panel en migración a Firebase.</strong> Ya todo funciona acá en tiempo real: Clientes, Vehículos, Historia clínica, Caja y Stock.
     </div>
 
     <nav class="tabs">
         <button class="activo" data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
         <button data-tab="vehiculos" onclick="cambiarTab('vehiculos')">Vehículos</button>
         <button data-tab="caja" onclick="cambiarTab('caja')">Caja</button>
-        <button class="proximamente" disabled>Stock (próx.)</button>
+        <button data-tab="stock" onclick="cambiarTab('stock')">Stock</button>
     </nav>
 
     <section class="seccion activa" id="tab-clientes">
@@ -674,6 +754,19 @@ td.mono{
             <button class="btn-chico" onclick="abrirModalCaja()">+ Registrar movimiento</button>
         </div>
         <div id="tablaCaja"></div>
+
+    </section>
+
+    <section class="seccion" id="tab-stock">
+
+        <div class="fila-titulo">
+            <h2>Stock</h2>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-chico" onclick="abrirEscaner()">📷 Escanear</button>
+                <button class="btn-chico" onclick="abrirModalProducto()">+ Nuevo producto</button>
+            </div>
+        </div>
+        <div id="tablaStock"></div>
 
     </section>
 
@@ -798,6 +891,96 @@ td.mono{
         <p id="mensajeEstadoCaja"></p>
     </div>
 </div>
+
+<!-- ---------- Modal: nuevo producto ---------- -->
+<div class="overlay" id="modalProducto">
+    <div class="modal">
+        <h3>Nuevo producto</h3>
+
+        <label>Nombre</label>
+        <input type="text" id="pNombre" placeholder="Perfume Glade">
+
+        <label>Cantidad inicial</label>
+        <input type="number" id="pCantidad" placeholder="10">
+
+        <label>Precio de venta</label>
+        <input type="number" id="pPrecio" placeholder="15000">
+
+        <label>Avisar cuando queden menos de</label>
+        <input type="number" id="pStockMinimo" placeholder="3">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarProducto()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoProducto"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: editar producto ---------- -->
+<div class="overlay" id="modalEditarProducto">
+    <div class="modal">
+        <h3>Editar producto</h3>
+
+        <input type="hidden" id="epId">
+
+        <label>Nombre</label>
+        <input type="text" id="epNombre">
+
+        <label>Cantidad</label>
+        <input type="number" id="epCantidad">
+
+        <label>Precio de venta</label>
+        <input type="number" id="epPrecio">
+
+        <label>Avisar cuando queden menos de</label>
+        <input type="number" id="epStockMinimo">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicionProducto()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoEdicionProducto"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: etiqueta imprimible ---------- -->
+<div class="overlay" id="modalEtiqueta">
+    <div class="modal" style="text-align:center;">
+        <h3>Etiqueta para imprimir</h3>
+
+        <div id="etiquetaContenido" style="background:#fff;color:#000;border-radius:12px;padding:24px;margin:16px 0;">
+            <div id="etiquetaNombre" style="font-weight:800;font-size:16px;margin-bottom:14px;"></div>
+            <div id="etiquetaQR" style="display:flex;justify-content:center;"></div>
+        </div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+            <button class="btn-red" onclick="window.print()">Imprimir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: escáner ---------- -->
+<div class="overlay" id="modalEscaner">
+    <div class="modal">
+        <h3>Escanear producto</h3>
+
+        <video id="videoEscaner" autoplay playsinline muted style="width:100%;border-radius:12px;background:#000;"></video>
+        <canvas id="canvasEscaner" style="display:none;"></canvas>
+
+        <div id="resultadoEscaner" style="margin-top:16px;"></div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarEscaner()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
 <!-- Listas de autocompletado: marcas y modelos comunes en Argentina -->
 <datalist id="listaMarcas">
@@ -925,6 +1108,7 @@ onAuthStateChanged(auth, (user) => {
         escucharVehiculos();
         escucharCaja();
         escucharHistorial();
+        escucharStock();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -1061,6 +1245,9 @@ window.cerrarModales = function () {
     document.getElementById("modalFicha").classList.remove("abierto");
     document.getElementById("modalEditarVehiculo").classList.remove("abierto");
     document.getElementById("modalCaja").classList.remove("abierto");
+    document.getElementById("modalProducto").classList.remove("abierto");
+    document.getElementById("modalEditarProducto").classList.remove("abierto");
+    document.getElementById("modalEtiqueta").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -1791,6 +1978,363 @@ window.agregarHistorial = async function (vehiculoId) {
     document.getElementById("hDesc-" + vehiculoId).value = "";
     document.getElementById("hCosto-" + vehiculoId).value = "";
 
+};
+
+// ---------- Stock en tiempo real ----------
+
+let stockCache = [];
+let streamCamara = null;
+let escaneando = false;
+
+function escucharStock() {
+
+    const q = query(collection(db, "stock"), orderBy("nombre"));
+
+    onSnapshot(q, (snapshot) => {
+
+        stockCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderStock();
+
+    });
+
+}
+
+function renderStock() {
+
+    const el = document.getElementById("tablaStock");
+
+    if (stockCache.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay productos cargados.</div>';
+        return;
+    }
+
+    el.innerHTML = "";
+
+    stockCache.forEach(p => {
+
+        const stockMinimo = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
+        const bajo = p.cantidad <= stockMinimo;
+
+        const fila = document.createElement("div");
+        fila.className = "fila-stock" + (bajo ? " stock-bajo" : "");
+        fila.innerHTML = `
+            <div>
+                <div class="fila-stock-nombre">${escapar(p.nombre)} ${bajo ? "⚠️" : ""}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades ${bajo ? "· stock bajo" : ""}</div>
+            </div>
+            <div class="fila-stock-botones">
+                <button class="btn-redondo" onclick="ajustarCantidad('${p.id}', -1)">-</button>
+                <span class="cantidad-numero" id="numero-${p.id}">${p.cantidad}</span>
+                <button class="btn-redondo" onclick="ajustarCantidad('${p.id}', 1)">+</button>
+                <button class="btn-chico" onclick="abrirEdicionProducto('${p.id}', '${escaparComillas(p.nombre)}', ${p.cantidad}, ${stockMinimo}, ${p.precio || 0})">Editar</button>
+                <button class="btn-chico" onclick="abrirEtiqueta('${p.id}', '${escaparComillas(p.nombre)}')">🏷️ Etiqueta</button>
+            </div>
+        `;
+        el.appendChild(fila);
+
+    });
+
+}
+
+window.ajustarCantidad = async function (id, delta) {
+
+    const producto = stockCache.find(p => p.id === id);
+    if (!producto) return;
+
+    const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) + delta);
+
+    await updateDoc(doc(db, "stock", id), { cantidad: nuevaCantidad });
+
+};
+
+window.abrirModalProducto = function () {
+    document.getElementById("modalProducto").classList.add("abierto");
+    document.getElementById("mensajeEstadoProducto").textContent = "";
+};
+
+window.guardarProducto = async function () {
+
+    const nombre = document.getElementById("pNombre").value.trim();
+    const cantidad = parseInt(document.getElementById("pCantidad").value, 10) || 0;
+    const precio = parseFloat(document.getElementById("pPrecio").value) || 0;
+    const stockMinimo = parseInt(document.getElementById("pStockMinimo").value, 10) || 3;
+    const estado = document.getElementById("mensajeEstadoProducto");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al producto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await addDoc(collection(db, "stock"), {
+            nombre, cantidad, precio, stockMinimo,
+            creado: serverTimestamp()
+        });
+
+        estado.textContent = "¡Producto guardado!";
+        estado.style.color = "#5fd98a";
+
+        document.getElementById("pNombre").value = "";
+        document.getElementById("pCantidad").value = "";
+        document.getElementById("pPrecio").value = "";
+        document.getElementById("pStockMinimo").value = "";
+
+        setTimeout(() => window.cerrarModales(), 600);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.abrirEdicionProducto = function (id, nombre, cantidad, stockMinimo, precio) {
+
+    document.getElementById("epId").value = id;
+    document.getElementById("epNombre").value = nombre;
+    document.getElementById("epCantidad").value = cantidad;
+    document.getElementById("epStockMinimo").value = stockMinimo;
+    document.getElementById("epPrecio").value = precio || "";
+
+    document.getElementById("mensajeEstadoEdicionProducto").textContent = "";
+    document.getElementById("modalEditarProducto").classList.add("abierto");
+
+};
+
+window.guardarEdicionProducto = async function () {
+
+    const id = document.getElementById("epId").value;
+    const nombre = document.getElementById("epNombre").value.trim();
+    const cantidad = parseInt(document.getElementById("epCantidad").value, 10) || 0;
+    const precio = parseFloat(document.getElementById("epPrecio").value) || 0;
+    const stockMinimo = parseInt(document.getElementById("epStockMinimo").value, 10) || 3;
+    const estado = document.getElementById("mensajeEstadoEdicionProducto");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al producto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await updateDoc(doc(db, "stock", id), { nombre, cantidad, precio, stockMinimo });
+
+        estado.textContent = "¡Listo!";
+        estado.style.color = "#5fd98a";
+
+        setTimeout(() => window.cerrarModales(), 500);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.abrirEtiqueta = function (id, nombre) {
+
+    document.getElementById("etiquetaNombre").textContent = nombre;
+
+    const contenedor = document.getElementById("etiquetaQR");
+    contenedor.innerHTML = "";
+
+    new QRCode(contenedor, {
+        text: "KM26-STOCK-" + id,
+        width: 180,
+        height: 180
+    });
+
+    document.getElementById("modalEtiqueta").classList.add("abierto");
+
+};
+
+// ---------- Escáner con cámara ----------
+
+window.abrirEscaner = async function () {
+
+    document.getElementById("modalEscaner").classList.add("abierto");
+
+    if (typeof jsQR !== "function") {
+        document.getElementById("resultadoEscaner").innerHTML =
+            '<p style="color:#ff6b6b;font-size:13px;">⚠️ La librería lectora de QR no cargó (revisá tu conexión a internet). Cerrá y probá de nuevo.</p>';
+        return;
+    }
+
+    document.getElementById("resultadoEscaner").innerHTML = "";
+
+    try {
+
+        streamCamara = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        });
+
+        const video = document.getElementById("videoEscaner");
+        video.srcObject = streamCamara;
+        await video.play();
+
+        escaneando = true;
+        requestAnimationFrame(loopEscaneo);
+
+    } catch (err) {
+        document.getElementById("resultadoEscaner").innerHTML =
+            '<p style="color:#ff6b6b;font-size:13px;">No se pudo acceder a la cámara. Revisá los permisos del navegador.</p>';
+    }
+
+};
+
+window.cerrarEscaner = function () {
+
+    escaneando = false;
+
+    if (streamCamara) {
+        streamCamara.getTracks().forEach(t => t.stop());
+        streamCamara = null;
+    }
+
+    document.getElementById("modalEscaner").classList.remove("abierto");
+
+};
+
+function loopEscaneo() {
+
+    if (!escaneando) return;
+
+    const video = document.getElementById("videoEscaner");
+    const canvas = document.getElementById("canvasEscaner");
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imagen = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const codigo = jsQR(imagen.data, imagen.width, imagen.height, {
+            inversionAttempts: "attemptBoth"
+        });
+
+        if (codigo && codigo.data) {
+
+            if (codigo.data.startsWith("KM26-STOCK-")) {
+                procesarCodigoEscaneado(codigo.data);
+                return;
+            } else {
+                document.getElementById("resultadoEscaner").innerHTML =
+                    `<p style="color:#ffb35f;font-size:12px;">Detecté un código, pero no es de un producto: "${codigo.data}"</p>`;
+            }
+
+        }
+
+    }
+
+    requestAnimationFrame(loopEscaneo);
+
+}
+
+function procesarCodigoEscaneado(texto) {
+
+    escaneando = false;
+
+    const id = texto.replace("KM26-STOCK-", "");
+    const producto = stockCache.find(p => p.id === id);
+
+    const el = document.getElementById("resultadoEscaner");
+
+    if (!producto) {
+        el.innerHTML = '<p style="color:#ff6b6b;font-size:13px;">Producto no encontrado.</p>';
+        setTimeout(() => { escaneando = true; requestAnimationFrame(loopEscaneo); }, 1500);
+        return;
+    }
+
+    el.innerHTML = `
+        <div class="fila-stock" style="margin-top:14px;">
+            <div>
+                <div class="fila-stock-nombre">${escapar(producto.nombre)}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="escaner-cantidad">${producto.cantidad}</span> unidades</div>
+            </div>
+            <div class="fila-stock-botones">
+                <button class="btn-redondo" onclick="ajustarDesdeEscaner('${producto.id}', -1)">-</button>
+                <button class="btn-redondo" onclick="ajustarDesdeEscaner('${producto.id}', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="ficha-historial-form" style="margin-top:10px;">
+            <input type="number" id="ventaPrecio" placeholder="Precio de venta $" value="${producto.precio || ''}">
+            <button class="btn-confirmar-gasto" onclick="registrarVentaDesdeEscaner('${producto.id}', '${escaparComillas(producto.nombre)}')">💰 Registrar venta</button>
+        </div>
+        <p id="ventaEstado" style="font-size:12px;margin-top:6px;"></p>
+
+        <button class="btn-chico" style="margin-top:10px;" onclick="reanudarEscaneo()">Escanear otro</button>
+    `;
+
+}
+
+window.ajustarDesdeEscaner = async function (id, delta) {
+
+    const producto = stockCache.find(p => p.id === id);
+    if (!producto) return;
+
+    const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) + delta);
+    await updateDoc(doc(db, "stock", id), { cantidad: nuevaCantidad });
+
+    document.getElementById("escaner-cantidad").textContent = nuevaCantidad;
+
+};
+
+window.registrarVentaDesdeEscaner = async function (id, nombre) {
+
+    const precio = document.getElementById("ventaPrecio").value.trim();
+    const estado = document.getElementById("ventaEstado");
+
+    if (!precio || Number(precio) <= 0) {
+        estado.textContent = "Poné el precio de venta primero.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Registrando...";
+    estado.style.color = "#999";
+
+    try {
+
+        const producto = stockCache.find(p => p.id === id);
+        const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) - 1);
+
+        await updateDoc(doc(db, "stock", id), { cantidad: nuevaCantidad });
+
+        await addDoc(collection(db, "caja"), {
+            tipo: "Ingreso",
+            descripcion: "Venta: " + nombre,
+            monto: parseFloat(precio),
+            fecha: serverTimestamp()
+        });
+
+        document.getElementById("escaner-cantidad").textContent = nuevaCantidad;
+        estado.textContent = "✅ Venta registrada y stock descontado.";
+        estado.style.color = "#5fd98a";
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.reanudarEscaneo = function () {
+    document.getElementById("resultadoEscaner").innerHTML = "";
+    escaneando = true;
+    requestAnimationFrame(loopEscaneo);
 };
 
 </script>
