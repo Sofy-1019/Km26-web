@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/apple-touch-icon-panel.png">
-<meta name="theme-color" content="#1c1c1e">
+<meta name="theme-color" content="#2a2a2e">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 
@@ -23,7 +23,7 @@ nav.tabs button,
 }
 
 body{
-    background:#1c1c1e;
+    background:#2a2a2e;
     color:#fff;
     min-height:100vh;
 }
@@ -41,10 +41,10 @@ body{
 }
 
 #pantallaLogin img{
-    width:110px;
-    height:110px;
+    width:130px;
+    height:130px;
     margin-bottom:18px;
-    filter:drop-shadow(0 8px 22px rgba(215,25,32,.4));
+    filter:drop-shadow(0 8px 24px rgba(215,25,32,.45));
 }
 
 #pantallaLogin h1{
@@ -123,8 +123,8 @@ header{
 }
 
 .marca-logo-img{
-    width:64px;
-    height:64px;
+    width:82px;
+    height:82px;
     filter:drop-shadow(0 4px 14px rgba(215,25,32,.4));
 }
 
@@ -462,6 +462,63 @@ td.mono{
     min-height:18px;
 }
 
+.ficha-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+    border-bottom:1px solid #2a2a2a;
+}
+
+.ficha-tabs button{
+    background:none;
+    border:none;
+    color:#888;
+    font-size:13px;
+    font-weight:600;
+    padding:10px 14px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    font-family:'Montserrat',sans-serif;
+}
+
+.ficha-tabs button.activo{
+    color:#ff6b6b;
+    border-bottom-color:#d71920;
+}
+
+.ficha-tab-contenido{
+    display:none;
+}
+
+.ficha-tab-contenido.activo{
+    display:block;
+}
+
+.ficha-historial-vehiculo-nombre{
+    font-weight:700;
+    font-size:13px;
+    margin-bottom:10px;
+    color:#eee;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-confirmar-gasto{
+    background:linear-gradient(180deg,#2fdb6e,#1fa851);
+    color:#fff;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-confirmar-gasto:hover{
+    background:linear-gradient(180deg,#3aff82,#25c25f);
+}
+
 .ficha-vehiculo{
     background:#1e1e1e;
     border-radius:12px;
@@ -652,25 +709,38 @@ td.mono{
 
 <!-- ---------- Modal: ficha de cliente (sus vehículos) ---------- -->
 <div class="overlay" id="modalFicha">
-    <div class="modal" style="max-width:520px;">
+    <div class="modal" style="max-width:560px;">
         <h3 id="fichaTitulo">Cliente</h3>
 
-        <div id="fichaVehiculos"></div>
+        <div class="ficha-tabs">
+            <button class="activo" id="fichaTabBtnVehiculos" onclick="cambiarFichaTab('vehiculos')">🚗 Vehículos</button>
+            <button id="fichaTabBtnHistorial" onclick="cambiarFichaTab('historial')">📋 Historia clínica</button>
+        </div>
 
-        <div style="margin-top:18px;padding-top:18px;border-top:1px solid #262626;">
-            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar vehículo a este cliente</p>
-            <input type="hidden" id="fichaClienteId">
-            <label>Patente</label>
-            <input type="text" id="vPatente" placeholder="AB123CD">
-            <label>Marca</label>
-            <input type="text" id="vMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off">
-            <label>Modelo</label>
-            <input type="text" id="vModelo" placeholder="Vento" list="listaModelos" autocomplete="off">
-            <label>Año</label>
-            <input type="text" id="vAnio" placeholder="2020">
-            <div class="modal-botones">
-                <button class="btn-chico" style="flex:1;" onclick="agregarVehiculo()">+ Agregar vehículo</button>
+        <div class="ficha-tab-contenido activo" id="fichaTabVehiculos">
+
+            <div id="fichaVehiculos"></div>
+
+            <div style="margin-top:18px;padding-top:18px;border-top:1px solid #262626;">
+                <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar vehículo a este cliente</p>
+                <input type="hidden" id="fichaClienteId">
+                <label>Patente</label>
+                <input type="text" id="vPatente" placeholder="AB123CD">
+                <label>Marca</label>
+                <input type="text" id="vMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off">
+                <label>Modelo</label>
+                <input type="text" id="vModelo" placeholder="Vento" list="listaModelos" autocomplete="off">
+                <label>Año</label>
+                <input type="text" id="vAnio" placeholder="2020">
+                <div class="modal-botones">
+                    <button class="btn-chico" style="flex:1;" onclick="agregarVehiculo()">+ Agregar vehículo</button>
+                </div>
             </div>
+
+        </div>
+
+        <div class="ficha-tab-contenido" id="fichaTabHistorial">
+            <div id="fichaHistorialCompleto"></div>
         </div>
 
         <div class="modal-botones">
@@ -1134,9 +1204,20 @@ window.abrirFicha = function (clienteId, nombreCompleto) {
     document.getElementById("vModelo").value = "";
     document.getElementById("vAnio").value = "";
 
+    window.cambiarFichaTab("vehiculos");
     renderFichaVehiculos();
 
     document.getElementById("modalFicha").classList.add("abierto");
+
+};
+
+window.cambiarFichaTab = function (tab) {
+
+    document.getElementById("fichaTabBtnVehiculos").classList.toggle("activo", tab === "vehiculos");
+    document.getElementById("fichaTabBtnHistorial").classList.toggle("activo", tab === "historial");
+
+    document.getElementById("fichaTabVehiculos").classList.toggle("activo", tab === "vehiculos");
+    document.getElementById("fichaTabHistorial").classList.toggle("activo", tab === "historial");
 
 };
 
@@ -1147,6 +1228,42 @@ function renderFichaVehiculos() {
 
     if (vehiculos.length === 0) {
         el.innerHTML = '<p style="font-size:13px;color:#999;">Este cliente todavía no tiene vehículos cargados.</p>';
+    } else {
+
+        let html = "";
+
+        vehiculos.forEach(v => {
+            html += `<div class="ficha-vehiculo">
+                <div class="ficha-vehiculo-cabecera">
+                    <div>
+                        <div class="ficha-vehiculo-patente">${escapar(v.patente)}</div>
+                        <div class="ficha-vehiculo-detalle">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</div>
+                    </div>
+                    <div>
+                        <button class="btn-chico" onclick="abrirEdicionVehiculo('${v.id}', '${escaparComillas(v.patente)}', '${escaparComillas(v.marca || "")}', '${escaparComillas(v.modelo || "")}', '${escaparComillas(v.anio || "")}')">Editar</button>
+                        <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarVehiculo('${v.id}')">Borrar</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        el.innerHTML = html;
+
+    }
+
+    renderFichaHistorialCompleto();
+
+}
+
+function renderFichaHistorialCompleto() {
+
+    const el = document.getElementById("fichaHistorialCompleto");
+    if (!el) return;
+
+    const vehiculos = vehiculosCache.filter(v => v.clienteId === fichaClienteActual);
+
+    if (vehiculos.length === 0) {
+        el.innerHTML = '<p style="font-size:13px;color:#999;">Cargá un vehículo primero en la pestaña "Vehículos".</p>';
         return;
     }
 
@@ -1154,25 +1271,16 @@ function renderFichaVehiculos() {
 
     vehiculos.forEach(v => {
         html += `<div class="ficha-vehiculo">
-            <div class="ficha-vehiculo-cabecera">
-                <div>
-                    <div class="ficha-vehiculo-patente">${escapar(v.patente)}</div>
-                    <div class="ficha-vehiculo-detalle">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</div>
-                </div>
-                <div>
-                    <button class="btn-chico" onclick="abrirEdicionVehiculo('${v.id}', '${escaparComillas(v.patente)}', '${escaparComillas(v.marca || "")}', '${escaparComillas(v.modelo || "")}', '${escaparComillas(v.anio || "")}')">Editar</button>
-                    <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarVehiculo('${v.id}')">Borrar</button>
-                </div>
-            </div>
+            <div class="ficha-historial-vehiculo-nombre">${escapar(v.patente)} · ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
 
             <div class="ficha-historial" id="historial-${v.id}">
                 <p style="font-size:12px;color:#777;">Cargando historial...</p>
             </div>
 
             <div class="ficha-historial-form">
-                <input type="text" id="hDesc-${v.id}" placeholder="Cambio de aceite, service, etc.">
-                <input type="number" id="hCosto-${v.id}" placeholder="$">
-                <button class="btn-chico" onclick="agregarHistorial('${v.id}')">+</button>
+                <input type="text" id="hDesc-${v.id}" placeholder="Ej: cambio de rótulas">
+                <input type="number" id="hCosto-${v.id}" placeholder="$ gasto">
+                <button class="btn-confirmar-gasto" onclick="agregarHistorial('${v.id}')">✓ Confirmar gasto</button>
             </div>
         </div>`;
     });
