@@ -511,9 +511,9 @@ td.mono{
             <label>Patente</label>
             <input type="text" id="vPatente" placeholder="AB123CD">
             <label>Marca</label>
-            <input type="text" id="vMarca" placeholder="VW">
+            <input type="text" id="vMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off">
             <label>Modelo</label>
-            <input type="text" id="vModelo" placeholder="Gol">
+            <input type="text" id="vModelo" placeholder="Vento" list="listaModelos" autocomplete="off">
             <label>Año</label>
             <input type="text" id="vAnio" placeholder="2020">
             <div class="modal-botones">
@@ -537,9 +537,9 @@ td.mono{
         <label>Patente</label>
         <input type="text" id="evPatente">
         <label>Marca</label>
-        <input type="text" id="evMarca">
+        <input type="text" id="evMarca" list="listaMarcas" autocomplete="off">
         <label>Modelo</label>
-        <input type="text" id="evModelo">
+        <input type="text" id="evModelo" list="listaModelos" autocomplete="off">
         <label>Año</label>
         <input type="text" id="evAnio">
 
@@ -551,6 +551,30 @@ td.mono{
         <p id="mensajeEstadoVehiculo"></p>
     </div>
 </div>
+
+<!-- Listas de autocompletado: marcas y modelos comunes en Argentina -->
+<datalist id="listaMarcas">
+    <option value="Volkswagen">
+    <option value="Ford">
+    <option value="Chevrolet">
+    <option value="Fiat">
+    <option value="Renault">
+    <option value="Peugeot">
+    <option value="Toyota">
+    <option value="Honda">
+    <option value="Nissan">
+    <option value="Citroën">
+    <option value="Jeep">
+    <option value="RAM">
+    <option value="Chery">
+    <option value="DS">
+    <option value="Suzuki">
+    <option value="Mitsubishi">
+    <option value="Hyundai">
+    <option value="Kia">
+</datalist>
+
+<datalist id="listaModelos"></datalist>
 
 <!-- Firebase (SDK vía CDN, sin necesidad de instalar nada) -->
 <script type="module">
@@ -576,6 +600,48 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// ---------- Marcas y modelos comunes en Argentina (para autocompletar) ----------
+
+const MODELOS_POR_MARCA = {
+    "volkswagen": ["Gol", "Polo", "Vento", "Virtus", "Nivus", "T-Cross", "Taos", "Amarok", "Suran", "Voyage", "Saveiro", "Fox"],
+    "ford": ["Fiesta", "Focus", "Ka", "EcoSport", "Ranger", "Territory", "Mondeo"],
+    "chevrolet": ["Onix", "Cruze", "Prisma", "Spin", "S10", "Tracker", "Corsa", "Astra"],
+    "fiat": ["Cronos", "Argo", "Mobi", "Toro", "Strada", "Palio", "Uno", "Siena"],
+    "renault": ["Sandero", "Logan", "Duster", "Kangoo", "Captur", "Kwid", "Clio", "Fluence", "Alaskan"],
+    "peugeot": ["208", "2008", "3008", "Partner", "408", "308"],
+    "toyota": ["Corolla", "Hilux", "Etios", "Yaris", "SW4", "RAV4"],
+    "honda": ["Civic", "HR-V", "City", "Fit", "CR-V"],
+    "nissan": ["Versa", "Kicks", "Frontier", "March", "Sentra"],
+    "citroën": ["C3", "C4 Cactus", "Berlingo"],
+    "citroen": ["C3", "C4 Cactus", "Berlingo"],
+    "jeep": ["Renegade", "Compass"],
+    "ram": ["1500", "700", "2500"],
+    "chery": ["Tiggo 2", "Tiggo 3", "Tiggo 7", "Arrizo"],
+    "ds": ["DS3", "DS4", "DS7"],
+    "suzuki": ["Fun", "S-Presso", "Vitara"],
+    "mitsubishi": ["L200", "ASX", "Outlander"],
+    "hyundai": ["HB20", "Creta", "Tucson"],
+    "kia": ["Rio", "Sportage", "Cerato"]
+};
+
+function actualizarModelos(marcaTexto) {
+
+    const clave = marcaTexto.trim().toLowerCase();
+    const datalist = document.getElementById("listaModelos");
+    const modelos = MODELOS_POR_MARCA[clave] || [];
+
+    datalist.innerHTML = modelos.map(m => `<option value="${m}">`).join("");
+
+}
+
+document.getElementById("vMarca").addEventListener("input", function () {
+    actualizarModelos(this.value);
+});
+
+document.getElementById("evMarca").addEventListener("input", function () {
+    actualizarModelos(this.value);
+});
 
 let clientesCache = [];
 let vehiculosCache = [];
@@ -949,6 +1015,7 @@ window.abrirEdicionVehiculo = function (id, patente, marca, modelo, anio) {
     document.getElementById("evMarca").value = marca;
     document.getElementById("evModelo").value = modelo;
     document.getElementById("evAnio").value = anio;
+    actualizarModelos(marca);
 
     document.getElementById("mensajeEstadoVehiculo").textContent = "";
     document.getElementById("modalEditarVehiculo").classList.add("abierto");
