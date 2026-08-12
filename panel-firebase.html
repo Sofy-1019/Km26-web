@@ -660,6 +660,29 @@ td.mono{
     font-family:'Montserrat',sans-serif;
 }
 
+.btn-carpeta{
+    width:34px;
+    height:34px;
+    border-radius:8px;
+    border:1px solid #3a3a3e;
+    background:#1a1a1c;
+    color:#ff6b6b;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.btn-carpeta:hover{
+    border-color:#d71920;
+    background:#2a0a0b;
+}
+
+.btn-carpeta svg{
+    width:18px;
+    height:18px;
+}
+
 .btn-redondo:hover{
     border-color:#d71920;
 }
@@ -744,6 +767,87 @@ td.mono{
 .turno-fila.estado-finalizado{ border-left-color:#888; opacity:.7; }
 .turno-fila.estado-cancelado{ border-left-color:#ff4d55; opacity:.6; }
 .turno-fila.estado-no-asistio{ border-left-color:#d71920; opacity:.6; }
+
+.presu-card{
+    background:#242428;
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:12px;
+    border-left:4px solid #555;
+}
+
+.presu-card.estado-borrador{ border-left-color:#888; }
+.presu-card.estado-enviado{ border-left-color:#3f9cff; }
+.presu-card.estado-aprobado{ border-left-color:#2fdb6e; }
+.presu-card.estado-rechazado{ border-left-color:#ff4d55; opacity:.7; }
+.presu-card.estado-vencido{ border-left-color:#f5a623; opacity:.7; }
+
+.presu-cabecera{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.presu-cliente{
+    font-weight:700;
+    font-size:14px;
+}
+
+.presu-detalle{
+    font-size:12px;
+    color:#999;
+    margin-top:2px;
+}
+
+.presu-total{
+    font-weight:800;
+    font-size:17px;
+    font-family:'Montserrat',sans-serif;
+    white-space:nowrap;
+}
+
+.presu-items-lista{
+    font-size:12px;
+    color:#aaa;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed #333;
+}
+
+.presu-acciones{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+    flex-wrap:wrap;
+}
+
+.badge-estado{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:12px;
+    white-space:nowrap;
+}
+
+.badge-estado.estado-borrador{ background:#2a2a2e; color:#aaa; }
+.badge-estado.estado-enviado{ background:#0d2038; color:#6ab6ff; }
+.badge-estado.estado-aprobado{ background:#0d2418; color:#5fd98a; }
+.badge-estado.estado-rechazado{ background:#2a0a0b; color:#ff6b6b; }
+.badge-estado.estado-vencido{ background:#2a1b0d; color:#ffb35f; }
+
+#modalPresupuesto select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:14px;
+    font-family:'Montserrat',sans-serif;
+    margin-top:6px;
+}
 
 #modalTurno select,
 #modalTurno input[type="date"],
@@ -897,6 +1001,7 @@ td.mono{
         <button class="activo" data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
         <button data-tab="vehiculos" onclick="cambiarTab('vehiculos')">Vehículos</button>
         <button data-tab="turnos" onclick="cambiarTab('turnos')">Turnos</button>
+        <button data-tab="presupuestos" onclick="cambiarTab('presupuestos')">Presupuestos</button>
         <button data-tab="caja" onclick="cambiarTab('caja')">Caja</button>
         <button data-tab="stock" onclick="cambiarTab('stock')">Stock</button>
     </nav>
@@ -909,6 +1014,14 @@ td.mono{
     <section class="seccion" id="tab-vehiculos">
         <div class="fila-titulo"><h2>Vehículos</h2></div>
         <div id="tablaVehiculos"></div>
+    </section>
+
+    <section class="seccion" id="tab-presupuestos">
+        <div class="fila-titulo">
+            <h2>Presupuestos</h2>
+            <button class="btn-red" onclick="abrirModalPresupuesto()">+ Nuevo presupuesto</button>
+        </div>
+        <div id="listaPresupuestos"></div>
     </section>
 
     <section class="seccion" id="tab-turnos">
@@ -1062,6 +1175,19 @@ td.mono{
         </div>
 
         <p id="mensajeEstadoVehiculo"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: historia clínica directa (desde la lista de Vehículos) ---------- -->
+<div class="overlay" id="modalHistorialDirecto">
+    <div class="modal">
+        <h3 id="historialDirectoTitulo">📋 Historia clínica</h3>
+
+        <div id="historialDirectoContenido"></div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()" style="flex:1;">Cerrar</button>
+        </div>
     </div>
 </div>
 
@@ -1251,6 +1377,52 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: nuevo presupuesto ---------- -->
+<div class="overlay" id="modalPresupuesto">
+    <div class="modal" style="max-width:520px;">
+        <h3>📋 Nuevo presupuesto</h3>
+
+        <label>Cliente</label>
+        <select id="presuCliente" onchange="actualizarVehiculosPresupuesto()"></select>
+
+        <label>Vehículo (opcional)</label>
+        <select id="presuVehiculo"></select>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar ítem (mano de obra, repuesto, etc.)</p>
+            <div class="ficha-historial-form">
+                <input type="text" id="presuItemDescripcion" placeholder="Ej: cambio de embrague">
+                <input type="number" id="presuItemMonto" placeholder="$">
+                <button class="btn-chico" onclick="agregarItemPresupuesto()">+ Agregar</button>
+            </div>
+            <button class="btn-chico" style="width:100%;margin-top:10px;" onclick="abrirEscanerParaPresupuesto()">📷 Escanear producto</button>
+        </div>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Ítems del presupuesto</p>
+            <div id="listaPresupuestoItems"></div>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-top:14px;">
+                <label style="margin:0;white-space:nowrap;">🏷️ Descuento</label>
+                <input type="number" id="presuDescuento" placeholder="0" min="0" max="100" style="max-width:90px;margin:0;" oninput="renderListaPresupuestoItems()">
+                <span style="color:#999;font-size:13px;">%</span>
+            </div>
+
+            <div id="presuTotal" style="text-align:right;font-size:20px;font-weight:800;margin-top:12px;font-family:'Montserrat',sans-serif;"></div>
+        </div>
+
+        <label>Notas (opcional)</label>
+        <input type="text" id="presuNotas" placeholder="Válido por 15 días, etc.">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModalPresupuesto()">Cancelar</button>
+            <button class="btn-red" style="flex:1;" onclick="guardarPresupuesto()">Guardar presupuesto</button>
+        </div>
+
+        <p id="mensajeEstadoPresupuesto"></p>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
@@ -1349,6 +1521,7 @@ let clientesCache = [];
 let vehiculosCache = [];
 let editandoId = null;
 let fichaClienteActual = null;
+let vehiculoHistorialDirectoActual = null;
 
 // ---------- Login ----------
 
@@ -1396,6 +1569,7 @@ onAuthStateChanged(auth, (user) => {
         escucharHistorial();
         escucharStock();
         escucharTurnos();
+        escucharPresupuestos();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -1528,6 +1702,7 @@ window.editarCliente = function (id) {
 };
 
 window.cerrarModales = function () {
+    vehiculoHistorialDirectoActual = null;
     document.getElementById("modalCliente").classList.remove("abierto");
     document.getElementById("modalFicha").classList.remove("abierto");
     document.getElementById("modalEditarVehiculo").classList.remove("abierto");
@@ -1537,6 +1712,8 @@ window.cerrarModales = function () {
     document.getElementById("modalEtiqueta").classList.remove("abierto");
     document.getElementById("modalTurno").classList.remove("abierto");
     document.getElementById("modalCuenta").classList.remove("abierto");
+    document.getElementById("modalPresupuesto").classList.remove("abierto");
+    document.getElementById("modalHistorialDirecto").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -1645,7 +1822,7 @@ function renderVehiculos(lista) {
         return;
     }
 
-    let html = "<table><thead><tr><th>Patente</th><th>Vehículo</th><th>Dueño</th><th>Teléfono</th></tr></thead><tbody>";
+    let html = "<table><thead><tr><th>Patente</th><th>Vehículo</th><th>Dueño</th><th>Teléfono</th><th></th></tr></thead><tbody>";
 
     lista.forEach(v => {
 
@@ -1658,6 +1835,11 @@ function renderVehiculos(lista) {
             <td class="mono">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</td>
             <td>${escapar(nombreCliente)}</td>
             <td class="mono">${escapar(telefono || "-")}</td>
+            <td>
+                <button class="btn-carpeta" onclick="abrirHistorialDirecto('${v.id}', '${escaparComillas(v.patente)}')" title="Historia clínica">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
+                </button>
+            </td>
         </tr>`;
 
     });
@@ -2222,6 +2404,11 @@ function escucharHistorial() {
             vehiculos.forEach(v => renderHistorialVehiculo(v.id));
         }
 
+        // Si está abierto el historial directo desde Vehículos, también se refresca
+        if (vehiculoHistorialDirectoActual) {
+            renderHistorialVehiculo(vehiculoHistorialDirectoActual);
+        }
+
     });
 
 }
@@ -2250,6 +2437,29 @@ function renderHistorialVehiculo(vehiculoId) {
 
 }
 
+window.abrirHistorialDirecto = function (vehiculoId, patente) {
+
+    vehiculoHistorialDirectoActual = vehiculoId;
+
+    document.getElementById("historialDirectoTitulo").textContent = "📋 " + patente;
+
+    document.getElementById("historialDirectoContenido").innerHTML = `
+        <div class="ficha-historial" id="historial-${vehiculoId}">
+            <p style="font-size:12px;color:#777;">Cargando historial...</p>
+        </div>
+        <div class="ficha-historial-form">
+            <input type="text" id="hDesc-${vehiculoId}" placeholder="Ej: cambio de rótulas">
+            <input type="number" id="hCosto-${vehiculoId}" placeholder="$ gasto">
+            <button class="btn-confirmar-gasto" onclick="agregarHistorial('${vehiculoId}')">✓ Confirmar gasto</button>
+        </div>
+    `;
+
+    renderHistorialVehiculo(vehiculoId);
+
+    document.getElementById("modalHistorialDirecto").classList.add("abierto");
+
+};
+
 window.agregarHistorial = async function (vehiculoId) {
 
     const desc = document.getElementById("hDesc-" + vehiculoId).value.trim();
@@ -2273,6 +2483,8 @@ window.agregarHistorial = async function (vehiculoId) {
 
 let stockCache = [];
 let cuentaItems = [];
+let presupuestoItemsTemp = [];
+let presupuestoEditandoId = null;
 let modoEscaner = "venta";
 let streamCamara = null;
 let escaneando = false;
@@ -2561,6 +2773,24 @@ function procesarCodigoEscaneado(texto) {
         window.cerrarEscaner();
         document.getElementById("modalCuenta").classList.add("abierto");
         renderListaCuentaItems();
+
+        return;
+
+    }
+
+    // Modo "presupuesto": se agrega como ítem al presupuesto que se está armando
+    if (modoEscaner === "presupuesto") {
+
+        presupuestoItemsTemp.push({
+            tipo: "stock",
+            stockId: producto.id,
+            descripcion: producto.nombre,
+            monto: Number(producto.precio) || 0
+        });
+
+        window.cerrarEscaner();
+        document.getElementById("modalPresupuesto").classList.add("abierto");
+        renderListaPresupuestoItems();
 
         return;
 
@@ -3022,6 +3252,295 @@ window.cobrarCuenta = async function () {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
     }
+
+};
+
+// ---------- Presupuestos ----------
+
+let presupuestosCache = [];
+
+function escucharPresupuestos() {
+
+    const q = query(collection(db, "presupuestos"), orderBy("fecha", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+
+        presupuestosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderPresupuestos();
+
+    });
+
+}
+
+function renderPresupuestos() {
+
+    const el = document.getElementById("listaPresupuestos");
+    if (!el) return;
+
+    if (presupuestosCache.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay presupuestos cargados.</div>';
+        return;
+    }
+
+    el.innerHTML = presupuestosCache.map(p => {
+
+        const cliente = clientesCache.find(c => c.id === p.clienteId);
+        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
+        const telefono = cliente ? cliente.telefono : "";
+        const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
+        const detalleVehiculo = vehiculo ? ` · ${escapar(vehiculo.patente)}` : "";
+        const fecha = p.fecha && p.fecha.toDate ? p.fecha.toDate().toLocaleDateString("es-AR") : "";
+        const clase = claseEstado(p.estado);
+        const itemsTexto = (p.items || []).map(i => i.descripcion).join(" · ");
+
+        return `<div class="presu-card ${clase}">
+            <div class="presu-cabecera">
+                <div>
+                    <div class="presu-cliente">${escapar(nombreCliente)}${detalleVehiculo}</div>
+                    <div class="presu-detalle">${fecha}</div>
+                </div>
+                <div style="text-align:right;">
+                    <span class="badge-estado ${clase}">${escapar(p.estado)}</span>
+                    <div class="presu-total">${formatoPlata(p.total)}</div>
+                </div>
+            </div>
+
+            <div class="presu-items-lista">${escapar(itemsTexto)}</div>
+
+            <div class="presu-acciones">
+                <select class="turno-estado-select" onchange="cambiarEstadoPresupuesto('${p.id}', this.value)">
+                    ${["Borrador", "Enviado", "Aprobado", "Rechazado", "Vencido"].map(e => `<option value="${e}" ${p.estado === e ? "selected" : ""}>${e}</option>`).join("")}
+                </select>
+                ${telefono ? `<button class="btn-chico" onclick="enviarPresupuestoWhatsApp('${p.id}')">💬 Enviar</button>` : ""}
+                ${p.estado === "Aprobado" ? `<button class="btn-confirmar-gasto" onclick="convertirPresupuestoEnCobro('${p.id}')">💰 Cobrar</button>` : ""}
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarPresupuesto('${p.id}')">Borrar</button>
+            </div>
+        </div>`;
+
+    }).join("");
+
+}
+
+window.abrirModalPresupuesto = function () {
+
+    presupuestoItemsTemp = [];
+
+    const selectCliente = document.getElementById("presuCliente");
+    selectCliente.innerHTML = clientesCache
+        .map(c => `<option value="${c.id}">${escapar(c.apellido)}, ${escapar(c.nombre)}</option>`)
+        .join("");
+
+    window.actualizarVehiculosPresupuesto();
+    renderListaPresupuestoItems();
+
+    document.getElementById("presuItemDescripcion").value = "";
+    document.getElementById("presuItemMonto").value = "";
+    document.getElementById("presuDescuento").value = "";
+    document.getElementById("presuNotas").value = "";
+    document.getElementById("mensajeEstadoPresupuesto").textContent = "";
+
+    document.getElementById("modalPresupuesto").classList.add("abierto");
+
+};
+
+window.actualizarVehiculosPresupuesto = function () {
+
+    const clienteId = document.getElementById("presuCliente").value;
+    const vehiculos = vehiculosCache.filter(v => v.clienteId === clienteId);
+
+    const selectVehiculo = document.getElementById("presuVehiculo");
+    selectVehiculo.innerHTML = '<option value="">Sin especificar</option>' +
+        vehiculos.map(v => `<option value="${v.id}">${escapar(v.patente)} - ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</option>`).join("");
+
+};
+
+window.agregarItemPresupuesto = function () {
+
+    const descripcion = document.getElementById("presuItemDescripcion").value.trim();
+    const monto = parseFloat(document.getElementById("presuItemMonto").value);
+
+    if (!descripcion || !monto) {
+        alert("Completá descripción y monto.");
+        return;
+    }
+
+    presupuestoItemsTemp.push({ tipo: "manual", descripcion, monto });
+
+    document.getElementById("presuItemDescripcion").value = "";
+    document.getElementById("presuItemMonto").value = "";
+
+    renderListaPresupuestoItems();
+
+};
+
+window.quitarItemPresupuesto = function (index) {
+    presupuestoItemsTemp.splice(index, 1);
+    renderListaPresupuestoItems();
+};
+
+function calcularTotalPresupuesto() {
+
+    const subtotal = presupuestoItemsTemp.reduce((suma, item) => suma + item.monto, 0);
+    const descuentoPorc = Math.min(100, Math.max(0, Number(document.getElementById("presuDescuento").value) || 0));
+    const totalFinal = subtotal - (subtotal * descuentoPorc / 100);
+
+    return { subtotal, descuentoPorc, totalFinal };
+
+}
+
+function renderListaPresupuestoItems() {
+
+    const el = document.getElementById("listaPresupuestoItems");
+    const totalEl = document.getElementById("presuTotal");
+
+    if (presupuestoItemsTemp.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Todavía no agregaste ningún ítem.</p>';
+        totalEl.innerHTML = "";
+        return;
+    }
+
+    el.innerHTML = presupuestoItemsTemp.map((item, i) => {
+        const icono = item.tipo === "stock" ? "📦 " : "🔧 ";
+        return `<div class="cuenta-item-fila">
+            <span class="cuenta-item-nombre">${icono}${escapar(item.descripcion)}</span>
+            <span class="cuenta-item-monto">${formatoPlata(item.monto)}</span>
+            <button class="cuenta-item-quitar" onclick="quitarItemPresupuesto(${i})">✕</button>
+        </div>`;
+    }).join("");
+
+    const { subtotal, descuentoPorc, totalFinal } = calcularTotalPresupuesto();
+
+    if (descuentoPorc > 0) {
+        totalEl.innerHTML = `
+            <div style="font-size:13px;font-weight:500;color:#999;">Subtotal: ${formatoPlata(subtotal)}</div>
+            <div style="font-size:13px;font-weight:500;color:#5fd98a;">Descuento ${descuentoPorc}%: -${formatoPlata(subtotal - totalFinal)}</div>
+            <div>Total: ${formatoPlata(totalFinal)}</div>
+        `;
+    } else {
+        totalEl.textContent = "Total: " + formatoPlata(totalFinal);
+    }
+
+}
+
+window.abrirEscanerParaPresupuesto = function () {
+    modoEscaner = "presupuesto";
+    document.getElementById("modalPresupuesto").classList.remove("abierto");
+    window.abrirEscaner();
+};
+
+window.cerrarModalPresupuesto = function () {
+    presupuestoItemsTemp = [];
+    document.getElementById("modalPresupuesto").classList.remove("abierto");
+};
+
+window.guardarPresupuesto = async function () {
+
+    const clienteId = document.getElementById("presuCliente").value;
+    const vehiculoId = document.getElementById("presuVehiculo").value || null;
+    const notas = document.getElementById("presuNotas").value.trim();
+    const estado = document.getElementById("mensajeEstadoPresupuesto");
+
+    if (presupuestoItemsTemp.length === 0) {
+        estado.textContent = "Agregá al menos un ítem.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    if (!clienteId) {
+        estado.textContent = "Elegí un cliente.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        const { subtotal, descuentoPorc, totalFinal } = calcularTotalPresupuesto();
+
+        await addDoc(collection(db, "presupuestos"), {
+            clienteId, vehiculoId,
+            items: presupuestoItemsTemp,
+            subtotal, descuentoPorc, total: totalFinal,
+            notas,
+            estado: "Borrador",
+            fecha: serverTimestamp()
+        });
+
+        estado.textContent = "¡Presupuesto guardado!";
+        estado.style.color = "#5fd98a";
+
+        setTimeout(() => window.cerrarModalPresupuesto(), 600);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.cambiarEstadoPresupuesto = async function (id, nuevoEstado) {
+    await updateDoc(doc(db, "presupuestos", id), { estado: nuevoEstado });
+};
+
+window.borrarPresupuesto = async function (id) {
+
+    const confirmado = confirm("¿Seguro que querés borrar este presupuesto? No se puede deshacer.");
+    if (!confirmado) return;
+
+    await deleteDoc(doc(db, "presupuestos", id));
+
+};
+
+window.enviarPresupuestoWhatsApp = function (id) {
+
+    const p = presupuestosCache.find(x => x.id === id);
+    if (!p) return;
+
+    const cliente = clientesCache.find(c => c.id === p.clienteId);
+    if (!cliente || !cliente.telefono) {
+        alert("Este cliente no tiene teléfono cargado.");
+        return;
+    }
+
+    const items = (p.items || []).map(i => `- ${i.descripcion}: ${formatoPlata(i.monto)}`).join("\n");
+    const notas = p.notas ? `\n\n${p.notas}` : "";
+
+    const texto = `Hola ${cliente.nombre}! Te paso el presupuesto de KM26 Performance:\n\n${items}\n\nTotal: ${formatoPlata(p.total)}${notas}`;
+
+    const telefonoLimpio = String(cliente.telefono).replace(/\D/g, "");
+    const url = `https://wa.me/549${telefonoLimpio}?text=${encodeURIComponent(texto)}`;
+
+    window.open(url, "_blank");
+
+};
+
+// Convierte un presupuesto aprobado en una Cuenta lista para cobrar
+window.convertirPresupuestoEnCobro = function (id) {
+
+    const p = presupuestosCache.find(x => x.id === id);
+    if (!p) return;
+
+    cuentaItems = (p.items || []).map(item => ({ ...item }));
+
+    const selectCliente = document.getElementById("cuentaCliente");
+    selectCliente.innerHTML = clientesCache
+        .map(c => `<option value="${c.id}" ${c.id === p.clienteId ? "selected" : ""}>${escapar(c.apellido)}, ${escapar(c.nombre)}</option>`)
+        .join("");
+
+    window.actualizarVehiculosCuenta();
+
+    if (p.vehiculoId) {
+        document.getElementById("cuentaVehiculo").value = p.vehiculoId;
+    }
+
+    document.getElementById("cuentaDescuento").value = p.descuentoPorc || "";
+    document.getElementById("mensajeEstadoCuenta").textContent = "";
+
+    renderListaCuentaItems();
+
+    document.getElementById("modalCuenta").classList.add("abierto");
 
 };
 

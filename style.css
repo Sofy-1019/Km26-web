@@ -64,6 +64,23 @@ nav a:hover{
     color:#d71920;
 }
 
+.nav-panel-link{
+    display:flex;
+    align-items:center;
+}
+
+.nav-panel-icon{
+    width:30px;
+    height:30px;
+    display:block;
+    filter:drop-shadow(0 2px 8px rgba(215,25,32,.4));
+    transition:transform .3s;
+}
+
+.nav-panel-link:hover .nav-panel-icon{
+    transform:scale(1.12);
+}
+
 .nav-toggle{
     display:none;
     position:absolute;
@@ -1317,7 +1334,7 @@ RESPONSIVE
     }
 
     nav.open{
-        max-height:400px;
+        max-height:460px;
     }
 
     nav a{
@@ -1325,6 +1342,10 @@ RESPONSIVE
         text-align:center;
         padding:18px 25px;
         border-bottom:1px solid rgba(255,255,255,.06);
+    }
+
+    .nav-panel-link{
+        justify-content:center;
     }
 
     /* Con la nueva portada de dos columnas, en mobile/tablet se apilan
