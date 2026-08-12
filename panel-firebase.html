@@ -849,6 +849,59 @@ td.mono{
     margin-top:6px;
 }
 
+#modalInspeccion input[type="file"]{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px dashed #444;
+    background:#1a1a1a;
+    color:#ccc;
+    font-size:13px;
+    margin-top:6px;
+}
+
+.inspeccion-preview-img{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:8px;
+    border:1px solid #333;
+}
+
+.inspeccion-anterior{
+    background:#1e1e1e;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:10px;
+}
+
+.inspeccion-anterior-fecha{
+    font-size:11px;
+    color:#777;
+    margin-bottom:6px;
+}
+
+.inspeccion-anterior-notas{
+    font-size:12px;
+    color:#ccc;
+    margin-bottom:8px;
+}
+
+.inspeccion-anterior-fotos{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+.inspeccion-anterior-fotos img{
+    width:64px;
+    height:64px;
+    object-fit:cover;
+    border-radius:6px;
+    cursor:pointer;
+    border:1px solid #333;
+}
+
 #modalTurno select,
 #modalTurno input[type="date"],
 #modalTurno input[type="time"]{
@@ -1191,6 +1244,35 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: inspección de ingreso (fotos) ---------- -->
+<div class="overlay" id="modalInspeccion">
+    <div class="modal">
+        <h3 id="inspeccionTitulo">📷 Inspección de ingreso</h3>
+
+        <input type="hidden" id="inspeccionVehiculoId">
+
+        <label>Fotos del auto (varias a la vez, tocá para usar la cámara)</label>
+        <input type="file" id="inspeccionFotos" accept="image/*" capture="environment" multiple>
+
+        <div id="inspeccionPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
+
+        <label>Notas (golpes, rayones, detalles a aclarar)</label>
+        <input type="text" id="inspeccionNotas" placeholder="Ej: rayón leve puerta trasera izquierda">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" style="flex:1;" onclick="guardarInspeccion()">Guardar inspección</button>
+        </div>
+
+        <p id="mensajeEstadoInspeccion"></p>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Inspecciones anteriores</p>
+            <div id="listaInspeccionesAnteriores"></div>
+        </div>
+    </div>
+</div>
+
 <!-- ---------- Modal: nuevo movimiento de caja ---------- -->
 <div class="overlay" id="modalCaja">
     <div class="modal">
@@ -1461,6 +1543,9 @@ import {
     getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
     onSnapshot, query, orderBy, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import {
+    getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyB8W3x4-b0JEaxwEXBY09qWWFPRc2q98CA",
@@ -1474,6 +1559,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // ---------- Marcas y modelos comunes en Argentina (para autocompletar) ----------
 
@@ -1570,6 +1656,7 @@ onAuthStateChanged(auth, (user) => {
         escucharStock();
         escucharTurnos();
         escucharPresupuestos();
+        escucharInspecciones();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -1714,6 +1801,7 @@ window.cerrarModales = function () {
     document.getElementById("modalCuenta").classList.remove("abierto");
     document.getElementById("modalPresupuesto").classList.remove("abierto");
     document.getElementById("modalHistorialDirecto").classList.remove("abierto");
+    document.getElementById("modalInspeccion").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -1838,6 +1926,9 @@ function renderVehiculos(lista) {
             <td>
                 <button class="btn-carpeta" onclick="abrirHistorialDirecto('${v.id}', '${escaparComillas(v.patente)}')" title="Historia clínica">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
+                </button>
+                <button class="btn-carpeta" onclick="abrirInspeccion('${v.id}', '${escaparComillas(v.patente)}')" title="Inspección de ingreso">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 </button>
             </td>
         </tr>`;
@@ -3541,6 +3632,141 @@ window.convertirPresupuestoEnCobro = function (id) {
     renderListaCuentaItems();
 
     document.getElementById("modalCuenta").classList.add("abierto");
+
+};
+
+// ---------- Inspección de ingreso (fotos) ----------
+
+let inspeccionesCache = [];
+let fotosSeleccionadas = [];
+
+function escucharInspecciones() {
+
+    const q = query(collection(db, "inspecciones"), orderBy("fecha", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+
+        inspeccionesCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        const vehiculoId = document.getElementById("inspeccionVehiculoId").value;
+        if (vehiculoId && document.getElementById("modalInspeccion").classList.contains("abierto")) {
+            renderInspeccionesAnteriores(vehiculoId);
+        }
+
+    });
+
+}
+
+window.abrirInspeccion = function (vehiculoId, patente) {
+
+    fotosSeleccionadas = [];
+
+    document.getElementById("inspeccionTitulo").textContent = "📷 Inspección de ingreso - " + patente;
+    document.getElementById("inspeccionVehiculoId").value = vehiculoId;
+    document.getElementById("inspeccionFotos").value = "";
+    document.getElementById("inspeccionPreview").innerHTML = "";
+    document.getElementById("inspeccionNotas").value = "";
+    document.getElementById("mensajeEstadoInspeccion").textContent = "";
+
+    renderInspeccionesAnteriores(vehiculoId);
+
+    document.getElementById("modalInspeccion").classList.add("abierto");
+
+};
+
+document.getElementById("inspeccionFotos").addEventListener("change", function (e) {
+
+    fotosSeleccionadas = Array.from(e.target.files);
+
+    const preview = document.getElementById("inspeccionPreview");
+    preview.innerHTML = "";
+
+    fotosSeleccionadas.forEach(archivo => {
+        const img = document.createElement("img");
+        img.className = "inspeccion-preview-img";
+        img.src = URL.createObjectURL(archivo);
+        preview.appendChild(img);
+    });
+
+});
+
+function renderInspeccionesAnteriores(vehiculoId) {
+
+    const el = document.getElementById("listaInspeccionesAnteriores");
+    const lista = inspeccionesCache.filter(i => i.vehiculoId === vehiculoId);
+
+    if (lista.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Sin inspecciones anteriores.</p>';
+        return;
+    }
+
+    el.innerHTML = lista.map(i => {
+
+        const fecha = i.fecha && i.fecha.toDate ? i.fecha.toDate().toLocaleString("es-AR") : "";
+        const fotos = (i.fotos || []).map(url => `<img src="${url}" onclick="window.open('${url}','_blank')">`).join("");
+
+        return `<div class="inspeccion-anterior">
+            <div class="inspeccion-anterior-fecha">${fecha}</div>
+            ${i.notas ? `<div class="inspeccion-anterior-notas">${escapar(i.notas)}</div>` : ""}
+            <div class="inspeccion-anterior-fotos">${fotos}</div>
+        </div>`;
+
+    }).join("");
+
+}
+
+window.guardarInspeccion = async function () {
+
+    const vehiculoId = document.getElementById("inspeccionVehiculoId").value;
+    const notas = document.getElementById("inspeccionNotas").value.trim();
+    const estado = document.getElementById("mensajeEstadoInspeccion");
+
+    if (fotosSeleccionadas.length === 0) {
+        estado.textContent = "Agregá al menos una foto.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = `Subiendo fotos (0/${fotosSeleccionadas.length})...`;
+    estado.style.color = "#999";
+
+    try {
+
+        const urls = [];
+
+        for (let i = 0; i < fotosSeleccionadas.length; i++) {
+
+            const archivo = fotosSeleccionadas[i];
+            const nombreArchivo = `inspecciones/${vehiculoId}/${Date.now()}_${i}.jpg`;
+            const storageRef = ref(storage, nombreArchivo);
+
+            await uploadBytes(storageRef, archivo);
+            const url = await getDownloadURL(storageRef);
+            urls.push(url);
+
+            estado.textContent = `Subiendo fotos (${i + 1}/${fotosSeleccionadas.length})...`;
+
+        }
+
+        await addDoc(collection(db, "inspecciones"), {
+            vehiculoId,
+            fotos: urls,
+            notas,
+            fecha: serverTimestamp()
+        });
+
+        estado.textContent = "✅ ¡Inspección guardada!";
+        estado.style.color = "#5fd98a";
+
+        fotosSeleccionadas = [];
+        document.getElementById("inspeccionFotos").value = "";
+        document.getElementById("inspeccionPreview").innerHTML = "";
+        document.getElementById("inspeccionNotas").value = "";
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
 
 };
 
