@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="images/apple-touch-icon-panel.png">
 <meta name="theme-color" content="#0f0f0f">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Racing+Sans+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
@@ -18,8 +18,8 @@ h1,h2,h3,
 .marca-nombre,
 nav.tabs button,
 .fila-titulo h2{
-    font-family:'Racing Sans One','Montserrat',sans-serif;
-    letter-spacing:.5px;
+    font-family:'Orbitron','Montserrat',sans-serif;
+    letter-spacing:.3px;
 }
 
 body{
@@ -382,6 +382,32 @@ td.mono{
     min-height:18px;
 }
 
+.ficha-vehiculo{
+    background:#1e1e1e;
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.ficha-vehiculo-cabecera{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.ficha-vehiculo-patente{
+    font-weight:700;
+    font-size:14px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.ficha-vehiculo-detalle{
+    font-size:12px;
+    color:#999;
+}
+
 @media (max-width:600px){
     header{flex-direction:column;align-items:stretch;}
     #buscador{max-width:none;}
@@ -416,18 +442,18 @@ td.mono{
             </div>
         </div>
         <span class="badge-tiempo-real"><span class="punto-verde"></span> En vivo</span>
-        <input type="text" id="buscador" placeholder="Buscar cliente por nombre...">
+        <input type="text" id="buscador" placeholder="Buscar por nombre o patente...">
         <button class="btn-red" onclick="abrirModalCliente()">+ Nuevo cliente</button>
         <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
     </header>
 
     <div class="aviso-migracion">
-        🚧 <strong>Panel en migración a Firebase.</strong> Por ahora solo "Clientes" funciona acá, ya en tiempo real entre dispositivos. El resto de los módulos (Vehículos, Caja, Stock, Historial) siguen en el panel de siempre hasta que los migremos.
+        🚧 <strong>Panel en migración a Firebase.</strong> Clientes y Vehículos ya funcionan acá en tiempo real. Caja, Stock e Historial siguen en el panel de siempre hasta que los migremos.
     </div>
 
     <nav class="tabs">
-        <button class="activo" data-tab="clientes">Clientes</button>
-        <button class="proximamente" disabled>Vehículos (próx.)</button>
+        <button class="activo" data-tab="clientes" onclick="cambiarTab('clientes')">Clientes</button>
+        <button data-tab="vehiculos" onclick="cambiarTab('vehiculos')">Vehículos</button>
         <button class="proximamente" disabled>Caja (próx.)</button>
         <button class="proximamente" disabled>Stock (próx.)</button>
     </nav>
@@ -435,6 +461,11 @@ td.mono{
     <section class="seccion activa" id="tab-clientes">
         <div class="fila-titulo"><h2>Clientes</h2></div>
         <div id="tablaClientes"></div>
+    </section>
+
+    <section class="seccion" id="tab-vehiculos">
+        <div class="fila-titulo"><h2>Vehículos</h2></div>
+        <div id="tablaVehiculos"></div>
     </section>
 
 </div>
@@ -467,6 +498,60 @@ td.mono{
     </div>
 </div>
 
+<!-- ---------- Modal: ficha de cliente (sus vehículos) ---------- -->
+<div class="overlay" id="modalFicha">
+    <div class="modal" style="max-width:520px;">
+        <h3 id="fichaTitulo">Cliente</h3>
+
+        <div id="fichaVehiculos"></div>
+
+        <div style="margin-top:18px;padding-top:18px;border-top:1px solid #262626;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar vehículo a este cliente</p>
+            <input type="hidden" id="fichaClienteId">
+            <label>Patente</label>
+            <input type="text" id="vPatente" placeholder="AB123CD">
+            <label>Marca</label>
+            <input type="text" id="vMarca" placeholder="VW">
+            <label>Modelo</label>
+            <input type="text" id="vModelo" placeholder="Gol">
+            <label>Año</label>
+            <input type="text" id="vAnio" placeholder="2020">
+            <div class="modal-botones">
+                <button class="btn-chico" style="flex:1;" onclick="agregarVehiculo()">+ Agregar vehículo</button>
+            </div>
+        </div>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: editar vehículo ---------- -->
+<div class="overlay" id="modalEditarVehiculo">
+    <div class="modal">
+        <h3>Editar vehículo</h3>
+
+        <input type="hidden" id="evId">
+
+        <label>Patente</label>
+        <input type="text" id="evPatente">
+        <label>Marca</label>
+        <input type="text" id="evMarca">
+        <label>Modelo</label>
+        <input type="text" id="evModelo">
+        <label>Año</label>
+        <input type="text" id="evAnio">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="document.getElementById('modalEditarVehiculo').classList.remove('abierto')">Cancelar</button>
+            <button class="btn-red" onclick="guardarEdicionVehiculo()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoVehiculo"></p>
+    </div>
+</div>
+
 <!-- Firebase (SDK vía CDN, sin necesidad de instalar nada) -->
 <script type="module">
 
@@ -476,7 +561,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
     getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
-    onSnapshot, query, orderBy, serverTimestamp
+    onSnapshot, query, orderBy, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -493,7 +578,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let clientesCache = [];
+let vehiculosCache = [];
 let editandoId = null;
+let fichaClienteActual = null;
 
 // ---------- Login ----------
 
@@ -522,6 +609,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById("pantallaLogin").style.display = "none";
         document.getElementById("app").style.display = "block";
         escucharClientes();
+        escucharVehiculos();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -565,6 +653,7 @@ function renderClientes(lista) {
             <td class="mono">${escapar(c.telefono || "-")}</td>
             <td class="mono">${escapar(c.email || "-")}</td>
             <td style="white-space:nowrap;">
+                <button class="btn-chico" onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')">Ver</button>
                 <button class="btn-chico" onclick="editarCliente('${c.id}')">Editar</button>
                 <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')">Borrar</button>
             </td>
@@ -588,6 +677,23 @@ function escaparComillas(s) {
 document.getElementById("buscador").addEventListener("input", function () {
 
     const q = this.value.trim().toLowerCase();
+    const enVehiculos = document.getElementById("tab-vehiculos").classList.contains("activa");
+
+    if (enVehiculos) {
+
+        if (!q) {
+            renderVehiculos(vehiculosCache);
+            return;
+        }
+
+        const filtrados = vehiculosCache.filter(v =>
+            String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(q.replace(/\s/g, ""))
+        );
+
+        renderVehiculos(filtrados);
+        return;
+
+    }
 
     if (!q) {
         renderClientes(clientesCache);
@@ -637,6 +743,8 @@ window.editarCliente = function (id) {
 
 window.cerrarModales = function () {
     document.getElementById("modalCliente").classList.remove("abierto");
+    document.getElementById("modalFicha").classList.remove("abierto");
+    document.getElementById("modalEditarVehiculo").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -693,6 +801,202 @@ window.borrarCliente = async function (id, nombreCompleto) {
     if (!confirmado) return;
 
     await deleteDoc(doc(db, "clientes", id));
+
+};
+
+// ---------- Tabs ----------
+
+window.cambiarTab = function (tab) {
+
+    document.querySelectorAll("nav.tabs button[data-tab]").forEach(b => b.classList.remove("activo"));
+    document.querySelector(`nav.tabs button[data-tab="${tab}"]`).classList.add("activo");
+
+    document.querySelectorAll(".seccion").forEach(s => s.classList.remove("activa"));
+    document.getElementById("tab-" + tab).classList.add("activa");
+
+};
+
+// ---------- Vehículos en tiempo real ----------
+
+function escucharVehiculos() {
+
+    const q = query(collection(db, "vehiculos"), orderBy("patente"));
+
+    onSnapshot(q, (snapshot) => {
+
+        vehiculosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderVehiculos(vehiculosCache);
+
+        // Si hay una ficha abierta, también se refresca sola
+        if (fichaClienteActual) {
+            renderFichaVehiculos();
+        }
+
+    });
+
+}
+
+function renderVehiculos(lista) {
+
+    const el = document.getElementById("tablaVehiculos");
+
+    if (!lista || lista.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay vehículos cargados.</div>';
+        return;
+    }
+
+    let html = "<table><thead><tr><th>Patente</th><th>Vehículo</th><th>Dueño</th><th>Teléfono</th></tr></thead><tbody>";
+
+    lista.forEach(v => {
+
+        const cliente = clientesCache.find(c => c.id === v.clienteId);
+        const nombreCliente = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "(sin datos)";
+        const telefono = cliente ? cliente.telefono : "";
+
+        html += `<tr>
+            <td class="mono">${escapar(v.patente)}</td>
+            <td class="mono">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</td>
+            <td>${escapar(nombreCliente)}</td>
+            <td class="mono">${escapar(telefono || "-")}</td>
+        </tr>`;
+
+    });
+
+    html += "</tbody></table>";
+    el.innerHTML = html;
+
+}
+
+// ---------- Ficha de cliente (sus vehículos) ----------
+
+window.abrirFicha = function (clienteId, nombreCompleto) {
+
+    fichaClienteActual = clienteId;
+
+    document.getElementById("fichaTitulo").textContent = nombreCompleto;
+    document.getElementById("fichaClienteId").value = clienteId;
+    document.getElementById("vPatente").value = "";
+    document.getElementById("vMarca").value = "";
+    document.getElementById("vModelo").value = "";
+    document.getElementById("vAnio").value = "";
+
+    renderFichaVehiculos();
+
+    document.getElementById("modalFicha").classList.add("abierto");
+
+};
+
+function renderFichaVehiculos() {
+
+    const el = document.getElementById("fichaVehiculos");
+    const vehiculos = vehiculosCache.filter(v => v.clienteId === fichaClienteActual);
+
+    if (vehiculos.length === 0) {
+        el.innerHTML = '<p style="font-size:13px;color:#999;">Este cliente todavía no tiene vehículos cargados.</p>';
+        return;
+    }
+
+    let html = "";
+
+    vehiculos.forEach(v => {
+        html += `<div class="ficha-vehiculo">
+            <div class="ficha-vehiculo-cabecera">
+                <div>
+                    <div class="ficha-vehiculo-patente">${escapar(v.patente)}</div>
+                    <div class="ficha-vehiculo-detalle">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</div>
+                </div>
+                <div>
+                    <button class="btn-chico" onclick="abrirEdicionVehiculo('${v.id}', '${escaparComillas(v.patente)}', '${escaparComillas(v.marca || "")}', '${escaparComillas(v.modelo || "")}', '${escaparComillas(v.anio || "")}')">Editar</button>
+                    <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarVehiculo('${v.id}')">Borrar</button>
+                </div>
+            </div>
+        </div>`;
+    });
+
+    el.innerHTML = html;
+
+}
+
+window.agregarVehiculo = async function () {
+
+    const clienteId = document.getElementById("fichaClienteId").value;
+    const patente = document.getElementById("vPatente").value.trim().toUpperCase();
+    const marca = document.getElementById("vMarca").value.trim();
+    const modelo = document.getElementById("vModelo").value.trim();
+    const anio = document.getElementById("vAnio").value.trim();
+
+    if (!patente) {
+        alert("Ponele al menos la patente.");
+        return;
+    }
+
+    await addDoc(collection(db, "vehiculos"), {
+        clienteId, patente, marca, modelo, anio,
+        creado: serverTimestamp()
+    });
+
+    document.getElementById("vPatente").value = "";
+    document.getElementById("vMarca").value = "";
+    document.getElementById("vModelo").value = "";
+    document.getElementById("vAnio").value = "";
+
+};
+
+window.abrirEdicionVehiculo = function (id, patente, marca, modelo, anio) {
+
+    document.getElementById("evId").value = id;
+    document.getElementById("evPatente").value = patente;
+    document.getElementById("evMarca").value = marca;
+    document.getElementById("evModelo").value = modelo;
+    document.getElementById("evAnio").value = anio;
+
+    document.getElementById("mensajeEstadoVehiculo").textContent = "";
+    document.getElementById("modalEditarVehiculo").classList.add("abierto");
+
+};
+
+window.guardarEdicionVehiculo = async function () {
+
+    const id = document.getElementById("evId").value;
+    const patente = document.getElementById("evPatente").value.trim().toUpperCase();
+    const marca = document.getElementById("evMarca").value.trim();
+    const modelo = document.getElementById("evModelo").value.trim();
+    const anio = document.getElementById("evAnio").value.trim();
+    const estado = document.getElementById("mensajeEstadoVehiculo");
+
+    if (!patente) {
+        estado.textContent = "La patente es obligatoria.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await updateDoc(doc(db, "vehiculos", id), { patente, marca, modelo, anio });
+
+        estado.textContent = "¡Listo!";
+        estado.style.color = "#5fd98a";
+
+        setTimeout(() => {
+            document.getElementById("modalEditarVehiculo").classList.remove("abierto");
+        }, 500);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.borrarVehiculo = async function (id) {
+
+    const confirmado = confirm("¿Seguro que querés borrar este vehículo? No se puede deshacer.");
+    if (!confirmado) return;
+
+    await deleteDoc(doc(db, "vehiculos", id));
 
 };
 
