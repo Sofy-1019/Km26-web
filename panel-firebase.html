@@ -959,6 +959,12 @@ td.mono{
     flex-wrap:wrap;
 }
 
+.inspeccion-foto-item{
+    position:relative;
+    width:64px;
+    height:64px;
+}
+
 .inspeccion-anterior-fotos img{
     width:64px;
     height:64px;
@@ -966,6 +972,24 @@ td.mono{
     border-radius:6px;
     cursor:pointer;
     border:1px solid #333;
+}
+
+.inspeccion-foto-borrar{
+    position:absolute;
+    top:-6px;
+    right:-6px;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#d71920;
+    color:#fff;
+    border:2px solid #161616;
+    font-size:12px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 #modalTurno select,
@@ -1030,15 +1054,18 @@ td.mono{
 }
 
 .ficha-historial-item{
-    font-size:12px;
-    color:#ccc;
-    padding:6px 0;
+    font-size:14px;
+    color:#ddd;
+    padding:8px 0;
     border-bottom:1px dashed #262626;
+    line-height:1.5;
 }
 
 .ficha-historial-fecha{
-    color:#777;
+    color:#999;
+    font-weight:700;
     margin-right:6px;
+    display:inline-block;
 }
 
 .ficha-historial-form{
@@ -1101,8 +1128,8 @@ header{
 }
 
 .header-logo-wrap{
-    width:52px;
-    height:52px;
+    width:68px;
+    height:68px;
     border-radius:50%;
     overflow:hidden;
     flex-shrink:0;
@@ -1125,8 +1152,9 @@ header{
 }
 
 .header-fecha{
-    font-size:11px;
-    color:#888;
+    font-size:12px;
+    color:#fff;
+    font-weight:600;
     margin-top:2px;
 }
 
@@ -1411,7 +1439,7 @@ header{
 
 .item-titulo{
     font-weight:700;
-    font-size:14px;
+    font-size:15.5px;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -1563,8 +1591,9 @@ header{
 }
 
 .sidebar-fechahora{
-    font-size:12px;
-    color:#999;
+    font-size:12.5px;
+    color:#fff;
+    font-weight:600;
     line-height:1.6;
     margin-bottom:6px;
     padding-bottom:14px;
@@ -1738,17 +1767,25 @@ header{
 .header-btn-accion{
     display:none;
     align-items:center;
-    gap:6px;
+    gap:7px;
     white-space:nowrap;
     border-radius:20px;
     font-size:12.5px;
     font-weight:700;
-    padding:10px 16px;
+    padding:10px 18px;
     cursor:pointer;
-    border:1px solid #333;
-    background:#1a1a1a;
-    color:#fff;
+    border:1px solid #3a3a3e;
+    background:linear-gradient(180deg,#3a3a3e,#242427);
+    color:#f0f0f0;
     font-family:'Montserrat',sans-serif;
+    box-shadow:0 3px 10px rgba(0,0,0,.35);
+    transition:.15s;
+}
+
+.header-btn-accion:hover{
+    background:linear-gradient(180deg,#454549,#2c2c30);
+    border-color:#4a4a4e;
+    transform:translateY(-1px);
 }
 
 @media (min-width:1024px){
@@ -1758,6 +1795,10 @@ header{
 .header-btn-accion.roja{
     background:linear-gradient(180deg,#ef2c33,#c1141b);
     border:none;
+}
+
+.header-btn-accion.roja:hover{
+    background:linear-gradient(180deg,#ff3941,#d71920);
 }
 
 .header-rol-badge{
@@ -2003,6 +2044,101 @@ header{
     .dash-vehiculo-grid{ grid-template-columns:repeat(3,1fr); }
 }
 
+/* ---- Agenda semanal de turnos ---- */
+
+.agenda-semana-nav{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+    font-size:13px;
+    font-weight:700;
+    color:#ccc;
+}
+
+.agenda-dias{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+    margin-bottom:20px;
+}
+
+.agenda-dia-btn{
+    background:#1a1a1a;
+    border:1px solid #2a2a2a;
+    border-radius:12px;
+    padding:10px 4px;
+    text-align:center;
+    cursor:pointer;
+    color:#ccc;
+}
+
+.agenda-dia-btn .nombre{
+    font-size:10px;
+    text-transform:uppercase;
+    color:#888;
+    display:block;
+    margin-bottom:4px;
+}
+
+.agenda-dia-btn .numero{
+    font-size:16px;
+    font-weight:800;
+    font-family:'Montserrat',sans-serif;
+    display:block;
+}
+
+.agenda-dia-btn .cantidad{
+    font-size:9.5px;
+    color:#ff8a7a;
+    margin-top:3px;
+    display:block;
+    min-height:12px;
+}
+
+.agenda-dia-btn.activo{
+    border-color:#d71920;
+    background:rgba(215,25,32,.15);
+    color:#fff;
+}
+
+.agenda-dia-btn.hoy .numero{
+    color:#5fd98a;
+}
+
+/* ---- Subtabs de Reportes (Hoy / Semana / Mes / Año): no tenían estilo propio
+   y por eso se veían con el fondo blanco por defecto del navegador ---- */
+
+.subtabs{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.subtabs button{
+    background:#1a1a1a;
+    border:1px solid #333;
+    color:#ccc;
+    padding:9px 18px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+    transition:.15s;
+}
+
+.subtabs button:hover{
+    border-color:#555;
+    color:#fff;
+}
+
+.subtabs button.activo{
+    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    border-color:transparent;
+    color:#fff;
+}
+
 </style>
 </head>
 
@@ -2079,10 +2215,6 @@ header{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
             Historia del vehículo
         </button>
-        <button class="sidebar-nav-btn" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos'); notificarInspeccionDesdeVehiculos()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            Inspección de ingreso
-        </button>
         <button class="sidebar-nav-btn" data-roles="admin,recepcion" onclick="abrirModalCuenta()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             Cuentas / Cobros
@@ -2090,7 +2222,7 @@ header{
 
         <div class="sidebar-separador">Más opciones</div>
 
-        <button class="sidebar-nav-btn pendiente" onclick="abrirModuloPendiente('Proveedores')">
+        <button class="sidebar-nav-btn" data-nav="proveedores" data-roles="admin,recepcion" onclick="cambiarTab('proveedores')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             Proveedores
         </button>
@@ -2296,13 +2428,34 @@ header{
 
         <div class="fila-titulo">
             <h2>Turnos</h2>
-            <div style="display:flex;gap:8px;">
-                <button class="btn-chico" id="btnFiltroProximos" style="border-color:#d71920;" onclick="filtrarTurnos('proximos')">Próximos</button>
-                <button class="btn-chico" id="btnFiltroTodos" onclick="filtrarTurnos('todos')">Todos</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-chico" id="btnVistaLista" style="border-color:#d71920;" onclick="cambiarVistaTurnos('lista')">📋 Lista</button>
+                <button class="btn-chico" id="btnVistaAgenda" onclick="cambiarVistaTurnos('agenda')">📅 Agenda</button>
                 <button class="btn-red" onclick="abrirModalTurno()">+ Nuevo turno</button>
             </div>
         </div>
-        <div id="listaTurnos"></div>
+
+        <div id="vistaListaTurnos">
+            <div class="fila-titulo" style="margin-top:6px;">
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-chico" id="btnFiltroProximos" style="border-color:#d71920;" onclick="filtrarTurnos('proximos')">Próximos</button>
+                    <button class="btn-chico" id="btnFiltroTodos" onclick="filtrarTurnos('todos')">Todos</button>
+                </div>
+            </div>
+            <div id="listaTurnos"></div>
+        </div>
+
+        <div id="vistaAgendaTurnos" style="display:none;">
+            <div class="agenda-semana-nav">
+                <button class="btn-redondo" onclick="moverSemanaAgenda(-1)">‹</button>
+                <span id="agendaRangoSemana">-</span>
+                <button class="btn-redondo" onclick="moverSemanaAgenda(1)">›</button>
+                <button class="btn-chico" onclick="irHoyAgenda()">Hoy</button>
+            </div>
+            <div class="agenda-dias" id="agendaDias"></div>
+            <div class="dash-seccion-titulo" id="agendaDiaTitulo">-</div>
+            <div id="agendaTurnosDia"></div>
+        </div>
 
     </section>
 
@@ -2346,6 +2499,16 @@ header{
             </div>
         </div>
         <div id="tablaStock"></div>
+
+    </section>
+
+    <section class="seccion" id="tab-proveedores">
+
+        <div class="fila-titulo">
+            <h2>Proveedores</h2>
+            <button class="btn-red" onclick="abrirModalProveedor()">+ Nuevo proveedor</button>
+        </div>
+        <div id="listaProveedores"></div>
 
     </section>
 
@@ -2439,6 +2602,10 @@ header{
             <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('stock')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 Stock
+            </button>
+            <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('proveedores')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Proveedores
             </button>
             <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('usuarios')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -2598,7 +2765,7 @@ header{
         <input type="hidden" id="inspeccionVehiculoId">
 
         <label>Fotos del auto</label>
-        <input type="file" id="inspeccionFotos" accept="image/*" capture="environment" multiple style="display:none;">
+        <input type="file" id="inspeccionFotos" accept="image/*" multiple style="display:none;">
         <button type="button" class="btn-camara" onclick="document.getElementById('inspeccionFotos').click()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
             Sacar / elegir fotos
@@ -2646,6 +2813,58 @@ header{
         </div>
 
         <p id="mensajeEstadoCaja"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: nuevo/editar proveedor ---------- -->
+<div class="overlay" id="modalProveedor">
+    <div class="modal">
+        <h3 id="modalProveedorTitulo">Nuevo proveedor</h3>
+
+        <input type="hidden" id="provId">
+
+        <label>Nombre / Razón social</label>
+        <input type="text" id="provNombre" placeholder="Repuestos Norte SRL">
+
+        <label>Contacto (teléfono o email)</label>
+        <input type="text" id="provContacto" placeholder="11 5555-1234">
+
+        <label>Notas (opcional)</label>
+        <input type="text" id="provNotas" placeholder="Rubro, condiciones de pago, etc.">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarProveedor()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoProveedor"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: pago a proveedor (genera un Egreso real en Caja) ---------- -->
+<div class="overlay" id="modalPagoProveedor">
+    <div class="modal">
+        <h3>💸 Registrar pago a proveedor</h3>
+
+        <input type="hidden" id="pagoProvId">
+        <p id="pagoProvNombre" style="font-size:13px;color:#999;margin-top:-8px;"></p>
+
+        <label>Concepto</label>
+        <input type="text" id="pagoProvConcepto" placeholder="Ej: pastillas de freno, factura #123">
+
+        <label>Monto a pagar</label>
+        <input type="number" id="pagoProvMonto" placeholder="15000">
+
+        <p style="font-size:11.5px;color:#777;margin-top:10px;line-height:1.5;">
+            Este pago se registra como Egreso en Caja y se descuenta automáticamente de la facturación del día.
+        </p>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarPagoProveedor()">Registrar pago</button>
+        </div>
+
+        <p id="mensajeEstadoPagoProveedor"></p>
     </div>
 </div>
 
@@ -3038,6 +3257,7 @@ onAuthStateChanged(auth, (user) => {
         escucharPresupuestos();
         escucharInspecciones();
         escucharUsuarios();
+        escucharProveedores();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -3182,6 +3402,16 @@ window.editarCliente = function (id) {
 };
 
 window.cerrarModales = function () {
+
+    // Si hay fotos de inspección ya elegidas pero todavía no guardadas, se avisa antes
+    // de perderlas (causa más común de "las fotos no se cargan": se sacan pero no se
+    // llega a tocar "Guardar inspección").
+    if (typeof fotosSeleccionadas !== "undefined" && fotosSeleccionadas.length > 0 &&
+        document.getElementById("modalInspeccion").classList.contains("abierto")) {
+        const seguir = confirm(`Sacaste ${fotosSeleccionadas.length} foto(s) que todavía no guardaste. ¿Salir sin guardarlas?`);
+        if (!seguir) return;
+    }
+
     vehiculoHistorialDirectoActual = null;
     document.getElementById("modalCliente").classList.remove("abierto");
     document.getElementById("modalFicha").classList.remove("abierto");
@@ -3196,6 +3426,8 @@ window.cerrarModales = function () {
     document.getElementById("modalHistorialDirecto").classList.remove("abierto");
     document.getElementById("modalInspeccion").classList.remove("abierto");
     document.getElementById("modalUsuario").classList.remove("abierto");
+    document.getElementById("modalProveedor").classList.remove("abierto");
+    document.getElementById("modalPagoProveedor").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -4076,8 +4308,9 @@ function dibujarGraficoCaja() {
 
     const etiquetas = dias.map(d => d.fecha.toLocaleDateString("es-AR", { weekday: "short" }));
     const valores = dias.map(d => d.total);
+    const bajaVsAnterior = valores.map((v, i) => i > 0 && v < valores[i - 1]);
 
-    dibujarBarras(canvas, valores, etiquetas, 140);
+    dibujarBarras(canvas, valores, etiquetas, 140, bajaVsAnterior);
 
 }
 
@@ -4114,8 +4347,9 @@ function dibujarGraficoMensual() {
 
     const etiquetas = meses.map(m => m.fecha.toLocaleDateString("es-AR", { month: "short" }));
     const valores = meses.map(m => m.total);
+    const bajaVsAnterior = valores.map((v, i) => i > 0 && v < valores[i - 1]);
 
-    dibujarBarras(canvas, valores, etiquetas, 90);
+    dibujarBarras(canvas, valores, etiquetas, 90, bajaVsAnterior);
 
 }
 
@@ -4149,14 +4383,18 @@ function dibujarGraficoAnual() {
 
     const etiquetas = anios.map(a => String(a.anio));
     const valores = anios.map(a => a.total);
+    const bajaVsAnterior = valores.map((v, i) => i > 0 && v < valores[i - 1]);
 
-    dibujarBarras(canvas, valores, etiquetas, 90);
+    dibujarBarras(canvas, valores, etiquetas, 90, bajaVsAnterior);
 
 }
 
 // Función genérica de barras moderna: degradado, puntas redondeadas,
 // línea base sutil, y el valor arriba de cada barra.
-function dibujarBarras(canvas, valores, etiquetas, height) {
+// bajaVsAnterior (opcional): array paralelo a "valores"; si bajaVsAnterior[i] es true,
+// esa barra se pinta en rojo KM26 (bajó respecto al período anterior), sin importar
+// si el valor en sí es positivo o negativo.
+function dibujarBarras(canvas, valores, etiquetas, height, bajaVsAnterior) {
 
     const dpr = window.devicePixelRatio || 1;
     const width = canvas.clientWidth || 300;
@@ -4189,9 +4427,15 @@ function dibujarBarras(canvas, valores, etiquetas, height) {
         const positivo = v >= 0;
         const y = positivo ? zeroY - alto : zeroY;
 
+        const bajo = bajaVsAnterior && bajaVsAnterior[i];
+
         const gradiente = ctx.createLinearGradient(0, y, 0, y + alto);
 
-        if (positivo) {
+        if (bajo) {
+            // Bajó respecto al período anterior: rojo KM26, independientemente del signo
+            gradiente.addColorStop(0, "#ef2c33");
+            gradiente.addColorStop(1, "#c1141b");
+        } else if (positivo) {
             gradiente.addColorStop(0, "#3aff82");
             gradiente.addColorStop(1, "#1fa851");
         } else {
@@ -4326,9 +4570,10 @@ function renderHistorialVehiculo(vehiculoId) {
 
         const fecha = h.fecha && h.fecha.toDate ? h.fecha.toDate() : null;
         const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") : "";
+        const horaTexto = fecha ? fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "";
         const costo = h.costo ? " · " + formatoPlata(h.costo) : "";
 
-        return `<div class="ficha-historial-item"><span class="ficha-historial-fecha">${fechaTexto}</span>${escapar(h.descripcion)}${costo}</div>`;
+        return `<div class="ficha-historial-item"><span class="ficha-historial-fecha">${fechaTexto}${horaTexto ? " · " + horaTexto + "hs" : ""}</span><br>${escapar(h.descripcion)}${costo}</div>`;
 
     }).join("");
 
@@ -4555,6 +4800,166 @@ window.abrirEtiqueta = function (id, nombre) {
     });
 
     document.getElementById("modalEtiqueta").classList.add("abierto");
+
+};
+
+// ---------- Proveedores ----------
+
+let proveedoresCache = [];
+
+function escucharProveedores() {
+
+    const q = query(collection(db, "proveedores"), orderBy("nombre"));
+
+    onSnapshot(q, (snapshot) => {
+
+        proveedoresCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderProveedores();
+
+    });
+
+}
+
+function renderProveedores() {
+
+    const el = document.getElementById("listaProveedores");
+    if (!el) return;
+
+    if (proveedoresCache.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay proveedores cargados.</div>';
+        return;
+    }
+
+    el.innerHTML = '<div class="lista-cards">' + proveedoresCache.map(p => `
+        <div class="item-card">
+            <div class="item-avatar" style="background:linear-gradient(135deg,#555,#2a2a2a);">${getIniciales(p.nombre, "")}</div>
+            <div class="item-info">
+                <div class="item-titulo">${escapar(p.nombre)}</div>
+                <div class="item-sub">${escapar(p.contacto || p.notas || "Sin datos de contacto")}</div>
+            </div>
+            <div class="item-acciones">
+                <button class="btn-confirmar-gasto" onclick="abrirModalPagoProveedor('${p.id}')">💸 Pagar</button>
+                <button class="btn-chico" onclick="editarProveedor('${p.id}')">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarProveedor('${p.id}', '${escaparComillas(p.nombre)}')">✕</button>
+            </div>
+        </div>
+    `).join("") + '</div>';
+
+}
+
+window.abrirModalProveedor = function () {
+    document.getElementById("modalProveedorTitulo").textContent = "Nuevo proveedor";
+    document.getElementById("provId").value = "";
+    document.getElementById("provNombre").value = "";
+    document.getElementById("provContacto").value = "";
+    document.getElementById("provNotas").value = "";
+    document.getElementById("mensajeEstadoProveedor").textContent = "";
+    document.getElementById("modalProveedor").classList.add("abierto");
+};
+
+window.editarProveedor = function (id) {
+    const p = proveedoresCache.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById("modalProveedorTitulo").textContent = "Editar proveedor";
+    document.getElementById("provId").value = p.id;
+    document.getElementById("provNombre").value = p.nombre || "";
+    document.getElementById("provContacto").value = p.contacto || "";
+    document.getElementById("provNotas").value = p.notas || "";
+    document.getElementById("mensajeEstadoProveedor").textContent = "";
+    document.getElementById("modalProveedor").classList.add("abierto");
+};
+
+window.guardarProveedor = async function () {
+
+    const id = document.getElementById("provId").value;
+    const nombre = document.getElementById("provNombre").value.trim();
+    const contacto = document.getElementById("provContacto").value.trim();
+    const notas = document.getElementById("provNotas").value.trim();
+    const estado = document.getElementById("mensajeEstadoProveedor");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al proveedor.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        if (id) {
+            await updateDoc(doc(db, "proveedores", id), { nombre, contacto, notas });
+        } else {
+            await addDoc(collection(db, "proveedores"), { nombre, contacto, notas, creado: serverTimestamp() });
+        }
+
+        estado.textContent = "¡Listo!";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 500);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.borrarProveedor = async function (id, nombre) {
+    const confirmado = confirm(`¿Seguro que querés borrar a ${nombre}? No se puede deshacer.`);
+    if (!confirmado) return;
+    await deleteDoc(doc(db, "proveedores", id));
+};
+
+// Pago a proveedor: registra el egreso REAL en la colección "caja", exactamente
+// igual que cualquier otro egreso — por eso descuenta solo de la facturación del día,
+// sin tocar ninguna otra lógica ni crear una base de datos aparte.
+window.abrirModalPagoProveedor = function (id) {
+    const p = proveedoresCache.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById("pagoProvId").value = id;
+    document.getElementById("pagoProvNombre").textContent = "Proveedor: " + p.nombre;
+    document.getElementById("pagoProvConcepto").value = "";
+    document.getElementById("pagoProvMonto").value = "";
+    document.getElementById("mensajeEstadoPagoProveedor").textContent = "";
+    document.getElementById("modalPagoProveedor").classList.add("abierto");
+};
+
+window.guardarPagoProveedor = async function () {
+
+    const id = document.getElementById("pagoProvId").value;
+    const concepto = document.getElementById("pagoProvConcepto").value.trim();
+    const monto = parseFloat(document.getElementById("pagoProvMonto").value);
+    const estado = document.getElementById("mensajeEstadoPagoProveedor");
+    const proveedor = proveedoresCache.find(p => p.id === id);
+
+    if (!monto || monto <= 0) {
+        estado.textContent = "Poné un monto válido.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Registrando pago...";
+    estado.style.color = "#999";
+
+    try {
+
+        await addDoc(collection(db, "caja"), {
+            tipo: "Egreso",
+            descripcion: `Pago a proveedor: ${proveedor ? proveedor.nombre : ""}${concepto ? " - " + concepto : ""}`,
+            monto,
+            proveedorId: id,
+            fecha: serverTimestamp()
+        });
+
+        estado.textContent = "✅ Pago registrado y descontado de caja.";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 900);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
 
 };
 
@@ -4794,10 +5199,224 @@ function escucharTurnos() {
         turnosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderTurnos();
         if (typeof renderDashboard === "function") renderDashboard();
+        if (typeof renderAgenda === "function") renderAgenda();
+        if (typeof revisarRecordatoriosTurnos === "function") revisarRecordatoriosTurnos();
 
     });
 
 }
+
+// ---------- Vista Lista / Agenda ----------
+
+window.cambiarVistaTurnos = function (vista) {
+
+    document.getElementById("btnVistaLista").style.borderColor = vista === "lista" ? "#d71920" : "#333";
+    document.getElementById("btnVistaAgenda").style.borderColor = vista === "agenda" ? "#d71920" : "#333";
+
+    document.getElementById("vistaListaTurnos").style.display = vista === "lista" ? "block" : "none";
+    document.getElementById("vistaAgendaTurnos").style.display = vista === "agenda" ? "block" : "none";
+
+    if (vista === "agenda") renderAgenda();
+
+};
+
+// ---------- Agenda semanal ----------
+
+let semanaAgendaOffset = 0; // 0 = semana actual, -1 = semana anterior, 1 = semana siguiente
+let diaSeleccionadoAgenda = null; // Date del día elegido dentro de la semana visible
+
+function inicioDeSemana(fecha) {
+    const d = new Date(fecha);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - d.getDay()); // domingo como primer día
+    return d;
+}
+
+window.moverSemanaAgenda = function (delta) {
+    semanaAgendaOffset += delta;
+    diaSeleccionadoAgenda = null;
+    renderAgenda();
+};
+
+window.irHoyAgenda = function () {
+    semanaAgendaOffset = 0;
+    diaSeleccionadoAgenda = null;
+    renderAgenda();
+};
+
+window.seleccionarDiaAgenda = function (isoFecha) {
+    diaSeleccionadoAgenda = new Date(isoFecha);
+    renderAgenda();
+};
+
+function renderAgenda() {
+
+    const elDias = document.getElementById("agendaDias");
+    if (!elDias) return; // la vista Agenda todavía no está en el DOM
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const inicioSemanaBase = inicioDeSemana(hoy);
+    const inicioSemana = new Date(inicioSemanaBase);
+    inicioSemana.setDate(inicioSemana.getDate() + semanaAgendaOffset * 7);
+
+    const dias = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(inicioSemana);
+        d.setDate(d.getDate() + i);
+        dias.push(d);
+    }
+
+    const finSemana = dias[6];
+    document.getElementById("agendaRangoSemana").textContent =
+        `${inicioSemana.toLocaleDateString("es-AR", { day: "numeric", month: "short" })} – ${finSemana.toLocaleDateString("es-AR", { day: "numeric", month: "short" })}`;
+
+    if (!diaSeleccionadoAgenda || diaSeleccionadoAgenda < inicioSemana || diaSeleccionadoAgenda > finSemana) {
+        diaSeleccionadoAgenda = (semanaAgendaOffset === 0) ? hoy : dias[0];
+    }
+
+    const nombresDia = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+    elDias.innerHTML = dias.map(d => {
+
+        const cantidad = turnosCache.filter(t => {
+            if (!t.fechaHora || !t.fechaHora.toDate) return false;
+            const f = t.fechaHora.toDate();
+            f.setHours(0, 0, 0, 0);
+            return f.getTime() === d.getTime() && t.estado !== "Cancelado";
+        }).length;
+
+        const esHoy = d.getTime() === hoy.getTime();
+        const esActivo = d.getTime() === diaSeleccionadoAgenda.getTime();
+
+        return `<div class="agenda-dia-btn ${esActivo ? "activo" : ""} ${esHoy ? "hoy" : ""}" onclick="seleccionarDiaAgenda('${d.toISOString()}')">
+            <span class="nombre">${nombresDia[d.getDay()]}</span>
+            <span class="numero">${d.getDate()}</span>
+            <span class="cantidad">${cantidad > 0 ? cantidad + " turno" + (cantidad > 1 ? "s" : "") : ""}</span>
+        </div>`;
+
+    }).join("");
+
+    const finDia = new Date(diaSeleccionadoAgenda);
+    finDia.setDate(finDia.getDate() + 1);
+
+    document.getElementById("agendaDiaTitulo").textContent =
+        diaSeleccionadoAgenda.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+
+    const turnosDelDia = turnosCache
+        .filter(t => t.fechaHora && t.fechaHora.toDate && t.fechaHora.toDate() >= diaSeleccionadoAgenda && t.fechaHora.toDate() < finDia)
+        .sort((a, b) => a.fechaHora.toDate() - b.fechaHora.toDate());
+
+    const elTurnosDia = document.getElementById("agendaTurnosDia");
+
+    if (turnosDelDia.length === 0) {
+        elTurnosDia.innerHTML = '<div class="vacio">No hay turnos este día.</div>';
+    } else {
+        elTurnosDia.innerHTML = turnosDelDia.map(t => {
+            const cliente = clientesCache.find(c => c.id === t.clienteId);
+            const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
+            const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
+            const detalleVehiculo = vehiculo ? ` · ${escapar(vehiculo.patente)}` : "";
+            const hora = t.fechaHora.toDate().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+            return `<div class="turno-fila ${claseEstado(t.estado)}">
+                <div class="turno-hora">${hora}</div>
+                <div class="turno-info">
+                    <div class="turno-cliente">${escapar(nombreCliente)}${detalleVehiculo}</div>
+                    <div class="turno-detalle">${escapar(t.servicio || "")}</div>
+                </div>
+                <select class="turno-estado-select" onchange="cambiarEstadoTurno('${t.id}', this.value)">
+                    ${ESTADOS_TURNO.map(e => `<option value="${e}" ${t.estado === e ? "selected" : ""}>${e}</option>`).join("")}
+                </select>
+            </div>`;
+        }).join("");
+    }
+
+}
+
+// ---------- Recordatorio sonoro 1 hora antes del turno ----------
+// IMPORTANTE: esto solo puede funcionar mientras el panel esté abierto en una pestaña
+// del navegador (no hay app en segundo plano). Revisa cada minuto si algún turno
+// arranca dentro de la próxima hora y todavía no fue avisado.
+
+const turnosYaAvisados = new Set();
+
+function sonidoAviso() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.55);
+        // segundo "beep" corto para que se note más
+        setTimeout(() => {
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.type = "sine";
+            osc2.frequency.value = 1046;
+            gain2.gain.setValueAtTime(0.001, ctx.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+            gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+            osc2.start();
+            osc2.stop(ctx.currentTime + 0.45);
+        }, 250);
+    } catch (err) {
+        console.log("No se pudo reproducir el sonido de aviso:", err.message);
+    }
+}
+
+if (window.Notification && Notification.permission === "default") {
+    // Se pide el permiso una sola vez; si el usuario lo rechaza, el aviso queda solo
+    // como sonido (el sonido no necesita permiso especial).
+    Notification.requestPermission();
+}
+
+function revisarRecordatoriosTurnos() {
+
+    const ahora = new Date();
+
+    turnosCache.forEach(t => {
+
+        if (!t.fechaHora || !t.fechaHora.toDate) return;
+        if (t.estado === "Cancelado" || t.estado === "Finalizado" || t.estado === "No asistió") return;
+        if (turnosYaAvisados.has(t.id)) return;
+
+        const inicio = t.fechaHora.toDate();
+        const minutosParaEmpezar = (inicio - ahora) / 60000;
+
+        // Ventana de 55 a 60 minutos antes (el chequeo corre cada minuto)
+        if (minutosParaEmpezar <= 60 && minutosParaEmpezar >= 55) {
+
+            turnosYaAvisados.add(t.id);
+            sonidoAviso();
+
+            const cliente = clientesCache.find(c => c.id === t.clienteId);
+            const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "Cliente";
+            const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
+            const detalle = vehiculo ? ` (${vehiculo.patente})` : "";
+
+            if (window.Notification && Notification.permission === "granted") {
+                new Notification("Turno en 1 hora — KM26 Performance", {
+                    body: `${nombreCliente}${detalle} — ${t.servicio || "sin detalle"}`
+                });
+            }
+
+        }
+
+    });
+
+}
+
+setInterval(revisarRecordatoriosTurnos, 60000);
 
 window.filtrarTurnos = function (tipo) {
 
@@ -5211,6 +5830,9 @@ function renderPresupuestos() {
                 <select class="turno-estado-select" onchange="cambiarEstadoPresupuesto('${p.id}', this.value)">
                     ${["Borrador", "Enviado", "Aprobado", "Rechazado", "Vencido"].map(e => `<option value="${e}" ${p.estado === e ? "selected" : ""}>${e}</option>`).join("")}
                 </select>
+                <button class="btn-carpeta" onclick="imprimirPresupuesto('${p.id}')" title="Imprimir para el cliente">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                </button>
                 ${telefono ? `<button class="btn-chico" onclick="enviarPresupuestoWhatsApp('${p.id}')">💬 Enviar</button>` : ""}
                 ${p.estado === "Aprobado" ? `<button class="btn-confirmar-gasto" onclick="convertirPresupuestoEnCobro('${p.id}')">💰 Cobrar</button>` : ""}
                 <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarPresupuesto('${p.id}')">Borrar</button>
@@ -5416,6 +6038,69 @@ window.enviarPresupuestoWhatsApp = function (id) {
 
 };
 
+// Abre una hoja lista para imprimir y dispara el diálogo de impresión del propio
+// dispositivo (notebook, tablet o celular) — desde ahí el usuario elige a qué
+// impresora mandarlo, exactamente como imprimir cualquier página web.
+window.imprimirPresupuesto = function (id) {
+
+    const p = presupuestosCache.find(x => x.id === id);
+    if (!p) return;
+
+    const cliente = clientesCache.find(c => c.id === p.clienteId);
+    const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "Consumidor final";
+    const telefono = cliente ? (cliente.telefono || "") : "";
+    const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
+    const detalleVehiculo = vehiculo ? `${vehiculo.patente} · ${vehiculo.marca || ""} ${vehiculo.modelo || ""}` : "-";
+    const fecha = p.fecha && p.fecha.toDate ? p.fecha.toDate().toLocaleDateString("es-AR") : "-";
+
+    const filasItems = (p.items || []).map(i => `
+        <tr><td>${escapar(i.descripcion)}</td><td style="text-align:right;">${formatoPlata(i.monto)}</td></tr>
+    `).join("");
+
+    const descuentoHtml = p.descuentoPorc > 0
+        ? `<tr><td>Descuento (${p.descuentoPorc}%)</td><td style="text-align:right;">-${formatoPlata((p.subtotal || 0) - (p.total || 0))}</td></tr>`
+        : "";
+
+    const html = `
+        <!DOCTYPE html>
+        <html lang="es"><head><meta charset="UTF-8"><title>Presupuesto ${escapar(nombreCliente)}</title>
+        <style>
+            *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
+            body{padding:32px;color:#111;}
+            h1{font-size:20px;margin-bottom:2px;color:#c1141b;}
+            .sub{color:#666;font-size:12px;margin-bottom:20px;}
+            table{width:100%;border-collapse:collapse;margin-top:10px;}
+            td,th{padding:8px 6px;border-bottom:1px solid #ddd;font-size:13px;text-align:left;}
+            .total{font-size:18px;font-weight:bold;text-align:right;margin-top:14px;}
+            .datos{font-size:13px;margin-bottom:6px;}
+            .footer{margin-top:36px;font-size:11px;color:#888;}
+        </style></head>
+        <body>
+            <h1>KM26 PERFORMANCE</h1>
+            <div class="sub">Presupuesto · ${fecha}</div>
+            <div class="datos"><strong>Cliente:</strong> ${escapar(nombreCliente)} ${telefono ? "· " + escapar(telefono) : ""}</div>
+            <div class="datos"><strong>Vehículo:</strong> ${escapar(detalleVehiculo)}</div>
+            <table>
+                <thead><tr><th>Detalle</th><th style="text-align:right;">Importe</th></tr></thead>
+                <tbody>${filasItems}${descuentoHtml}</tbody>
+            </table>
+            <div class="total">Total: ${formatoPlata(p.total)}</div>
+            ${p.notas ? `<div class="datos" style="margin-top:14px;"><strong>Notas:</strong> ${escapar(p.notas)}</div>` : ""}
+            <div class="footer">KM26 Performance — Presupuesto sujeto a disponibilidad de repuestos.</div>
+        </body></html>
+    `;
+
+    const ventana = window.open("", "_blank");
+    if (!ventana) {
+        alert("El navegador bloqueó la ventana de impresión. Habilitá las ventanas emergentes para este sitio.");
+        return;
+    }
+    ventana.document.write(html);
+    ventana.document.close();
+    ventana.onload = () => ventana.print();
+
+};
+
 // Convierte un presupuesto aprobado en una Cuenta lista para cobrar
 window.convertirPresupuestoEnCobro = function (id) {
 
@@ -5515,15 +6200,29 @@ function renderInspeccionesAnteriores(vehiculoId) {
         return;
     }
 
-    el.innerHTML = lista.map(i => {
+    el.innerHTML = lista.map((i, idx) => {
 
         const fecha = i.fecha && i.fecha.toDate ? i.fecha.toDate().toLocaleString("es-AR") : "";
-        const fotos = (i.fotos || []).map(url => `<img src="${url}" onclick="window.open('${url}','_blank')">`).join("");
+        const fotos = (i.fotos || []).map((url, fotoIdx) => `
+            <div class="inspeccion-foto-item">
+                <img src="${url}" onclick="window.open('${url}','_blank')">
+                <button class="inspeccion-foto-borrar" title="Eliminar esta foto" onclick="borrarFotoDeInspeccion('${i.id}', ${fotoIdx})">✕</button>
+            </div>
+        `).join("");
+
+        // La más reciente (idx 0, porque la lista viene ordenada por fecha desc) tiene además
+        // un acceso directo para el caso típico: "el cliente volvió, sacale fotos nuevas".
+        const botonReemplazar = idx === 0
+            ? `<button class="btn-chico" style="font-size:11px;padding:4px 10px;" onclick="reemplazarInspeccion('${i.id}', '${vehiculoId}')">🔄 Reemplazar por fotos nuevas</button>`
+            : "";
 
         return `<div class="inspeccion-anterior">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
                 <div class="inspeccion-anterior-fecha">${fecha}</div>
-                <button class="btn-chico" style="color:#ff6b6b;font-size:11px;padding:4px 10px;" onclick="borrarInspeccion('${i.id}')">🗑️ Borrar fotos</button>
+                <div style="display:flex;gap:6px;">
+                    ${botonReemplazar}
+                    <button class="btn-chico" style="color:#ff6b6b;font-size:11px;padding:4px 10px;" onclick="borrarInspeccion('${i.id}')">🗑️ Borrar todo</button>
+                </div>
             </div>
             ${i.notas ? `<div class="inspeccion-anterior-notas">${escapar(i.notas)}</div>` : ""}
             <div class="inspeccion-anterior-fotos">${fotos}</div>
@@ -5533,10 +6232,60 @@ function renderInspeccionesAnteriores(vehiculoId) {
 
 }
 
-window.borrarInspeccion = async function (inspeccionId) {
+// Elimina una sola foto de una inspección (de Storage y del array en Firestore),
+// sin borrar el resto de las fotos ni las notas.
+window.borrarFotoDeInspeccion = async function (inspeccionId, fotoIdx) {
 
-    const confirmado = confirm("¿Borrar esta inspección y sus fotos? No se puede deshacer.");
+    const confirmado = confirm("¿Eliminar esta foto? No se puede deshacer.");
     if (!confirmado) return;
+
+    const inspeccion = inspeccionesCache.find(i => i.id === inspeccionId);
+    if (!inspeccion) return;
+
+    const fotos = [...(inspeccion.fotos || [])];
+    const url = fotos[fotoIdx];
+    if (url === undefined) return;
+
+    try {
+        const fotoRef = ref(storage, url);
+        await deleteObject(fotoRef);
+    } catch (err) {
+        console.log("No se pudo borrar la foto de Storage (puede que ya no exista):", err.message);
+    }
+
+    fotos.splice(fotoIdx, 1);
+    await updateDoc(doc(db, "inspecciones", inspeccionId), { fotos });
+
+};
+
+// Caso típico: el cliente vuelve por segunda vez en el mes y hay que sacar fotos nuevas.
+// Borra automáticamente la inspección anterior (fotos incluidas) y deja la cámara lista
+// para cargar las nuevas en el mismo modal.
+window.reemplazarInspeccion = async function (inspeccionId, vehiculoId) {
+
+    const confirmado = confirm("Esto borra las fotos anteriores para cargar unas nuevas. ¿Continuar?");
+    if (!confirmado) return;
+
+    await window.borrarInspeccion(inspeccionId, true);
+
+    fotosSeleccionadas = [];
+    document.getElementById("inspeccionFotos").value = "";
+    document.getElementById("inspeccionPreview").innerHTML = "";
+    document.getElementById("cantidadFotosTexto").textContent = "";
+    document.getElementById("inspeccionNotas").value = "";
+    document.getElementById("mensajeEstadoInspeccion").textContent = "Fotos anteriores eliminadas. Sacá las nuevas y tocá \"Guardar inspección\".";
+    document.getElementById("mensajeEstadoInspeccion").style.color = "#5fd98a";
+
+    document.getElementById("inspeccionFotos").click();
+
+};
+
+window.borrarInspeccion = async function (inspeccionId, saltarConfirmacion) {
+
+    if (!saltarConfirmacion) {
+        const confirmado = confirm("¿Borrar esta inspección y sus fotos? No se puede deshacer.");
+        if (!confirmado) return;
+    }
 
     const inspeccion = inspeccionesCache.find(i => i.id === inspeccionId);
     if (!inspeccion) return;
