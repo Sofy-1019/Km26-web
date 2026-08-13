@@ -2415,7 +2415,7 @@ header{
             </div>
 
             <div class="header-acciones">
-                <button class="header-btn-accion" onclick="abrirModalCuenta()">💰 Nueva cuenta</button>
+                <button class="header-btn-accion" style="background:linear-gradient(180deg,#2fdb6e,#1fa851);border:none;color:#fff;" onclick="abrirModalCuenta()">💲 COBROS</button>
                 <button class="header-btn-accion roja" onclick="abrirModalCliente()">+ Nuevo cliente</button>
 
                 <div class="notif-wrap">
@@ -2462,8 +2462,11 @@ header{
 
     <section class="seccion activa" id="tab-dashboard">
 
-        <div class="dash-fecha" id="dashFechaLinea">
+        <div class="dash-fecha" id="dashFechaLinea" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
             <span class="badge-tiempo-real" id="dashEnVivo"><span class="punto-verde"></span> En vivo</span>
+            <span class="badge-tiempo-real" style="background:#0a1e33;color:#3f9cff;font-size:13px;padding:8px 16px;cursor:pointer;" onclick="cambiarTab('vehiculos')" title="Ver detalle">
+                🔧 En taller ahora: <strong id="dashEnTallerAhora" style="font-size:15px;">0</strong>
+            </span>
         </div>
 
         <div class="dash-grid" id="dashGrid">
@@ -2877,7 +2880,7 @@ header{
         <h3>Acción rápida</h3>
         <button class="rapido-item" onclick="cerrarOverlayRapido(); abrirModalCuenta()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            Nueva cuenta / cobro
+            Cobros
         </button>
         <button class="rapido-item" onclick="cerrarOverlayRapido(); abrirModalCliente()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
@@ -3365,22 +3368,24 @@ header{
     </div>
 </div>
 
-<!-- ---------- Modal: Nueva cuenta (varios ítems, un solo cobro) ---------- -->
+<!-- ---------- Modal: Cobros (varios ítems, un solo cobro) ---------- -->
 <div class="overlay" id="modalCuenta">
     <div class="modal" style="max-width:520px;">
-        <h3>💰 Nueva cuenta</h3>
+        <h3>💲 Cobros</h3>
 
-        <label>Cliente</label>
-        <select id="cuentaCliente" onchange="actualizarVehiculosCuenta()"></select>
+        <label>Cliente (buscá por nombre o patente)</label>
+        <input type="text" id="cuentaClienteBuscar" placeholder="Ej: Esteban o AB123CD" autocomplete="off" oninput="buscarClienteCuenta()" onfocus="buscarClienteCuenta()">
+        <input type="hidden" id="cuentaCliente">
+        <div id="cuentaClienteResultados" style="display:none;background:#1a1a1a;border:1px solid #333;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto;"></div>
 
-        <label>Vehículo (opcional, para sumar la mano de obra a su historia clínica)</label>
+        <label>Vehículo</label>
         <select id="cuentaVehiculo"></select>
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
-            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar ítem (mano de obra, servicio, etc.)</p>
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar reparación</p>
             <div class="ficha-historial-form">
-                <input type="text" id="itemDescripcion" placeholder="Ej: cambio de rótulas">
-                <input type="number" id="itemMonto" placeholder="$">
+                <input type="text" id="itemDescripcion" placeholder="Descripción · Ej: cambio de rótulas">
+                <input type="number" id="itemMonto" placeholder="$ Precio">
                 <button class="btn-chico" onclick="agregarItemManual()">+ Agregar</button>
             </div>
             <button class="btn-chico" style="width:100%;margin-top:10px;" onclick="abrirEscanerParaCuenta()">📷 Escanear producto</button>
@@ -3397,7 +3402,17 @@ header{
                 <span style="color:#999;font-size:13px;">%</span>
             </div>
 
-            <div id="cuentaTotal" style="text-align:right;font-size:20px;font-weight:800;margin-top:12px;font-family:'Montserrat',sans-serif;"></div>
+            <div style="background:#1a1a1a;border-radius:10px;padding:14px 16px;margin-top:14px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:#999;padding:4px 0;">
+                    <span>Subtotal</span><span id="cuentaSubtotalTexto">$0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:#5fd98a;padding:4px 0;">
+                    <span>Descuento</span><span id="cuentaDescuentoTexto">$0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:800;font-family:'Montserrat',sans-serif;padding:8px 0 0;border-top:1px solid #333;margin-top:6px;">
+                    <span>Total a cobrar</span><span id="cuentaTotal">$0</span>
+                </div>
+            </div>
         </div>
 
         <div class="modal-botones">
@@ -3681,6 +3696,7 @@ function renderClientes(lista) {
     let html = '<div class="lista-cards">';
 
     lista.forEach(c => {
+        const telefonoLimpio = c.telefono ? String(c.telefono).replace(/\D/g, "") : "";
         html += `<div class="item-card">
             <div class="item-avatar">${getIniciales(c.nombre, c.apellido)}</div>
             <div class="item-info" onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')" style="cursor:pointer;">
@@ -3688,8 +3704,10 @@ function renderClientes(lista) {
                 <div class="item-sub">${escapar(c.telefono || c.email || "Sin datos de contacto")}</div>
             </div>
             <div class="item-acciones">
-                <button class="btn-chico" onclick="editarCliente('${c.id}')">Editar</button>
-                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')">✕</button>
+                ${telefonoLimpio ? `<a class="btn-carpeta" href="tel:${telefonoLimpio}" title="Llamar" style="text-decoration:none;">📞</a>` : ""}
+                ${telefonoLimpio ? `<a class="btn-carpeta" href="https://wa.me/549${telefonoLimpio}" target="_blank" rel="noopener" title="WhatsApp" style="text-decoration:none;">🟢</a>` : ""}
+                <button class="btn-carpeta" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>
+                <button class="btn-carpeta" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')" title="Borrar">❌</button>
             </div>
         </div>`;
     });
@@ -4353,6 +4371,9 @@ function renderTableroTaller() {
 
     const vehiculosEnTaller = vehiculosCache.filter(v => v.estadoTaller && CONFIG_ESTADO_TALLER[v.estadoTaller]);
     elTotal.textContent = vehiculosEnTaller.length;
+
+    const elDashTotal = document.getElementById("dashEnTallerAhora");
+    if (elDashTotal) elDashTotal.textContent = vehiculosEnTaller.length;
 
     elGrid.innerHTML = Object.keys(CONFIG_ESTADO_TALLER).map(estado => {
 
@@ -6311,6 +6332,7 @@ function renderTurnos() {
             <select class="turno-estado-select" onchange="cambiarEstadoTurno('${t.id}', this.value)">
                 ${ESTADOS_TURNO.map(e => `<option value="${e}" ${t.estado === e ? "selected" : ""}>${e}</option>`).join("")}
             </select>
+            ${cliente && cliente.telefono ? `<button class="btn-whatsapp" onclick="recordarTurnoWhatsApp('${t.id}')" title="Recordar por WhatsApp">📲 Recordar</button>` : ""}
             <button class="btn-chico" onclick="borrarTurno('${t.id}')" style="color:#ff6b6b;">Borrar</button>
         </div>`;
 
@@ -6319,6 +6341,44 @@ function renderTurnos() {
     el.innerHTML = html;
 
 }
+
+// Manda un recordatorio de turno por WhatsApp con un clic. El mensaje se abre
+// ya redactado en WhatsApp — el mecánico solo tiene que tocar "Enviar" ahí.
+window.recordarTurnoWhatsApp = function (id) {
+
+    const t = turnosCache.find(x => x.id === id);
+    if (!t || !t.fechaHora || !t.fechaHora.toDate) return;
+
+    const cliente = clientesCache.find(c => c.id === t.clienteId);
+    if (!cliente || !cliente.telefono) {
+        alert("Este cliente no tiene teléfono cargado.");
+        return;
+    }
+
+    const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
+    const nombreNegocio = configuracionActual.nombreNegocio || "KM26 Performance";
+    const fecha = t.fechaHora.toDate();
+
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const manana = new Date(hoy); manana.setDate(hoy.getDate() + 1);
+    const fechaDia = new Date(fecha); fechaDia.setHours(0, 0, 0, 0);
+
+    let diaTexto;
+    if (fechaDia.getTime() === hoy.getTime()) diaTexto = "hoy";
+    else if (fechaDia.getTime() === manana.getTime()) diaTexto = "mañana";
+    else diaTexto = fecha.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+
+    const horaTexto = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+    const detalleVehiculo = vehiculo ? `\nVehículo: ${vehiculo.marca || ""} ${vehiculo.modelo || ""} ${vehiculo.patente}`.trim() : "";
+
+    const texto = `Hola ${cliente.nombre}!\nTe recordamos tu turno para ${diaTexto} a las ${horaTexto} hs.${detalleVehiculo}\n\n${nombreNegocio}`;
+
+    const telefonoLimpio = String(cliente.telefono).replace(/\D/g, "");
+    const url = `https://wa.me/549${telefonoLimpio}?text=${encodeURIComponent(texto)}`;
+
+    window.open(url, "_blank");
+
+};
 
 window.abrirModalTurno = function () {
 
@@ -6411,12 +6471,11 @@ window.abrirModalCuenta = function () {
 
     cuentaItems = [];
 
-    const selectCliente = document.getElementById("cuentaCliente");
-    selectCliente.innerHTML = clientesCache
-        .map(c => `<option value="${c.id}">${escapar(c.apellido)}, ${escapar(c.nombre)}</option>`)
-        .join("");
+    document.getElementById("cuentaClienteBuscar").value = "";
+    document.getElementById("cuentaCliente").value = "";
+    document.getElementById("cuentaClienteResultados").style.display = "none";
+    document.getElementById("cuentaVehiculo").innerHTML = '<option value="">Elegí un cliente primero</option>';
 
-    window.actualizarVehiculosCuenta();
     renderListaCuentaItems();
 
     document.getElementById("itemDescripcion").value = "";
@@ -6426,7 +6485,71 @@ window.abrirModalCuenta = function () {
 
     document.getElementById("modalCuenta").classList.add("abierto");
 
+    setTimeout(() => document.getElementById("cuentaClienteBuscar").focus(), 100);
+
 };
+
+// Busca clientes por nombre/apellido O por patente de alguno de sus vehículos,
+// a medida que se escribe — no hace falta abrir un select con todos los clientes.
+window.buscarClienteCuenta = function () {
+
+    const texto = document.getElementById("cuentaClienteBuscar").value.trim().toLowerCase();
+    const elResultados = document.getElementById("cuentaClienteResultados");
+
+    if (!texto) {
+        elResultados.style.display = "none";
+        elResultados.innerHTML = "";
+        return;
+    }
+
+    const textoSinEspacios = texto.replace(/\s/g, "");
+
+    const coincidencias = clientesCache.filter(c => {
+        const nombreCompleto = `${c.nombre} ${c.apellido}`.toLowerCase();
+        const tieneVehiculoConEsaPatente = vehiculosCache.some(v =>
+            v.clienteId === c.id && String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(textoSinEspacios)
+        );
+        return nombreCompleto.includes(texto) || tieneVehiculoConEsaPatente;
+    }).slice(0, 8);
+
+    if (coincidencias.length === 0) {
+        elResultados.innerHTML = '<div style="padding:10px 12px;color:#777;font-size:12.5px;">Sin resultados.</div>';
+        elResultados.style.display = "block";
+        return;
+    }
+
+    elResultados.innerHTML = coincidencias.map(c => {
+        const vehiculosDelCliente = vehiculosCache.filter(v => v.clienteId === c.id).map(v => v.patente).join(", ");
+        return `<div style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #262626;" onclick="seleccionarClienteCuenta('${c.id}')">
+            <div style="font-size:13px;font-weight:600;">${escapar(c.apellido)}, ${escapar(c.nombre)}</div>
+            ${vehiculosDelCliente ? `<div style="font-size:11px;color:#888;">${escapar(vehiculosDelCliente)}</div>` : ""}
+        </div>`;
+    }).join("");
+
+    elResultados.style.display = "block";
+
+};
+
+window.seleccionarClienteCuenta = function (clienteId) {
+
+    const cliente = clientesCache.find(c => c.id === clienteId);
+    if (!cliente) return;
+
+    document.getElementById("cuentaCliente").value = clienteId;
+    document.getElementById("cuentaClienteBuscar").value = `${cliente.apellido}, ${cliente.nombre}`;
+    document.getElementById("cuentaClienteResultados").style.display = "none";
+
+    window.actualizarVehiculosCuenta();
+
+};
+
+document.addEventListener("click", function (e) {
+    const buscador = document.getElementById("cuentaClienteBuscar");
+    const resultados = document.getElementById("cuentaClienteResultados");
+    if (buscador && resultados && !buscador.contains(e.target) && !resultados.contains(e.target)) {
+        resultados.style.display = "none";
+    }
+});
 
 window.actualizarVehiculosCuenta = function () {
 
@@ -6484,11 +6607,12 @@ function calcularTotalConDescuento() {
 function renderListaCuentaItems() {
 
     const el = document.getElementById("listaCuentaItems");
-    const totalEl = document.getElementById("cuentaTotal");
 
     if (cuentaItems.length === 0) {
         el.innerHTML = '<p style="font-size:12px;color:#777;">Todavía no agregaste ningún ítem.</p>';
-        totalEl.innerHTML = "";
+        document.getElementById("cuentaSubtotalTexto").textContent = "$0";
+        document.getElementById("cuentaDescuentoTexto").textContent = "$0";
+        document.getElementById("cuentaTotal").textContent = "$0";
         return;
     }
 
@@ -6503,15 +6627,11 @@ function renderListaCuentaItems() {
 
     const { subtotal, descuentoPorc, totalFinal } = calcularTotalConDescuento();
 
-    if (descuentoPorc > 0) {
-        totalEl.innerHTML = `
-            <div style="font-size:13px;font-weight:500;color:#999;">Subtotal: ${formatoPlata(subtotal)}</div>
-            <div style="font-size:13px;font-weight:500;color:#5fd98a;">Descuento ${descuentoPorc}%: -${formatoPlata(subtotal - totalFinal)}</div>
-            <div>Total: ${formatoPlata(totalFinal)}</div>
-        `;
-    } else {
-        totalEl.textContent = "Total: " + formatoPlata(totalFinal);
-    }
+    document.getElementById("cuentaSubtotalTexto").textContent = formatoPlata(subtotal);
+    document.getElementById("cuentaDescuentoTexto").textContent = descuentoPorc > 0
+        ? `-${formatoPlata(subtotal - totalFinal)} (${descuentoPorc}%)`
+        : "$0";
+    document.getElementById("cuentaTotal").textContent = formatoPlata(totalFinal);
 
 }
 
@@ -6664,7 +6784,7 @@ function renderPresupuestos() {
                 <button class="btn-carpeta" onclick="imprimirPresupuesto('${p.id}')" title="Imprimir para el cliente">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 </button>
-                ${telefono ? `<button class="btn-chico" onclick="enviarPresupuestoWhatsApp('${p.id}')">💬 Enviar</button>` : ""}
+                ${telefono ? `<button class="btn-whatsapp" onclick="enviarPresupuestoWhatsApp('${p.id}')">🟢 WhatsApp</button>` : ""}
                 ${p.estado === "Aprobado" ? `<button class="btn-confirmar-gasto" onclick="convertirPresupuestoEnCobro('${p.id}')">💰 Cobrar</button>` : ""}
                 <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarPresupuesto('${p.id}')">Borrar</button>
             </div>
@@ -6865,13 +6985,16 @@ window.enviarPresupuestoWhatsApp = function (id) {
         return;
     }
 
-    const items = (p.items || []).map(i => `- ${i.descripcion}: ${formatoPlata(i.monto)}`).join("\n");
+    const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
+    const detalleVehiculo = vehiculo ? `${vehiculo.marca || ""} ${vehiculo.modelo || ""} patente ${vehiculo.patente}`.replace(/\s+/g, " ").trim() : "";
+
+    const items = (p.items || []).map(i => `• ${i.descripcion}`).join("\n");
     const notas = p.notas ? `\n\n${p.notas}` : "";
     const nombreNegocio = configuracionActual.nombreNegocio || "KM26 Performance";
 
     const plantilla = configuracionActual.mensajeWhatsappPresupuesto && configuracionActual.mensajeWhatsappPresupuesto.trim()
         ? configuracionActual.mensajeWhatsappPresupuesto
-        : `Hola {nombre}! Te paso el presupuesto de ${nombreNegocio}:\n\n{items}\n\nTotal: {total}{notas}`;
+        : `Hola {nombre}.\nTu presupuesto${detalleVehiculo ? " para " + detalleVehiculo : ""} ya está listo.\nDetalle:\n{items}\nTotal: {total}{notas}\n\nPara aprobar este presupuesto respondé:\nAPROBAR\n\n${nombreNegocio}`;
 
     const texto = plantilla
         .replace(/\{nombre\}/g, cliente.nombre || "")
@@ -6973,10 +7096,10 @@ window.convertirPresupuestoEnCobro = function (id) {
 
     cuentaItems = (p.items || []).map(item => ({ ...item }));
 
-    const selectCliente = document.getElementById("cuentaCliente");
-    selectCliente.innerHTML = clientesCache
-        .map(c => `<option value="${c.id}" ${c.id === p.clienteId ? "selected" : ""}>${escapar(c.apellido)}, ${escapar(c.nombre)}</option>`)
-        .join("");
+    const cliente = clientesCache.find(c => c.id === p.clienteId);
+    document.getElementById("cuentaCliente").value = p.clienteId || "";
+    document.getElementById("cuentaClienteBuscar").value = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "";
+    document.getElementById("cuentaClienteResultados").style.display = "none";
 
     window.actualizarVehiculosCuenta();
 
