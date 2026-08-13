@@ -2608,10 +2608,10 @@ header{
 
     <section class="seccion" id="tab-configuracion">
 
-        <div class="fila-titulo"><h2>⚙️ Configuración</h2></div>
+        <div class="fila-titulo"><h2 style="color:#ff6b6b;">⚙️ Configuración</h2></div>
         <p style="font-size:12px;color:#888;margin-bottom:20px;">Solo vos, como administrador, podés ver y cambiar esto. Se aplica a todo el panel, para todos los usuarios.</p>
 
-        <div class="fila-titulo" style="margin-top:10px;"><h2 style="font-size:16px;">Datos del negocio</h2></div>
+        <div class="fila-titulo" style="margin-top:10px;"><h2 style="font-size:16px;color:#ff6b6b;">Datos del negocio</h2></div>
         <p style="font-size:11.5px;color:#777;margin-bottom:10px;">Aparecen en el encabezado de los presupuestos impresos.</p>
 
         <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Nombre del negocio</label>
@@ -2626,12 +2626,12 @@ header{
         <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">CUIT / Razón social (opcional)</label>
         <input type="text" id="cfgCuit" placeholder="20-12345678-9" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
 
-        <div class="fila-titulo"><h2 style="font-size:16px;">Stock</h2></div>
+        <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Stock</h2></div>
 
         <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Stock mínimo por defecto para productos nuevos</label>
         <input type="number" id="cfgStockMinimo" placeholder="3" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
 
-        <div class="fila-titulo"><h2 style="font-size:16px;">Presupuestos y cuentas</h2></div>
+        <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Presupuestos y cuentas</h2></div>
 
         <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Descuento máximo permitido sin ser admin (%)</label>
         <input type="number" id="cfgDescuentoMax" placeholder="20" min="0" max="100" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
@@ -2641,7 +2641,7 @@ header{
         <input type="number" id="cfgDiasValidez" placeholder="10" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
         <p style="font-size:11px;color:#777;margin-bottom:22px;">Se completa solo en "Notas" al crear un presupuesto nuevo (se puede borrar o cambiar igual).</p>
 
-        <div class="fila-titulo"><h2 style="font-size:16px;">Mensaje de WhatsApp para presupuestos</h2></div>
+        <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Mensaje de WhatsApp para presupuestos</h2></div>
         <p style="font-size:11px;color:#777;margin-bottom:10px;">Usá <code>{nombre}</code>, <code>{items}</code>, <code>{total}</code> y <code>{notas}</code> donde quieras que se reemplacen solos por los datos reales.</p>
         <textarea id="cfgMensajeWhatsapp" rows="5" placeholder="Hola {nombre}! Te paso el presupuesto de KM26 Performance:&#10;&#10;{items}&#10;&#10;Total: {total}&#10;{notas}" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:13px;margin-bottom:22px;font-family:'Montserrat',sans-serif;"></textarea>
 
