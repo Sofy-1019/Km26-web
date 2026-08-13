@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historial del vehículo · KM26 Performance</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+body{
+    background:#2a2a2e;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+}
+
+#contenedor{
+    max-width:480px;
+    width:100%;
+    padding:24px 20px 60px;
+}
+
+.logo-wrap{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:24px;
+}
+
+.logo-wrap img{
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    filter:drop-shadow(0 4px 14px rgba(215,25,32,.4));
+}
+
+.logo-texto{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:17px;
+    color:#ff6b6b;
+}
+
+.logo-sub{
+    font-size:11px;
+    color:#888;
+}
+
+.tarjeta-vehiculo{
+    background:#1a1a1a;
+    border-radius:16px;
+    padding:22px;
+    margin-bottom:22px;
+}
+
+.patente{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:22px;
+    color:#fff;
+    margin-bottom:4px;
+}
+
+.detalle-vehiculo{
+    color:#999;
+    font-size:13px;
+    margin-bottom:16px;
+}
+
+.dato-fila{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px dashed #2a2a2a;
+    font-size:13px;
+}
+
+.dato-fila:last-child{
+    border-bottom:none;
+}
+
+.dato-fila span:first-child{
+    color:#888;
+}
+
+.seccion-titulo{
+    font-size:12px;
+    font-weight:700;
+    color:#888;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin:24px 0 12px;
+}
+
+.item-historial{
+    background:#1a1a1a;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:8px;
+}
+
+.item-historial-fecha{
+    font-size:11px;
+    color:#777;
+    margin-bottom:4px;
+}
+
+.item-historial-desc{
+    font-size:14px;
+    color:#eee;
+}
+
+.item-historial-costo{
+    font-size:12px;
+    color:#5fd98a;
+    margin-top:4px;
+}
+
+.vacio{
+    text-align:center;
+    color:#666;
+    padding:30px;
+    font-size:13px;
+    background:#1a1a1a;
+    border-radius:12px;
+}
+
+.footer{
+    text-align:center;
+    color:#555;
+    font-size:11px;
+    margin-top:40px;
+}
+
+.cargando{
+    text-align:center;
+    color:#777;
+    padding:60px 0;
+    font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="contenedor">
+
+    <div class="logo-wrap">
+        <img src="images/icon-192.png" alt="KM26" onerror="this.style.display='none'">
+        <div>
+            <div class="logo-texto">KM26 PERFORMANCE</div>
+            <div class="logo-sub">Historial del vehículo</div>
+        </div>
+    </div>
+
+    <div id="resultado">
+        <div class="cargando">Buscando el vehículo...</div>
+    </div>
+
+    <div class="footer">KM26 Performance — Este historial es de solo lectura.</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyB8W3x4-b0JEaxwEXBY09qWWFPRc2q98CA",
+    authDomain: "km26-gestion.firebaseapp.com",
+    projectId: "km26-gestion",
+    storageBucket: "km26-gestion.firebasestorage.app",
+    messagingSenderId: "1006314454164",
+    appId: "1:1006314454164:web:7a4e49c99e54d125038881"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+function escapar(s) {
+    if (s === undefined || s === null) return "";
+    return String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function formatoPlata(n) {
+    n = Number(n) || 0;
+    return "$" + Math.round(n).toLocaleString("es-AR");
+}
+
+async function cargar() {
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const el = document.getElementById("resultado");
+
+    if (!id) {
+        el.innerHTML = '<div class="vacio">Este link no tiene un vehículo asociado.</div>';
+        return;
+    }
+
+    try {
+
+        // Esta es una lectura de UN SOLO documento por su ID exacto (no una lista),
+        // así que no expone al resto de los clientes ni vehículos del taller.
+        const snap = await getDoc(doc(db, "vehiculos", id));
+
+        if (!snap.exists()) {
+            el.innerHTML = '<div class="vacio">No se encontró este vehículo. Puede que el link esté vencido o mal escrito.</div>';
+            return;
+        }
+
+        const v = snap.data();
+        const resumen = v.historialResumen || [];
+
+        let html = `
+            <div class="tarjeta-vehiculo">
+                <div class="patente">${escapar(v.patente || "-")}</div>
+                <div class="detalle-vehiculo">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</div>
+                ${v.kilometraje ? `<div class="dato-fila"><span>Kilometraje</span><span>${Number(v.kilometraje).toLocaleString("es-AR")} km</span></div>` : ""}
+                ${v.combustible ? `<div class="dato-fila"><span>Combustible</span><span>${escapar(v.combustible)}</span></div>` : ""}
+                ${v.color ? `<div class="dato-fila"><span>Color</span><span>${escapar(v.color)}</span></div>` : ""}
+                ${v.proximoService ? `<div class="dato-fila"><span>Próximo service</span><span>${escapar(v.proximoService)}</span></div>` : ""}
+            </div>
+            <div class="seccion-titulo">Últimos servicios</div>
+        `;
+
+        if (resumen.length === 0) {
+            html += '<div class="vacio">Todavía no hay servicios registrados.</div>';
+        } else {
+            html += resumen.map(h => {
+                const fecha = h.fecha ? new Date(h.fecha).toLocaleDateString("es-AR") : "";
+                return `<div class="item-historial">
+                    <div class="item-historial-fecha">${fecha}</div>
+                    <div class="item-historial-desc">${escapar(h.descripcion || "")}</div>
+                    ${h.costo ? `<div class="item-historial-costo">${formatoPlata(h.costo)}</div>` : ""}
+                </div>`;
+            }).join("");
+        }
+
+        el.innerHTML = html;
+
+    } catch (err) {
+        el.innerHTML = '<div class="vacio">No se pudo cargar el historial. Probá de nuevo más tarde.</div>';
+    }
+
+}
+
+cargar();
+
+</script>
+
+</body>
+</html>
