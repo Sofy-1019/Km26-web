@@ -2226,11 +2226,11 @@ header{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             Proveedores
         </button>
-        <button class="sidebar-nav-btn pendiente" onclick="abrirModuloPendiente('Categorías de repuestos')">
+        <button class="sidebar-nav-btn" data-nav="categorias" data-roles="admin,recepcion" onclick="cambiarTab('categorias')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83V3H4v7h.83l9.58 9.59a2 2 0 002.83 0l3.35-3.35a2 2 0 000-2.83z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
             Categorías
         </button>
-        <button class="sidebar-nav-btn pendiente" onclick="abrirModuloPendiente('Servicios')">
+        <button class="sidebar-nav-btn" data-nav="servicios" data-roles="admin,recepcion" onclick="cambiarTab('servicios')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
             Servicios
         </button>
@@ -2246,7 +2246,7 @@ header{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
             Configuración
         </button>
-        <button class="sidebar-nav-btn pendiente" data-roles="admin" onclick="abrirModuloPendiente('Respaldo de datos')">
+        <button class="sidebar-nav-btn" data-nav="respaldo" data-roles="admin" onclick="cambiarTab('respaldo')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Respaldo de datos
         </button>
@@ -2512,6 +2512,28 @@ header{
 
     </section>
 
+    <section class="seccion" id="tab-categorias">
+
+        <div class="fila-titulo">
+            <h2>Categorías</h2>
+            <button class="btn-red" onclick="abrirModalCategoria()">+ Nueva categoría</button>
+        </div>
+        <p style="font-size:12.5px;color:#888;margin-bottom:16px;">Se usan para ordenar el Stock por rubro (Frenos, Motor, Filtros, etc.).</p>
+        <div id="listaCategorias"></div>
+
+    </section>
+
+    <section class="seccion" id="tab-servicios">
+
+        <div class="fila-titulo">
+            <h2>Servicios</h2>
+            <button class="btn-red" onclick="abrirModalServicio()">+ Nuevo servicio</button>
+        </div>
+        <p style="font-size:12.5px;color:#888;margin-bottom:16px;">Catálogo de trabajos habituales con precio de referencia — se pueden elegir directo al armar un Presupuesto o una Cuenta.</p>
+        <div id="listaServicios"></div>
+
+    </section>
+
     <section class="seccion" id="tab-usuarios">
 
         <div class="fila-titulo">
@@ -2554,6 +2576,33 @@ header{
 
         <div class="fila-titulo" style="margin-top:28px;"><h2 style="font-size:19px;">🚗 Vehículos atendidos en el período</h2></div>
         <div id="repListaVehiculos"></div>
+
+    </section>
+
+    <section class="seccion" id="tab-respaldo">
+
+        <div class="fila-titulo"><h2>💾 Respaldo de datos</h2></div>
+
+        <div class="aviso-migracion" style="border-color:#0d2038;background:#0a1a2a;color:#6ab6ff;">
+            💡 Esto descarga un archivo Excel a tu computadora o celular con una copia de todo lo que hay cargado en el sistema (clientes, vehículos, turnos, presupuestos, caja, stock, historial, usuarios, proveedores, categorías y servicios) — cada uno en su propia hoja. Guardalo en tu disco externo o donde prefieras.
+        </div>
+
+        <button class="btn-red" style="padding:14px 26px;font-size:14px;" onclick="exportarRespaldoCompleto()">⬇️ Descargar respaldo completo (Excel)</button>
+
+        <p id="mensajeEstadoRespaldo" style="margin-top:14px;font-size:13px;"></p>
+
+        <div class="fila-titulo" style="margin-top:32px;"><h2 style="font-size:16px;">Respaldos por sección</h2></div>
+        <p style="font-size:12px;color:#888;margin-bottom:14px;">Si solo necesitás una parte, podés bajarla por separado:</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-chico" onclick="exportarUnaColeccion('clientes', clientesCache)">Clientes</button>
+            <button class="btn-chico" onclick="exportarUnaColeccion('vehiculos', vehiculosCache)">Vehículos</button>
+            <button class="btn-chico" onclick="exportarUnaColeccion('turnos', turnosCache)">Turnos</button>
+            <button class="btn-chico" onclick="exportarUnaColeccion('presupuestos', presupuestosCache)">Presupuestos</button>
+            <button class="btn-chico" onclick="exportarUnaColeccion('caja', cajaCache)">Caja</button>
+            <button class="btn-chico" onclick="exportarUnaColeccion('stock', stockCache)">Stock</button>
+            <button class="btn-chico" onclick="exportarUnaColeccion('historial', historialCache)">Historia clínica</button>
+            <button class="btn-chico" onclick="exportarUnaColeccion('proveedores', proveedoresCache)">Proveedores</button>
+        </div>
 
     </section>
 
@@ -2607,6 +2656,14 @@ header{
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                 Proveedores
             </button>
+            <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('categorias')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83V3H4v7h.83l9.58 9.59a2 2 0 002.83 0l3.35-3.35a2 2 0 000-2.83z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Categorías
+            </button>
+            <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('servicios')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+                Servicios
+            </button>
             <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('usuarios')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 Usuarios
@@ -2614,6 +2671,10 @@ header{
             <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('reportes')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 Reportes
+            </button>
+            <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('respaldo')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Respaldo de datos
             </button>
             <button class="mas-item salir" onclick="cerrarOverlayMas(); cerrarSesion()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -2868,6 +2929,51 @@ header{
     </div>
 </div>
 
+<!-- ---------- Modal: nueva/editar categoría ---------- -->
+<div class="overlay" id="modalCategoria">
+    <div class="modal">
+        <h3 id="modalCategoriaTitulo">Nueva categoría</h3>
+
+        <input type="hidden" id="catId">
+
+        <label>Nombre</label>
+        <input type="text" id="catNombre" placeholder="Ej: Frenos">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarCategoria()">Guardar</button>
+        </div>
+
+        <div class="modal-botones" id="accionesCategoria" style="display:none;"></div>
+
+        <p id="mensajeEstadoCategoria"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: nuevo/editar servicio ---------- -->
+<div class="overlay" id="modalServicio">
+    <div class="modal">
+        <h3 id="modalServicioTitulo">Nuevo servicio</h3>
+
+        <input type="hidden" id="servId">
+
+        <label>Nombre</label>
+        <input type="text" id="servNombre" placeholder="Ej: Cambio de aceite">
+
+        <label>Precio de referencia</label>
+        <input type="number" id="servPrecio" placeholder="15000">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarServicio()">Guardar</button>
+        </div>
+
+        <div class="modal-botones" id="accionesServicio" style="display:none;"></div>
+
+        <p id="mensajeEstadoServicio"></p>
+    </div>
+</div>
+
 <!-- ---------- Modal: nuevo producto ---------- -->
 <div class="overlay" id="modalProducto">
     <div class="modal">
@@ -2884,6 +2990,9 @@ header{
 
         <label>Avisar cuando queden menos de</label>
         <input type="number" id="pStockMinimo" placeholder="3">
+
+        <label>Categoría (opcional)</label>
+        <select id="pCategoria"><option value="">Sin categoría</option></select>
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
@@ -2912,6 +3021,9 @@ header{
 
         <label>Avisar cuando queden menos de</label>
         <input type="number" id="epStockMinimo">
+
+        <label>Categoría (opcional)</label>
+        <select id="epCategoria"><option value="">Sin categoría</option></select>
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
@@ -3005,6 +3117,7 @@ header{
                 <button class="btn-chico" onclick="agregarItemManual()">+ Agregar</button>
             </div>
             <button class="btn-chico" style="width:100%;margin-top:10px;" onclick="abrirEscanerParaCuenta()">📷 Escanear producto</button>
+            <button class="btn-chico" style="width:100%;margin-top:6px;" onclick="elegirServicioParaCuenta()">🔧 Elegir de Servicios</button>
         </div>
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
@@ -3075,6 +3188,7 @@ header{
                 <button class="btn-chico" onclick="agregarItemPresupuesto()">+ Agregar</button>
             </div>
             <button class="btn-chico" style="width:100%;margin-top:10px;" onclick="abrirEscanerParaPresupuesto()">📷 Escanear producto</button>
+            <button class="btn-chico" style="width:100%;margin-top:6px;" onclick="elegirServicioParaPresupuesto()">🔧 Elegir de Servicios</button>
         </div>
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
@@ -3104,6 +3218,7 @@ header{
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <!-- Listas de autocompletado: marcas y modelos comunes en Argentina -->
 <datalist id="listaMarcas">
@@ -3258,6 +3373,8 @@ onAuthStateChanged(auth, (user) => {
         escucharInspecciones();
         escucharUsuarios();
         escucharProveedores();
+        escucharCategorias();
+        escucharServicios();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -3428,6 +3545,8 @@ window.cerrarModales = function () {
     document.getElementById("modalUsuario").classList.remove("abierto");
     document.getElementById("modalProveedor").classList.remove("abierto");
     document.getElementById("modalPagoProveedor").classList.remove("abierto");
+    document.getElementById("modalCategoria").classList.remove("abierto");
+    document.getElementById("modalServicio").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -4660,19 +4779,20 @@ function renderStock() {
 
         const stockMinimo = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
         const bajo = p.cantidad <= stockMinimo;
+        const categoria = categoriasCache.find(c => c.id === p.categoriaId);
 
         const fila = document.createElement("div");
         fila.className = "fila-stock" + (bajo ? " stock-bajo" : "");
         fila.innerHTML = `
             <div>
                 <div class="fila-stock-nombre">${escapar(p.nombre)} ${bajo ? "⚠️" : ""}</div>
-                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades ${bajo ? "· stock bajo" : ""}</div>
+                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades ${bajo ? "· stock bajo" : ""}${categoria ? " · " + escapar(categoria.nombre) : ""}</div>
             </div>
             <div class="fila-stock-botones">
                 <button class="btn-redondo" onclick="ajustarCantidad('${p.id}', -1)">-</button>
                 <span class="cantidad-numero" id="numero-${p.id}">${p.cantidad}</span>
                 <button class="btn-redondo" onclick="ajustarCantidad('${p.id}', 1)">+</button>
-                <button class="btn-chico" onclick="abrirEdicionProducto('${p.id}', '${escaparComillas(p.nombre)}', ${p.cantidad}, ${stockMinimo}, ${p.precio || 0})">Editar</button>
+                <button class="btn-chico" onclick="abrirEdicionProducto('${p.id}', '${escaparComillas(p.nombre)}', ${p.cantidad}, ${stockMinimo}, ${p.precio || 0}, '${p.categoriaId || ""}')">Editar</button>
                 <button class="btn-chico" onclick="abrirEtiqueta('${p.id}', '${escaparComillas(p.nombre)}')">🏷️ Etiqueta</button>
             </div>
         `;
@@ -4696,6 +4816,8 @@ window.ajustarCantidad = async function (id, delta) {
 window.abrirModalProducto = function () {
     document.getElementById("modalProducto").classList.add("abierto");
     document.getElementById("mensajeEstadoProducto").textContent = "";
+    actualizarSelectCategoriasEnStock();
+    document.getElementById("pCategoria").value = "";
 };
 
 window.guardarProducto = async function () {
@@ -4704,6 +4826,7 @@ window.guardarProducto = async function () {
     const cantidad = parseInt(document.getElementById("pCantidad").value, 10) || 0;
     const precio = parseFloat(document.getElementById("pPrecio").value) || 0;
     const stockMinimo = parseInt(document.getElementById("pStockMinimo").value, 10) || 3;
+    const categoriaId = document.getElementById("pCategoria").value || null;
     const estado = document.getElementById("mensajeEstadoProducto");
 
     if (!nombre) {
@@ -4718,7 +4841,7 @@ window.guardarProducto = async function () {
     try {
 
         await addDoc(collection(db, "stock"), {
-            nombre, cantidad, precio, stockMinimo,
+            nombre, cantidad, precio, stockMinimo, categoriaId,
             creado: serverTimestamp()
         });
 
@@ -4729,6 +4852,7 @@ window.guardarProducto = async function () {
         document.getElementById("pCantidad").value = "";
         document.getElementById("pPrecio").value = "";
         document.getElementById("pStockMinimo").value = "";
+        document.getElementById("pCategoria").value = "";
 
         setTimeout(() => window.cerrarModales(), 600);
 
@@ -4739,13 +4863,16 @@ window.guardarProducto = async function () {
 
 };
 
-window.abrirEdicionProducto = function (id, nombre, cantidad, stockMinimo, precio) {
+window.abrirEdicionProducto = function (id, nombre, cantidad, stockMinimo, precio, categoriaId) {
 
     document.getElementById("epId").value = id;
     document.getElementById("epNombre").value = nombre;
     document.getElementById("epCantidad").value = cantidad;
     document.getElementById("epStockMinimo").value = stockMinimo;
     document.getElementById("epPrecio").value = precio || "";
+
+    actualizarSelectCategoriasEnStock();
+    document.getElementById("epCategoria").value = categoriaId || "";
 
     document.getElementById("mensajeEstadoEdicionProducto").textContent = "";
     document.getElementById("modalEditarProducto").classList.add("abierto");
@@ -4759,6 +4886,7 @@ window.guardarEdicionProducto = async function () {
     const cantidad = parseInt(document.getElementById("epCantidad").value, 10) || 0;
     const precio = parseFloat(document.getElementById("epPrecio").value) || 0;
     const stockMinimo = parseInt(document.getElementById("epStockMinimo").value, 10) || 3;
+    const categoriaId = document.getElementById("epCategoria").value || null;
     const estado = document.getElementById("mensajeEstadoEdicionProducto");
 
     if (!nombre) {
@@ -4772,7 +4900,7 @@ window.guardarEdicionProducto = async function () {
 
     try {
 
-        await updateDoc(doc(db, "stock", id), { nombre, cantidad, precio, stockMinimo });
+        await updateDoc(doc(db, "stock", id), { nombre, cantidad, precio, stockMinimo, categoriaId });
 
         estado.textContent = "¡Listo!";
         estado.style.color = "#5fd98a";
@@ -4961,6 +5089,256 @@ window.guardarPagoProveedor = async function () {
         estado.style.color = "#ff6b6b";
     }
 
+};
+
+// ---------- Categorías (para ordenar Stock por rubro) ----------
+
+let categoriasCache = [];
+
+function escucharCategorias() {
+    const q = query(collection(db, "categorias"), orderBy("nombre"));
+    onSnapshot(q, (snapshot) => {
+        categoriasCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCategorias();
+        actualizarSelectCategoriasEnStock();
+    });
+}
+
+function renderCategorias() {
+
+    const el = document.getElementById("listaCategorias");
+    if (!el) return;
+
+    if (categoriasCache.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay categorías cargadas.</div>';
+        return;
+    }
+
+    el.innerHTML = '<div class="lista-cards">' + categoriasCache.map(c => {
+        const cantidadProductos = stockCache.filter(p => p.categoriaId === c.id).length;
+        return `
+        <div class="item-card">
+            <div class="item-avatar" style="background:linear-gradient(135deg,#555,#2a2a2a);">${c.nombre.charAt(0).toUpperCase()}</div>
+            <div class="item-info">
+                <div class="item-titulo">${escapar(c.nombre)}</div>
+                <div class="item-sub">${cantidadProductos} producto${cantidadProductos === 1 ? "" : "s"}</div>
+            </div>
+            <div class="item-acciones">
+                <button class="btn-chico" onclick="editarCategoria('${c.id}')">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarCategoria('${c.id}', '${escaparComillas(c.nombre)}')">✕</button>
+            </div>
+        </div>`;
+    }).join("") + '</div>';
+
+}
+
+window.abrirModalCategoria = function () {
+    document.getElementById("modalCategoriaTitulo").textContent = "Nueva categoría";
+    document.getElementById("catId").value = "";
+    document.getElementById("catNombre").value = "";
+    document.getElementById("mensajeEstadoCategoria").textContent = "";
+    document.getElementById("accionesCategoria").style.display = "none";
+    document.getElementById("modalCategoria").classList.add("abierto");
+};
+
+window.editarCategoria = function (id) {
+    const c = categoriasCache.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById("modalCategoriaTitulo").textContent = "Editar categoría";
+    document.getElementById("catId").value = c.id;
+    document.getElementById("catNombre").value = c.nombre || "";
+    document.getElementById("mensajeEstadoCategoria").textContent = "";
+    document.getElementById("accionesCategoria").innerHTML =
+        `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="borrarCategoria('${c.id}', '${escaparComillas(c.nombre)}')">🗑️ Eliminar</button>`;
+    document.getElementById("accionesCategoria").style.display = "flex";
+    document.getElementById("modalCategoria").classList.add("abierto");
+};
+
+window.guardarCategoria = async function () {
+
+    const id = document.getElementById("catId").value;
+    const nombre = document.getElementById("catNombre").value.trim();
+    const estado = document.getElementById("mensajeEstadoCategoria");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre a la categoría.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        if (id) {
+            await updateDoc(doc(db, "categorias", id), { nombre });
+        } else {
+            await addDoc(collection(db, "categorias"), { nombre, creado: serverTimestamp() });
+        }
+
+        estado.textContent = "¡Listo!";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 500);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.borrarCategoria = async function (id, nombre) {
+    const confirmado = confirm(`¿Eliminar la categoría "${nombre}"? Los productos que la tenían asignada quedan sin categoría (no se borra ningún producto).`);
+    if (!confirmado) return;
+    await deleteDoc(doc(db, "categorias", id));
+    window.cerrarModales();
+};
+
+// Rellena el <select> de categoría dentro de los modales de Stock (se llama cuando
+// cambian las categorías, y también al abrir cada modal de producto)
+function actualizarSelectCategoriasEnStock() {
+
+    const opciones = '<option value="">Sin categoría</option>' +
+        categoriasCache.map(c => `<option value="${c.id}">${escapar(c.nombre)}</option>`).join("");
+
+    const selNuevo = document.getElementById("pCategoria");
+    const selEditar = document.getElementById("epCategoria");
+    if (selNuevo) { const actual = selNuevo.value; selNuevo.innerHTML = opciones; selNuevo.value = actual; }
+    if (selEditar) { const actual = selEditar.value; selEditar.innerHTML = opciones; selEditar.value = actual; }
+
+}
+
+// ---------- Servicios (catálogo de trabajos habituales con precio de referencia) ----------
+
+let serviciosCache = [];
+
+function escucharServicios() {
+    const q = query(collection(db, "servicios"), orderBy("nombre"));
+    onSnapshot(q, (snapshot) => {
+        serviciosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderServicios();
+    });
+}
+
+function renderServicios() {
+
+    const el = document.getElementById("listaServicios");
+    if (!el) return;
+
+    if (serviciosCache.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay servicios cargados.</div>';
+        return;
+    }
+
+    el.innerHTML = '<div class="lista-cards">' + serviciosCache.map(s => `
+        <div class="item-card">
+            <div class="item-icono-auto">🔧</div>
+            <div class="item-info">
+                <div class="item-titulo">${escapar(s.nombre)}</div>
+                <div class="item-sub">${formatoPlata(s.precio || 0)}</div>
+            </div>
+            <div class="item-acciones">
+                <button class="btn-chico" onclick="editarServicio('${s.id}')">Editar</button>
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarServicio('${s.id}', '${escaparComillas(s.nombre)}')">✕</button>
+            </div>
+        </div>
+    `).join("") + '</div>';
+
+}
+
+window.abrirModalServicio = function () {
+    document.getElementById("modalServicioTitulo").textContent = "Nuevo servicio";
+    document.getElementById("servId").value = "";
+    document.getElementById("servNombre").value = "";
+    document.getElementById("servPrecio").value = "";
+    document.getElementById("mensajeEstadoServicio").textContent = "";
+    document.getElementById("accionesServicio").style.display = "none";
+    document.getElementById("modalServicio").classList.add("abierto");
+};
+
+window.editarServicio = function (id) {
+    const s = serviciosCache.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById("modalServicioTitulo").textContent = "Editar servicio";
+    document.getElementById("servId").value = s.id;
+    document.getElementById("servNombre").value = s.nombre || "";
+    document.getElementById("servPrecio").value = s.precio || "";
+    document.getElementById("mensajeEstadoServicio").textContent = "";
+    document.getElementById("accionesServicio").innerHTML =
+        `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="borrarServicio('${s.id}', '${escaparComillas(s.nombre)}')">🗑️ Eliminar</button>`;
+    document.getElementById("accionesServicio").style.display = "flex";
+    document.getElementById("modalServicio").classList.add("abierto");
+};
+
+window.guardarServicio = async function () {
+
+    const id = document.getElementById("servId").value;
+    const nombre = document.getElementById("servNombre").value.trim();
+    const precio = parseFloat(document.getElementById("servPrecio").value) || 0;
+    const estado = document.getElementById("mensajeEstadoServicio");
+
+    if (!nombre) {
+        estado.textContent = "Ponele un nombre al servicio.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        if (id) {
+            await updateDoc(doc(db, "servicios", id), { nombre, precio });
+        } else {
+            await addDoc(collection(db, "servicios"), { nombre, precio, creado: serverTimestamp() });
+        }
+
+        estado.textContent = "¡Listo!";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 500);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+window.borrarServicio = async function (id, nombre) {
+    const confirmado = confirm(`¿Eliminar el servicio "${nombre}"?`);
+    if (!confirmado) return;
+    await deleteDoc(doc(db, "servicios", id));
+    window.cerrarModales();
+};
+
+// Elegir un servicio del catálogo para autocompletar el ítem manual de Cuenta o Presupuesto,
+// en vez de escribir descripción y precio a mano cada vez.
+window.elegirServicioParaCuenta = function () {
+    if (serviciosCache.length === 0) {
+        alert("Todavía no cargaste ningún servicio en el catálogo (sección Servicios).");
+        return;
+    }
+    const opciones = serviciosCache.map((s, i) => `${i + 1}. ${s.nombre} — ${formatoPlata(s.precio || 0)}`).join("\n");
+    const eleccion = prompt("Elegí un servicio escribiendo su número:\n\n" + opciones);
+    const idx = parseInt(eleccion, 10) - 1;
+    if (isNaN(idx) || !serviciosCache[idx]) return;
+    document.getElementById("itemDescripcion").value = serviciosCache[idx].nombre;
+    document.getElementById("itemMonto").value = serviciosCache[idx].precio || "";
+};
+
+window.elegirServicioParaPresupuesto = function () {
+    if (serviciosCache.length === 0) {
+        alert("Todavía no cargaste ningún servicio en el catálogo (sección Servicios).");
+        return;
+    }
+    const opciones = serviciosCache.map((s, i) => `${i + 1}. ${s.nombre} — ${formatoPlata(s.precio || 0)}`).join("\n");
+    const eleccion = prompt("Elegí un servicio escribiendo su número:\n\n" + opciones);
+    const idx = parseInt(eleccion, 10) - 1;
+    if (isNaN(idx) || !serviciosCache[idx]) return;
+    document.getElementById("presuItemDescripcion").value = serviciosCache[idx].nombre;
+    document.getElementById("presuItemMonto").value = serviciosCache[idx].precio || "";
 };
 
 // ---------- Escáner con cámara ----------
@@ -6697,6 +7075,114 @@ function calcularReportes() {
     }
 
 }
+
+// ======================================================================
+// RESPALDO DE DATOS
+// ======================================================================
+// Genera un archivo Excel (una hoja por colección) con TODO lo cargado en
+// Firestore, para descargar y guardar donde el usuario quiera (disco externo,
+// Google Drive, etc.). No borra ni modifica nada, solo lee lo que ya está
+// cargado en memoria (los mismos "cache" que usa el resto del panel).
+
+// Convierte un array de documentos de Firestore en objetos "planos" que Excel
+// puede entender: las fechas (Timestamp) pasan a texto legible, y los campos
+// que son objetos/arrays (como los ítems de un presupuesto) se guardan como
+// texto JSON en una sola celda, para no perder información.
+function convertirParaExcel(lista) {
+
+    return (lista || []).map(item => {
+
+        const plano = {};
+
+        Object.keys(item).forEach(key => {
+
+            let valor = item[key];
+
+            if (valor && typeof valor === "object" && typeof valor.toDate === "function") {
+                valor = valor.toDate().toLocaleString("es-AR");
+            } else if (Array.isArray(valor)) {
+                valor = JSON.stringify(valor);
+            } else if (valor && typeof valor === "object") {
+                valor = JSON.stringify(valor);
+            }
+
+            plano[key] = valor;
+
+        });
+
+        return plano;
+
+    });
+
+}
+
+window.exportarUnaColeccion = function (nombre, lista) {
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    const datos = convertirParaExcel(lista);
+    const hoja = XLSX.utils.json_to_sheet(datos.length ? datos : [{ info: "Sin datos cargados" }]);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, nombre.slice(0, 31));
+
+    const fechaTexto = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(libro, `KM26_${nombre}_${fechaTexto}.xlsx`);
+
+};
+
+window.exportarRespaldoCompleto = function () {
+
+    const estado = document.getElementById("mensajeEstadoRespaldo");
+
+    if (typeof XLSX === "undefined") {
+        estado.textContent = "No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Generando respaldo...";
+    estado.style.color = "#999";
+
+    try {
+
+        const libro = XLSX.utils.book_new();
+
+        const colecciones = [
+            ["Clientes", clientesCache],
+            ["Vehiculos", vehiculosCache],
+            ["Turnos", turnosCache],
+            ["Presupuestos", presupuestosCache],
+            ["Caja", cajaCache],
+            ["Stock", stockCache],
+            ["Historial", historialCache],
+            ["Inspecciones", inspeccionesCache],
+            ["Usuarios", usuariosCache],
+            ["Proveedores", proveedoresCache],
+            ["Categorias", categoriasCache],
+            ["Servicios", serviciosCache]
+        ];
+
+        colecciones.forEach(([nombreHoja, lista]) => {
+            const datos = convertirParaExcel(lista);
+            const hoja = XLSX.utils.json_to_sheet(datos.length ? datos : [{ info: "Sin datos cargados" }]);
+            XLSX.utils.book_append_sheet(libro, hoja, nombreHoja.slice(0, 31));
+        });
+
+        const fechaTexto = new Date().toISOString().split("T")[0];
+        XLSX.writeFile(libro, `KM26_Respaldo_Completo_${fechaTexto}.xlsx`);
+
+        estado.textContent = "✅ Respaldo descargado. Revisá la carpeta de Descargas de tu dispositivo (o de tu navegador) y guardalo donde prefieras.";
+        estado.style.color = "#5fd98a";
+
+    } catch (err) {
+        estado.textContent = "Error al generar el respaldo: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
 
 </script>
 
