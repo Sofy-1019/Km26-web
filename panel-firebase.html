@@ -30,6 +30,20 @@ body{
     min-height:100vh;
 }
 
+/* El navegador (Chrome, Edge, etc.) le pone su propio fondo claro a los campos
+   que detecta como "autocompletables" (dirección, teléfono, etc.), tapando
+   el estilo oscuro. Esto lo fuerza a mantener el fondo y la letra del panel. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill{
+    -webkit-text-fill-color:#fff;
+    -webkit-box-shadow:0 0 0 1000px #1a1a1a inset;
+    box-shadow:0 0 0 1000px #1a1a1a inset;
+    caret-color:#fff;
+    transition:background-color 5000s ease-in-out 0s;
+}
+
 /* ---------- Login ---------- */
 
 #pantallaLogin{
@@ -2614,30 +2628,30 @@ header{
         <div class="fila-titulo" style="margin-top:10px;"><h2 style="font-size:16px;color:#ff6b6b;">Datos del negocio</h2></div>
         <p style="font-size:11.5px;color:#777;margin-bottom:10px;">Aparecen en el encabezado de los presupuestos impresos.</p>
 
-        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Nombre del negocio</label>
+        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Nombre del negocio</label>
         <input type="text" id="cfgNombreNegocio" placeholder="KM26 PERFORMANCE" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
 
-        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Dirección (opcional)</label>
+        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Dirección (opcional)</label>
         <input type="text" id="cfgDireccion" placeholder="Ej: Av. Siempre Viva 123, CABA" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
 
-        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Teléfono (opcional)</label>
+        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Teléfono (opcional)</label>
         <input type="text" id="cfgTelefono" placeholder="11 5555-1234" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
 
-        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">CUIT / Razón social (opcional)</label>
+        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">CUIT / Razón social (opcional)</label>
         <input type="text" id="cfgCuit" placeholder="20-12345678-9" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
 
         <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Stock</h2></div>
 
-        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Stock mínimo por defecto para productos nuevos</label>
+        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Stock mínimo por defecto para productos nuevos</label>
         <input type="number" id="cfgStockMinimo" placeholder="3" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
 
         <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Presupuestos y cuentas</h2></div>
 
-        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Descuento máximo permitido sin ser admin (%)</label>
+        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Descuento máximo permitido sin ser admin (%)</label>
         <input type="number" id="cfgDescuentoMax" placeholder="20" min="0" max="100" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
         <p style="font-size:11px;color:#777;margin-bottom:14px;">Recepción y mecánicos no van a poder cargar más que este porcentaje. Los admin no tienen límite.</p>
 
-        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Días de validez por defecto de un presupuesto nuevo</label>
+        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Días de validez por defecto de un presupuesto nuevo</label>
         <input type="number" id="cfgDiasValidez" placeholder="10" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
         <p style="font-size:11px;color:#777;margin-bottom:22px;">Se completa solo en "Notas" al crear un presupuesto nuevo (se puede borrar o cambiar igual).</p>
 
