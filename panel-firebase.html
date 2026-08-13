@@ -1513,6 +1513,496 @@ header{
     flex-shrink:0;
 }
 
+/* ======================================================================
+   SIDEBAR DE ESCRITORIO + HEADER AMPLIADO + DASHBOARD EXTENDIDO
+   ====================================================================== */
+
+.sidebar{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    width:250px;
+    background:#141416;
+    border-right:1px solid #232326;
+    padding:22px 16px;
+    flex-direction:column;
+    z-index:400;
+    overflow-y:auto;
+}
+
+.sidebar-logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:16px;
+}
+
+.sidebar-logo img{
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    flex-shrink:0;
+}
+
+.sidebar-logo-texto{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:16px;
+    line-height:1.15;
+    color:#fff;
+}
+
+.sidebar-logo-texto small{
+    display:block;
+    font-family:'Montserrat',sans-serif;
+    font-size:9px;
+    letter-spacing:2px;
+    color:#ff6b6b;
+    font-weight:700;
+}
+
+.sidebar-fechahora{
+    font-size:12px;
+    color:#999;
+    line-height:1.6;
+    margin-bottom:6px;
+    padding-bottom:14px;
+    border-bottom:1px solid #232326;
+}
+
+.sidebar-fechahora .hora{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:20px;
+    color:#fff;
+    display:block;
+}
+
+.sidebar-saludo{
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+    margin-top:8px;
+}
+
+.sidebar-envivo{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:11px;
+    color:#5fd98a;
+    font-weight:700;
+    margin-top:10px;
+    margin-bottom:16px;
+}
+
+.sidebar-nav{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.sidebar-nav-btn{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:none;
+    border:none;
+    color:#aaa;
+    padding:10px 12px;
+    border-radius:10px;
+    font-size:13.5px;
+    font-weight:600;
+    font-family:'Montserrat',sans-serif;
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+}
+
+.sidebar-nav-btn:hover{
+    background:#1e1e20;
+    color:#fff;
+}
+
+.sidebar-nav-btn.activo{
+    background:rgba(215,25,32,.15);
+    color:#ff8a7a;
+}
+
+.sidebar-nav-btn svg{
+    width:18px;
+    height:18px;
+    flex-shrink:0;
+}
+
+.sidebar-separador{
+    font-size:10.5px;
+    font-weight:700;
+    color:#666;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin:18px 0 6px 12px;
+}
+
+.sidebar-nav-btn.pendiente{
+    opacity:.55;
+}
+
+.sidebar-salir{
+    margin-top:auto;
+    padding-top:14px;
+}
+
+/* Cuando hay sidebar (desktop ancho), el contenido principal se corre */
+@media (min-width:1024px){
+
+    .sidebar{
+        display:flex;
+    }
+
+    #app{
+        margin-left:250px;
+        max-width:none;
+        padding:24px 32px 48px;
+    }
+
+    .nav-inferior{
+        display:none;
+    }
+
+    .btn-hamburguesa{
+        display:none !important;
+    }
+
+    .header-top{
+        gap:16px;
+    }
+
+    .header-buscador-desktop{
+        display:flex !important;
+    }
+
+}
+
+.btn-hamburguesa{
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#ccc;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.btn-hamburguesa svg{
+    width:20px;
+    height:20px;
+}
+
+.header-buscador-desktop{
+    display:none;
+    flex:1;
+    max-width:420px;
+    position:relative;
+    align-items:center;
+}
+
+.header-buscador-desktop svg{
+    position:absolute;
+    left:14px;
+    width:16px;
+    height:16px;
+    color:#777;
+    pointer-events:none;
+}
+
+.header-buscador-desktop input{
+    width:100%;
+    padding:11px 14px 11px 38px;
+    border-radius:10px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:13.5px;
+}
+
+.header-buscador-desktop input:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
+.header-btn-accion{
+    display:none;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+    border-radius:20px;
+    font-size:12.5px;
+    font-weight:700;
+    padding:10px 16px;
+    cursor:pointer;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-family:'Montserrat',sans-serif;
+}
+
+@media (min-width:1024px){
+    .header-btn-accion{ display:flex; }
+}
+
+.header-btn-accion.roja{
+    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    border:none;
+}
+
+.header-rol-badge{
+    display:none;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px 6px 6px;
+    border-radius:20px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    font-size:12.5px;
+    font-weight:600;
+    color:#ddd;
+}
+
+@media (min-width:1024px){
+    .header-rol-badge{ display:flex; }
+}
+
+.header-rol-avatar{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#d71920,#8f0f14);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    font-weight:800;
+}
+
+/* Notificaciones */
+
+.notif-wrap{
+    position:relative;
+}
+
+.notif-dropdown{
+    display:none;
+    position:absolute;
+    right:0;
+    top:calc(100% + 10px);
+    width:300px;
+    background:#161616;
+    border:1px solid #2a2a2a;
+    border-radius:14px;
+    padding:10px;
+    z-index:600;
+    box-shadow:0 12px 32px rgba(0,0,0,.5);
+}
+
+.notif-dropdown.abierto{
+    display:block;
+}
+
+.notif-dropdown-titulo{
+    font-size:12px;
+    font-weight:700;
+    color:#999;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    padding:6px 8px 10px;
+}
+
+.notif-badge{
+    position:absolute;
+    top:-4px;
+    right:-4px;
+    background:#d71920;
+    color:#fff;
+    font-size:10px;
+    font-weight:800;
+    border-radius:20px;
+    min-width:16px;
+    height:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 4px;
+}
+
+/* Dashboard: grilla ampliada de tarjetas + paneles */
+
+.dash-grid{
+    grid-template-columns:repeat(2,1fr);
+}
+
+@media (min-width:640px){
+    .dash-grid{ grid-template-columns:repeat(3,1fr); }
+}
+
+@media (min-width:1024px){
+    .dash-grid{ grid-template-columns:repeat(6,1fr); }
+}
+
+.dash-paneles{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-bottom:20px;
+}
+
+@media (min-width:1024px){
+    .dash-paneles{
+        grid-template-columns:repeat(3,1fr);
+    }
+    .dash-paneles.dos-col{
+        grid-template-columns:2fr 1fr;
+    }
+}
+
+.dash-panel{
+    background:#1a1a1a;
+    border-radius:14px;
+    padding:16px;
+}
+
+.dash-panel-titulo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:12px;
+    font-weight:700;
+    color:#999;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin-bottom:12px;
+}
+
+.dash-panel-titulo a{
+    color:#ff6b6b;
+    font-size:11px;
+    text-transform:none;
+    letter-spacing:0;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.dash-mov-fila{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px dashed #262626;
+    font-size:12.5px;
+}
+
+.dash-mov-fila:last-child{
+    border-bottom:none;
+}
+
+.dash-mov-icono{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    font-size:13px;
+}
+
+.dash-mov-icono.ingreso{ background:#0d2418; color:#5fd98a; }
+.dash-mov-icono.egreso{ background:#2a0a0b; color:#ff6b6b; }
+
+.dash-mov-desc{
+    flex:1;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.dash-mov-monto{
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.dash-turno-fila{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px dashed #262626;
+    font-size:12.5px;
+}
+
+.dash-turno-fila:last-child{ border-bottom:none; }
+
+.dash-turno-hora{
+    font-weight:800;
+    color:#ff8a7a;
+    min-width:42px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.dash-turno-info{ flex:1; min-width:0; }
+
+.dash-turno-cliente{ font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dash-turno-detalle{ font-size:11px; color:#888; }
+
+.dash-mini-badge{
+    font-size:10px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:10px;
+    white-space:nowrap;
+}
+
+.dash-stock-fila{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px dashed #262626;
+    font-size:12.5px;
+    gap:8px;
+}
+
+.dash-stock-fila:last-child{ border-bottom:none; }
+
+.dash-vehiculo-card{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#141414;
+    border-radius:12px;
+    padding:10px 12px;
+}
+
+.dash-vehiculo-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+}
+
+@media (min-width:640px){
+    .dash-vehiculo-grid{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media (min-width:1024px){
+    .dash-vehiculo-grid{ grid-template-columns:repeat(3,1fr); }
+}
+
 </style>
 </head>
 
@@ -1538,10 +2028,115 @@ header{
 </div>
 
 <!-- ---------- App ---------- -->
+
+<!-- Sidebar fija de escritorio (>=1024px). En mobile/tablet no se muestra;
+     sus mismas opciones viven en el menú "Más" (overlayMas) de abajo. -->
+<aside class="sidebar" id="sidebarDesktop">
+
+    <div class="sidebar-logo">
+        <img src="images/icon-192.png" alt="KM26">
+        <div class="sidebar-logo-texto">KM26<br><small>PERFORMANCE</small></div>
+    </div>
+
+    <div class="sidebar-fechahora">
+        <span class="hora" id="sidebarHora">--:--</span>
+        <span id="sidebarFecha">-</span>
+        <div class="sidebar-saludo" id="sidebarSaludo">¡Hola!</div>
+    </div>
+
+    <div class="sidebar-envivo" id="sidebarEnVivo"><span class="punto-verde"></span> En vivo · Sincronizado con Firebase</div>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+        <button class="sidebar-nav-btn activo" data-nav="dashboard" onclick="cambiarTab('dashboard')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Dashboard
+        </button>
+        <button class="sidebar-nav-btn" data-nav="clientes" data-roles="admin,recepcion" onclick="cambiarTab('clientes')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Clientes
+        </button>
+        <button class="sidebar-nav-btn" data-nav="vehiculos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
+            Vehículos
+        </button>
+        <button class="sidebar-nav-btn" data-nav="turnos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('turnos')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Turnos
+        </button>
+        <button class="sidebar-nav-btn" data-nav="presupuestos" data-roles="admin,recepcion" onclick="cambiarTab('presupuestos')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Presupuestos
+        </button>
+        <button class="sidebar-nav-btn" data-nav="caja" data-roles="admin,recepcion" onclick="cambiarTab('caja')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Caja / Movimientos
+        </button>
+        <button class="sidebar-nav-btn" data-nav="stock" data-roles="admin,recepcion" onclick="cambiarTab('stock')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            Stock
+        </button>
+        <button class="sidebar-nav-btn" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos'); notificarHistoriaDesdeVehiculos()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
+            Historia del vehículo
+        </button>
+        <button class="sidebar-nav-btn" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos'); notificarInspeccionDesdeVehiculos()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Inspección de ingreso
+        </button>
+        <button class="sidebar-nav-btn" data-roles="admin,recepcion" onclick="abrirModalCuenta()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Cuentas / Cobros
+        </button>
+
+        <div class="sidebar-separador">Más opciones</div>
+
+        <button class="sidebar-nav-btn pendiente" onclick="abrirModuloPendiente('Proveedores')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            Proveedores
+        </button>
+        <button class="sidebar-nav-btn pendiente" onclick="abrirModuloPendiente('Categorías de repuestos')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83V3H4v7h.83l9.58 9.59a2 2 0 002.83 0l3.35-3.35a2 2 0 000-2.83z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Categorías
+        </button>
+        <button class="sidebar-nav-btn pendiente" onclick="abrirModuloPendiente('Servicios')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+            Servicios
+        </button>
+        <button class="sidebar-nav-btn" data-nav="usuarios" data-roles="admin" onclick="cambiarTab('usuarios')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Usuarios
+        </button>
+        <button class="sidebar-nav-btn" data-nav="reportes" data-roles="admin" onclick="cambiarTab('reportes')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Reportes
+        </button>
+        <button class="sidebar-nav-btn pendiente" data-roles="admin" onclick="abrirModuloPendiente('Configuración')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Configuración
+        </button>
+        <button class="sidebar-nav-btn pendiente" data-roles="admin" onclick="abrirModuloPendiente('Respaldo de datos')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Respaldo de datos
+        </button>
+    </nav>
+
+    <div class="sidebar-salir">
+        <button class="sidebar-nav-btn" style="color:#ff6b6b;" onclick="cerrarSesion()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Cerrar sesión
+        </button>
+    </div>
+
+</aside>
+
 <div id="app">
 
     <header>
         <div class="header-top">
+            <button class="btn-hamburguesa" onclick="abrirOverlayMas()" title="Menú">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+
             <div class="marca" style="gap:12px;">
                 <div class="header-logo-wrap">
                     <img src="images/icon-192.png" alt="KM26">
@@ -1551,7 +2146,32 @@ header{
                     <div class="header-fecha" id="headerFecha"></div>
                 </div>
             </div>
+
+            <div class="header-buscador-desktop">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="buscadorDesktop" placeholder="Buscar cliente, vehículo o patente...">
+            </div>
+
             <div class="header-acciones">
+                <button class="header-btn-accion" onclick="abrirModalCuenta()">💰 Nueva cuenta</button>
+                <button class="header-btn-accion roja" onclick="abrirModalCliente()">+ Nuevo cliente</button>
+
+                <div class="notif-wrap">
+                    <button class="btn-icono-header" onclick="toggleNotificaciones()" title="Notificaciones" style="position:relative;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                        <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-dropdown-titulo">Requiere atención</div>
+                        <div id="notifLista"></div>
+                    </div>
+                </div>
+
+                <div class="header-rol-badge">
+                    <span class="header-rol-avatar" id="rolAvatar">KM</span>
+                    <span id="rolTexto">Administrador</span>
+                </div>
+
                 <button class="btn-icono-header" onclick="toggleBuscador()" title="Buscar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
@@ -1581,7 +2201,7 @@ header{
     <section class="seccion activa" id="tab-dashboard">
 
         <div class="dash-fecha" id="dashFechaLinea">
-            <span class="badge-tiempo-real"><span class="punto-verde"></span> En vivo</span>
+            <span class="badge-tiempo-real" id="dashEnVivo"><span class="punto-verde"></span> En vivo</span>
         </div>
 
         <div class="dash-grid" id="dashGrid">
@@ -1594,8 +2214,16 @@ header{
                 <div class="dash-card-valor" id="dashTurnosHoy">-</div>
             </div>
             <div class="dash-card">
+                <div class="dash-card-label">Autos en taller</div>
+                <div class="dash-card-valor" id="dashAutosTaller">-</div>
+            </div>
+            <div class="dash-card">
                 <div class="dash-card-label">Pendiente de cobro</div>
                 <div class="dash-card-valor" id="dashPendienteCobro">-</div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-label">Presupuestos pendientes</div>
+                <div class="dash-card-valor" id="dashPresuPendientes">-</div>
             </div>
             <div class="dash-card">
                 <div class="dash-card-label">Stock bajo</div>
@@ -1603,11 +2231,46 @@ header{
             </div>
         </div>
 
-        <div class="dash-seccion-titulo">Requiere atención</div>
+        <div class="dash-seccion-titulo" style="margin-top:4px;">Requiere atención</div>
         <div id="dashAtencion"></div>
 
-        <div class="dash-seccion-titulo">Próximo turno</div>
-        <div id="dashProximoTurno"></div>
+        <div class="dash-paneles dos-col" style="margin-top:22px;">
+
+            <div class="dash-panel">
+                <div class="dash-panel-titulo">Próximos turnos <a onclick="cambiarTab('turnos')">Ver agenda completa</a></div>
+                <div id="dashProximosTurnos"></div>
+            </div>
+
+            <div class="dash-panel">
+                <div class="dash-panel-titulo">Movimientos recientes <a onclick="cambiarTab('caja')">Ver todos</a></div>
+                <div id="dashMovimientos"></div>
+            </div>
+
+        </div>
+
+        <div class="dash-paneles">
+
+            <div class="dash-panel">
+                <div class="dash-panel-titulo">Facturación (mes actual)</div>
+                <canvas id="dashGraficoFacturacion" height="90" style="width:100%;"></canvas>
+            </div>
+
+            <div class="dash-panel">
+                <div class="dash-panel-titulo">Presupuestos recientes <a onclick="cambiarTab('presupuestos')">Ver todos</a></div>
+                <div id="dashPresuRecientes"></div>
+            </div>
+
+            <div class="dash-panel">
+                <div class="dash-panel-titulo">Stock bajo <a onclick="cambiarTab('stock')">Ver todos</a></div>
+                <div id="dashStockBajoLista"></div>
+            </div>
+
+        </div>
+
+        <div class="dash-panel" style="margin-bottom:20px;">
+            <div class="dash-panel-titulo">Vehículos en taller <a onclick="cambiarTab('vehiculos')">Ver todos</a></div>
+            <div class="dash-vehiculo-grid" id="dashVehiculosTaller"></div>
+        </div>
 
     </section>
 
@@ -2440,9 +3103,9 @@ function escaparComillas(s) {
     return String(s).replace(/'/g, "\\'");
 }
 
-document.getElementById("buscador").addEventListener("input", function () {
+function ejecutarBusqueda(q) {
 
-    const q = this.value.trim().toLowerCase();
+    q = q.trim().toLowerCase();
     const enVehiculos = document.getElementById("tab-vehiculos").classList.contains("activa");
 
     if (enVehiculos) {
@@ -2473,7 +3136,18 @@ document.getElementById("buscador").addEventListener("input", function () {
 
     renderClientes(filtrados);
 
+}
+
+document.getElementById("buscador").addEventListener("input", function () {
+    document.getElementById("buscadorDesktop").value = this.value;
+    ejecutarBusqueda(this.value);
 });
+
+document.getElementById("buscadorDesktop").addEventListener("input", function () {
+    document.getElementById("buscador").value = this.value;
+    ejecutarBusqueda(this.value);
+});
+
 
 // ---------- Modal nuevo/editar cliente ----------
 
@@ -2601,7 +3275,12 @@ window.cambiarTab = function (tab) {
     const btnNavInferior = document.querySelector(`.nav-inferior-btn[data-nav="${tab}"]`);
     if (btnNavInferior) btnNavInferior.classList.add("activo");
 
+    document.querySelectorAll(".sidebar-nav-btn[data-nav]").forEach(b => b.classList.remove("activo"));
+    const btnSidebar = document.querySelector(`.sidebar-nav-btn[data-nav="${tab}"]`);
+    if (btnSidebar) btnSidebar.classList.add("activo");
+
     window.cerrarOverlayMas();
+    window.cerrarNotificaciones();
 
     if (tab === "caja" && typeof dibujarGraficoCaja === "function") {
         setTimeout(() => {
@@ -2628,17 +3307,93 @@ window.toggleBuscador = function () {
 
 function actualizarSaludoYFecha() {
 
-    const hora = new Date().getHours();
+    const ahora = new Date();
+    const hora = ahora.getHours();
+
+    // 05:00–11:59 Buenos días · 12:00–19:59 Buenas tardes · 20:00–04:59 Buenas noches
     let saludo = "¡Buenas noches!";
-    if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
+    if (hora >= 5 && hora < 12) saludo = "¡Buenos días!";
     else if (hora >= 12 && hora < 20) saludo = "¡Buenas tardes!";
 
     document.getElementById("headerSaludo").textContent = saludo;
 
-    const fechaTexto = new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
-    document.getElementById("headerFecha").textContent = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
+    const fechaTexto = ahora.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    const fechaCapitalizada = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
+    document.getElementById("headerFecha").textContent = fechaCapitalizada;
+
+    // Sidebar de escritorio: mismo saludo/fecha, más la hora en formato HH:MM
+    const horaTexto = ahora.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+    const sidebarHora = document.getElementById("sidebarHora");
+    const sidebarFecha = document.getElementById("sidebarFecha");
+    const sidebarSaludo = document.getElementById("sidebarSaludo");
+    if (sidebarHora) sidebarHora.textContent = horaTexto;
+    if (sidebarFecha) sidebarFecha.textContent = fechaCapitalizada;
+    if (sidebarSaludo) sidebarSaludo.textContent = saludo;
 
 }
+
+// La hora se actualiza sola cada 15 segundos, sin recargar la página,
+// y el saludo cambia automáticamente si el usuario cruza la franja horaria.
+setInterval(actualizarSaludoYFecha, 15000);
+
+// ---------- Estado real de conexión (no simulado): se basa en si el dispositivo
+// tiene red, que es lo que determina si Firestore puede sincronizar. ----------
+
+function actualizarEstadoConexion() {
+
+    const conectado = navigator.onLine;
+    const html = conectado
+        ? '<span class="punto-verde"></span> En vivo'
+        : '<span class="punto-verde" style="background:#ff6b6b;animation:none;"></span> Sin conexión';
+    const htmlSidebar = conectado
+        ? '<span class="punto-verde"></span> En vivo · Sincronizado con Firebase'
+        : '<span class="punto-verde" style="background:#ff6b6b;animation:none;"></span> Sin conexión';
+
+    const elDash = document.getElementById("dashEnVivo");
+    const elSidebar = document.getElementById("sidebarEnVivo");
+    if (elDash) elDash.innerHTML = html;
+    if (elSidebar) elSidebar.innerHTML = htmlSidebar;
+
+}
+
+window.addEventListener("online", actualizarEstadoConexion);
+window.addEventListener("offline", actualizarEstadoConexion);
+actualizarEstadoConexion();
+
+// ---------- Notificaciones (mismo contenido real que "Requiere atención" del dashboard) ----------
+
+window.toggleNotificaciones = function () {
+    document.getElementById("notifDropdown").classList.toggle("abierto");
+};
+
+window.cerrarNotificaciones = function () {
+    const el = document.getElementById("notifDropdown");
+    if (el) el.classList.remove("abierto");
+};
+
+document.addEventListener("click", function (e) {
+    const wrap = document.querySelector(".notif-wrap");
+    if (wrap && !wrap.contains(e.target)) window.cerrarNotificaciones();
+});
+
+// ---------- Módulos que todavía no existen en el sistema real ----------
+// (Proveedores, Categorías, Servicios, Configuración, Respaldo de datos: no tienen
+// colección en Firestore todavía. En vez de inventar datos falsos, se avisa
+// honestamente que faltan desarrollar, en vez de mostrar una maqueta vacía.)
+
+window.abrirModuloPendiente = function (nombre) {
+    window.cerrarOverlayMas();
+    alert(`"${nombre}" todavía no está desarrollado en el sistema real de KM26 (no tiene su colección en Firebase). Decime si querés que lo construya como un módulo nuevo y lo agregamos.`);
+};
+
+window.notificarHistoriaDesdeVehiculos = function () {
+    // No hay una vista propia de "Historia del vehículo": se consulta por vehículo,
+    // tocando el ícono de carpeta en la lista de Vehículos (ya existente).
+};
+
+window.notificarInspeccionDesdeVehiculos = function () {
+    // Ídem: la inspección de ingreso se abre por vehículo desde la lista de Vehículos.
+};
 
 // ---------- Overlay "Más opciones" ----------
 
@@ -2698,10 +3453,18 @@ function renderDashboard() {
     });
     document.getElementById("dashTurnosHoy").textContent = turnosHoy.length;
 
+    // Autos en taller: turnos cuyo estado actual es "En taller" (dato real, no inventado)
+    const autosEnTaller = turnosCache.filter(t => t.estado === "En taller");
+    document.getElementById("dashAutosTaller").textContent = autosEnTaller.length;
+
     // Pendiente de cobro: presupuestos aprobados todavía no cobrados
-    const presuPendientes = presupuestosCache.filter(p => p.estado === "Aprobado");
-    const totalPendiente = presuPendientes.reduce((s, p) => s + (Number(p.total) || 0), 0);
+    const presuAprobadosSinCobrar = presupuestosCache.filter(p => p.estado === "Aprobado");
+    const totalPendiente = presuAprobadosSinCobrar.reduce((s, p) => s + (Number(p.total) || 0), 0);
     document.getElementById("dashPendienteCobro").textContent = formatoPlata(totalPendiente);
+
+    // Presupuestos pendientes de decisión (Borrador o Enviado, todavía sin aprobar/rechazar)
+    const presuPendientesDecision = presupuestosCache.filter(p => p.estado === "Borrador" || p.estado === "Enviado");
+    document.getElementById("dashPresuPendientes").textContent = presuPendientesDecision.length;
 
     // Stock bajo
     const stockBajo = stockCache.filter(p => {
@@ -2710,24 +3473,38 @@ function renderDashboard() {
     });
     document.getElementById("dashStockBajo").textContent = stockBajo.length;
 
-    // "Requiere atención"
+    // ---------- "Requiere atención" (solo situaciones con datos reales) ----------
+
     const elAtencion = document.getElementById("dashAtencion");
     const filas = [];
 
-    if (presuPendientes.length > 0) {
-        filas.push({ texto: "Presupuestos aprobados sin cobrar", badge: presuPendientes.length, tab: "presupuestos" });
+    if (presuPendientesDecision.length > 0) {
+        filas.push({ texto: "Presupuestos pendientes de aprobación", badge: presuPendientesDecision.length, tab: "presupuestos" });
+    }
+
+    if (presuAprobadosSinCobrar.length > 0) {
+        filas.push({ texto: "Presupuestos aprobados sin cobrar", badge: presuAprobadosSinCobrar.length, tab: "presupuestos" });
     }
 
     if (stockBajo.length > 0) {
-        filas.push({ texto: "Productos con stock bajo", badge: stockBajo.length, tab: "stock" });
+        filas.push({ texto: "Repuestos con stock bajo", badge: stockBajo.length, tab: "stock" });
     }
 
-    const clientesConSaldo = clientesCache.length; // sin cuenta corriente propia todavía: se deja preparado
-    void clientesConSaldo;
-
-    if (turnosHoy.length > 0) {
-        filas.push({ texto: "Turnos para hoy", badge: turnosHoy.length, tab: "turnos" });
+    const turnosSinConfirmar = turnosHoy.filter(t => t.estado === "Pendiente");
+    if (turnosSinConfirmar.length > 0) {
+        filas.push({ texto: "Turnos de hoy sin confirmar", badge: turnosSinConfirmar.length, tab: "turnos" });
     }
+
+    const vehiculosListos = turnosCache.filter(t => {
+        if (!t.fechaHora || !t.fechaHora.toDate) return false;
+        return t.estado === "Finalizado" && t.fechaHora.toDate() >= hoy && t.fechaHora.toDate() < mananaInicio;
+    });
+    if (vehiculosListos.length > 0) {
+        filas.push({ texto: "Vehículos listos para entregar (turnos de hoy finalizados)", badge: vehiculosListos.length, tab: "turnos" });
+    }
+
+    // Nota: "Cliente con saldo pendiente" no se incluye porque el sistema todavía
+    // no lleva cuenta corriente por cliente — no hay ese dato real para mostrar.
 
     if (filas.length === 0) {
         elAtencion.innerHTML = '<div class="vacio">Todo al día, no hay nada urgente 🎉</div>';
@@ -2740,34 +3517,169 @@ function renderDashboard() {
         `).join("");
     }
 
-    // Próximo turno
-    const elProximo = document.getElementById("dashProximoTurno");
-    const ahora = new Date();
-    const proximo = turnosCache
-        .filter(t => t.fechaHora && t.fechaHora.toDate && t.fechaHora.toDate() >= ahora && t.estado !== "Cancelado")
-        .sort((a, b) => a.fechaHora.toDate() - b.fechaHora.toDate())[0];
-
-    if (!proximo) {
-        elProximo.innerHTML = '<div class="vacio">No hay turnos próximos.</div>';
-    } else {
-        const fecha = proximo.fechaHora.toDate();
-        const cliente = clientesCache.find(c => c.id === proximo.clienteId);
-        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
-        const vehiculo = vehiculosCache.find(v => v.id === proximo.vehiculoId);
-        const detalleVehiculo = vehiculo ? ` · ${escapar(vehiculo.patente)}` : "";
-        const hora = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-        const esHoy = fecha >= hoy && fecha < mananaInicio;
-        const diaTexto = esHoy ? "Hoy" : fecha.toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" });
-
-        elProximo.innerHTML = `
-            <div class="dash-proximo-turno">
-                <div class="dash-proximo-turno-hora">${hora}<br><span style="font-size:10px;color:#888;">${diaTexto}</span></div>
-                <div class="dash-proximo-turno-info">
-                    <div class="dash-proximo-turno-cliente">${escapar(nombreCliente)}${detalleVehiculo}</div>
-                    <div class="dash-proximo-turno-detalle">${escapar(proximo.servicio || "")}</div>
+    // Notificaciones (campanita): mismo contenido real que "Requiere atención"
+    const notifBadge = document.getElementById("notifBadge");
+    const notifLista = document.getElementById("notifLista");
+    if (notifBadge && notifLista) {
+        if (filas.length === 0) {
+            notifBadge.style.display = "none";
+            notifLista.innerHTML = '<div class="vacio" style="padding:14px;">Sin novedades.</div>';
+        } else {
+            notifBadge.style.display = "flex";
+            notifBadge.textContent = filas.length;
+            notifLista.innerHTML = filas.map(f => `
+                <div class="dash-atencion-fila" onclick="cerrarNotificaciones(); cambiarTab('${f.tab}')">
+                    <span>${escapar(f.texto)}</span>
+                    <span class="dash-atencion-badge">${f.badge}</span>
                 </div>
-            </div>
-        `;
+            `).join("");
+        }
+    }
+
+    // ---------- Próximos turnos (lista, no solo el primero) ----------
+
+    const elProximos = document.getElementById("dashProximosTurnos");
+    const ahora = new Date();
+    const proximos = turnosCache
+        .filter(t => t.fechaHora && t.fechaHora.toDate && t.fechaHora.toDate() >= ahora && t.estado !== "Cancelado")
+        .sort((a, b) => a.fechaHora.toDate() - b.fechaHora.toDate())
+        .slice(0, 5);
+
+    if (elProximos) {
+        if (proximos.length === 0) {
+            elProximos.innerHTML = '<div class="vacio">No hay turnos próximos.</div>';
+        } else {
+            elProximos.innerHTML = proximos.map(t => {
+                const fecha = t.fechaHora.toDate();
+                const cliente = clientesCache.find(c => c.id === t.clienteId);
+                const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
+                const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
+                const detalleVehiculo = vehiculo ? ` · ${escapar(vehiculo.patente)}` : "";
+                const hora = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+                const colorEstado = { "Pendiente": "#f5a623", "Confirmado": "#2fdb6e", "En taller": "#3f9cff", "Finalizado": "#888" }[t.estado] || "#888";
+                return `<div class="dash-turno-fila">
+                    <div class="dash-turno-hora">${hora}</div>
+                    <div class="dash-turno-info">
+                        <div class="dash-turno-cliente">${escapar(nombreCliente)}${detalleVehiculo}</div>
+                        <div class="dash-turno-detalle">${escapar(t.servicio || "")}</div>
+                    </div>
+                    <span class="dash-mini-badge" style="background:${colorEstado}22;color:${colorEstado};">${escapar(t.estado || "Pendiente")}</span>
+                </div>`;
+            }).join("");
+        }
+    }
+
+    // ---------- Movimientos recientes (Caja) ----------
+
+    const elMovs = document.getElementById("dashMovimientos");
+    if (elMovs) {
+        const movs = cajaCache.slice(0, 6);
+        if (movs.length === 0) {
+            elMovs.innerHTML = '<div class="vacio">Todavía no hay movimientos.</div>';
+        } else {
+            elMovs.innerHTML = movs.map(m => {
+                const esIngreso = m.tipo === "Ingreso";
+                const fecha = m.fecha && m.fecha.toDate ? m.fecha.toDate() : null;
+                const horaTexto = fecha ? fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "";
+                return `<div class="dash-mov-fila">
+                    <div class="dash-mov-icono ${esIngreso ? "ingreso" : "egreso"}">${esIngreso ? "↑" : "↓"}</div>
+                    <div class="dash-mov-desc">${escapar(m.descripcion)}</div>
+                    <div class="dash-mov-monto" style="color:${esIngreso ? "#5fd98a" : "#ff6b6b"};">${esIngreso ? "+" : "-"}${formatoPlata(m.monto)}</div>
+                    <div style="color:#666;font-size:10.5px;white-space:nowrap;">${horaTexto}</div>
+                </div>`;
+            }).join("");
+        }
+    }
+
+    // ---------- Facturación del mes (reusa el mismo cálculo que el gráfico de Caja) ----------
+
+    const canvasFact = document.getElementById("dashGraficoFacturacion");
+    if (canvasFact) {
+
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const diasDelMes = [];
+        for (let d = new Date(inicioMes); d <= hoy; d.setDate(d.getDate() + 1)) {
+            diasDelMes.push({ fecha: new Date(d), total: 0 });
+        }
+
+        cajaCache.forEach(m => {
+            if (!m.fecha || !m.fecha.toDate || m.tipo !== "Ingreso") return;
+            const f = m.fecha.toDate();
+            f.setHours(0, 0, 0, 0);
+            diasDelMes.forEach(d => {
+                if (f.getTime() === d.fecha.getTime()) d.total += Number(m.monto) || 0;
+            });
+        });
+
+        const etiquetas = diasDelMes.map(d => String(d.fecha.getDate()));
+        const valores = diasDelMes.map(d => d.total);
+        dibujarBarras(canvasFact, valores, etiquetas, 90);
+
+    }
+
+    // ---------- Presupuestos recientes ----------
+
+    const elPresuRecientes = document.getElementById("dashPresuRecientes");
+    if (elPresuRecientes) {
+        const recientes = presupuestosCache.slice(0, 5);
+        if (recientes.length === 0) {
+            elPresuRecientes.innerHTML = '<div class="vacio">Sin presupuestos todavía.</div>';
+        } else {
+            const clase = window.claseEstadoLocal || null; // no-op, se usa claseEstado() de abajo
+            elPresuRecientes.innerHTML = recientes.map(p => {
+                const cliente = clientesCache.find(c => c.id === p.clienteId);
+                const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
+                const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
+                const idCorto = "#" + p.id.slice(-4).toUpperCase();
+                const colorEstado = { "Borrador": "#aaa", "Enviado": "#6ab6ff", "Aprobado": "#5fd98a", "Rechazado": "#ff6b6b", "Vencido": "#ffb35f" }[p.estado] || "#aaa";
+                return `<div class="dash-mov-fila">
+                    <div class="dash-mov-desc"><span style="color:#666;">${idCorto}</span> ${escapar(nombreCliente)}${vehiculo ? " · " + escapar(vehiculo.patente) : ""}</div>
+                    <div class="dash-mov-monto">${formatoPlata(p.total)}</div>
+                    <span class="dash-mini-badge" style="background:${colorEstado}22;color:${colorEstado};">${escapar(p.estado)}</span>
+                </div>`;
+            }).join("");
+        }
+    }
+
+    // ---------- Stock bajo (lista) ----------
+
+    const elStockLista = document.getElementById("dashStockBajoLista");
+    if (elStockLista) {
+        if (stockBajo.length === 0) {
+            elStockLista.innerHTML = '<div class="vacio">Sin alertas de stock.</div>';
+        } else {
+            elStockLista.innerHTML = stockBajo.slice(0, 6).map(p => {
+                const min = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
+                return `<div class="dash-stock-fila">
+                    <span>${escapar(p.nombre)}</span>
+                    <span style="color:#ffb35f;font-weight:700;white-space:nowrap;">${p.cantidad} / mín. ${min}</span>
+                </div>`;
+            }).join("");
+        }
+    }
+
+    // ---------- Vehículos en taller ----------
+
+    const elVehTaller = document.getElementById("dashVehiculosTaller");
+    if (elVehTaller) {
+        if (autosEnTaller.length === 0) {
+            elVehTaller.innerHTML = '<div class="vacio">No hay vehículos en taller ahora mismo.</div>';
+        } else {
+            elVehTaller.innerHTML = autosEnTaller.map(t => {
+                const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
+                const cliente = clientesCache.find(c => c.id === t.clienteId);
+                const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(sin datos)";
+                return `<div class="dash-vehiculo-card">
+                    <div class="item-icono-auto">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-titulo">${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") : "(vehículo eliminado)"}</div>
+                        <div class="item-sub">${vehiculo ? escapar(vehiculo.patente) + " · " : ""}${escapar(nombreCliente)}</div>
+                    </div>
+                </div>`;
+            }).join("");
+        }
     }
 
 }
@@ -4751,13 +5663,20 @@ function determinarRolActual() {
     rolActual = miUsuario.rol;
     aplicarPermisosUI();
 
+    // Insignia de rol del header: usa el rol real del usuario logueado, no un texto fijo
+    const ROL_TEXTO = { admin: "Administrador", recepcion: "Recepción", mecanico: "Mecánico" };
+    const rolTexto = document.getElementById("rolTexto");
+    const rolAvatar = document.getElementById("rolAvatar");
+    if (rolTexto) rolTexto.textContent = ROL_TEXTO[rolActual] || rolActual;
+    if (rolAvatar) rolAvatar.textContent = (miUsuario.nombre || rolActual || "?").trim().charAt(0).toUpperCase();
+
 }
 
 function aplicarPermisosUI() {
 
     // Aplica el mismo criterio de roles a: la nav.tabs original (oculta, dentro de "Más"),
     // los botones de la nav inferior y las filas del menú "Más opciones".
-    document.querySelectorAll("nav.tabs button[data-roles], .nav-inferior-btn[data-roles], .mas-item[data-roles]").forEach(btn => {
+    document.querySelectorAll("nav.tabs button[data-roles], .nav-inferior-btn[data-roles], .mas-item[data-roles], .sidebar-nav-btn[data-roles]").forEach(btn => {
 
         const rolesPermitidos = btn.dataset.roles.split(",");
 
