@@ -6061,6 +6061,17 @@ window.imprimirPresupuesto = function (id) {
         ? `<tr><td>Descuento (${p.descuentoPorc}%)</td><td style="text-align:right;">-${formatoPlata((p.subtotal || 0) - (p.total || 0))}</td></tr>`
         : "";
 
+    const notasTexto = (p.notas || "").trim();
+    // Si el mecánico puso solo un número en "Notas" (ej: "10"), lo entendemos como
+    // los días de validez del presupuesto y lo imprimimos como una frase clara,
+    // en vez de mostrar literalmente "Notas: 10".
+    const esSoloNumero = /^\d+$/.test(notasTexto);
+    const notasHtml = !notasTexto
+        ? ""
+        : esSoloNumero
+            ? `<div class="datos" style="margin-top:14px;">Presupuesto válido por ${notasTexto} días.</div>`
+            : `<div class="datos" style="margin-top:14px;"><strong>Notas:</strong> ${escapar(notasTexto)}</div>`;
+
     const html = `
         <!DOCTYPE html>
         <html lang="es"><head><meta charset="UTF-8"><title>Presupuesto ${escapar(nombreCliente)}</title>
@@ -6085,7 +6096,7 @@ window.imprimirPresupuesto = function (id) {
                 <tbody>${filasItems}${descuentoHtml}</tbody>
             </table>
             <div class="total">Total: ${formatoPlata(p.total)}</div>
-            ${p.notas ? `<div class="datos" style="margin-top:14px;"><strong>Notas:</strong> ${escapar(p.notas)}</div>` : ""}
+            ${notasHtml}
             <div class="footer">KM26 Performance — Presupuesto sujeto a disponibilidad de repuestos.</div>
         </body></html>
     `;
