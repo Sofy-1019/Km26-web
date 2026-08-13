@@ -2242,7 +2242,7 @@ header{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             Reportes
         </button>
-        <button class="sidebar-nav-btn pendiente" data-roles="admin" onclick="abrirModuloPendiente('Configuración')">
+        <button class="sidebar-nav-btn" data-nav="configuracion" data-roles="admin" onclick="cambiarTab('configuracion')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
             Configuración
         </button>
@@ -2606,6 +2606,50 @@ header{
 
     </section>
 
+    <section class="seccion" id="tab-configuracion">
+
+        <div class="fila-titulo"><h2>⚙️ Configuración</h2></div>
+        <p style="font-size:12px;color:#888;margin-bottom:20px;">Solo vos, como administrador, podés ver y cambiar esto. Se aplica a todo el panel, para todos los usuarios.</p>
+
+        <div class="fila-titulo" style="margin-top:10px;"><h2 style="font-size:16px;">Datos del negocio</h2></div>
+        <p style="font-size:11.5px;color:#777;margin-bottom:10px;">Aparecen en el encabezado de los presupuestos impresos.</p>
+
+        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Nombre del negocio</label>
+        <input type="text" id="cfgNombreNegocio" placeholder="KM26 PERFORMANCE" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
+
+        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Dirección (opcional)</label>
+        <input type="text" id="cfgDireccion" placeholder="Ej: Av. Siempre Viva 123, CABA" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
+
+        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Teléfono (opcional)</label>
+        <input type="text" id="cfgTelefono" placeholder="11 5555-1234" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
+
+        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">CUIT / Razón social (opcional)</label>
+        <input type="text" id="cfgCuit" placeholder="20-12345678-9" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
+
+        <div class="fila-titulo"><h2 style="font-size:16px;">Stock</h2></div>
+
+        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Stock mínimo por defecto para productos nuevos</label>
+        <input type="number" id="cfgStockMinimo" placeholder="3" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
+
+        <div class="fila-titulo"><h2 style="font-size:16px;">Presupuestos y cuentas</h2></div>
+
+        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Descuento máximo permitido sin ser admin (%)</label>
+        <input type="number" id="cfgDescuentoMax" placeholder="20" min="0" max="100" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
+        <p style="font-size:11px;color:#777;margin-bottom:14px;">Recepción y mecánicos no van a poder cargar más que este porcentaje. Los admin no tienen límite.</p>
+
+        <label style="display:block;font-size:12px;color:#999;margin-bottom:6px;">Días de validez por defecto de un presupuesto nuevo</label>
+        <input type="number" id="cfgDiasValidez" placeholder="10" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
+        <p style="font-size:11px;color:#777;margin-bottom:22px;">Se completa solo en "Notas" al crear un presupuesto nuevo (se puede borrar o cambiar igual).</p>
+
+        <div class="fila-titulo"><h2 style="font-size:16px;">Mensaje de WhatsApp para presupuestos</h2></div>
+        <p style="font-size:11px;color:#777;margin-bottom:10px;">Usá <code>{nombre}</code>, <code>{items}</code>, <code>{total}</code> y <code>{notas}</code> donde quieras que se reemplacen solos por los datos reales.</p>
+        <textarea id="cfgMensajeWhatsapp" rows="5" placeholder="Hola {nombre}! Te paso el presupuesto de KM26 Performance:&#10;&#10;{items}&#10;&#10;Total: {total}&#10;{notas}" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:13px;margin-bottom:22px;font-family:'Montserrat',sans-serif;"></textarea>
+
+        <button class="btn-red" style="padding:14px 26px;font-size:14px;" onclick="guardarConfiguracion()">Guardar configuración</button>
+        <p id="mensajeEstadoConfiguracion" style="margin-top:12px;font-size:13px;"></p>
+
+    </section>
+
 </div>
 
 <!-- ---------- Nav inferior fija ---------- -->
@@ -2675,6 +2719,10 @@ header{
             <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('respaldo')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Respaldo de datos
+            </button>
+            <button class="mas-item" data-roles="admin" onclick="cerrarOverlayMas(); cambiarTab('configuracion')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82"/></svg>
+                Configuración
             </button>
             <button class="mas-item salir" onclick="cerrarOverlayMas(); cerrarSesion()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -3375,6 +3423,7 @@ onAuthStateChanged(auth, (user) => {
         escucharProveedores();
         escucharCategorias();
         escucharServicios();
+        escucharConfiguracion();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
         document.getElementById("app").style.display = "none";
@@ -3643,6 +3692,10 @@ window.cambiarTab = function (tab) {
 
     if (tab === "reportes" && typeof calcularReportes === "function") {
         setTimeout(calcularReportes, 30);
+    }
+
+    if (tab === "configuracion" && typeof renderFormConfiguracion === "function") {
+        setTimeout(renderFormConfiguracion, 30);
     }
 
 };
@@ -4818,6 +4871,7 @@ window.abrirModalProducto = function () {
     document.getElementById("mensajeEstadoProducto").textContent = "";
     actualizarSelectCategoriasEnStock();
     document.getElementById("pCategoria").value = "";
+    document.getElementById("pStockMinimo").value = configuracionActual.stockMinimoDefecto || "";
 };
 
 window.guardarProducto = async function () {
@@ -4825,7 +4879,7 @@ window.guardarProducto = async function () {
     const nombre = document.getElementById("pNombre").value.trim();
     const cantidad = parseInt(document.getElementById("pCantidad").value, 10) || 0;
     const precio = parseFloat(document.getElementById("pPrecio").value) || 0;
-    const stockMinimo = parseInt(document.getElementById("pStockMinimo").value, 10) || 3;
+    const stockMinimo = parseInt(document.getElementById("pStockMinimo").value, 10) || configuracionActual.stockMinimoDefecto || 3;
     const categoriaId = document.getElementById("pCategoria").value || null;
     const estado = document.getElementById("mensajeEstadoProducto");
 
@@ -6021,7 +6075,15 @@ window.quitarItemCuenta = function (index) {
 function calcularTotalConDescuento() {
 
     const subtotal = cuentaItems.reduce((suma, item) => suma + item.monto, 0);
-    const descuentoPorc = Math.min(100, Math.max(0, Number(document.getElementById("cuentaDescuento").value) || 0));
+    const topeConfigurado = configuracionActual.descuentoMaximoPorc;
+    const topeAplicable = (rolActual !== "admin" && topeConfigurado) ? topeConfigurado : 100;
+    let descuentoPorc = Math.min(100, Math.max(0, Number(document.getElementById("cuentaDescuento").value) || 0));
+
+    if (descuentoPorc > topeAplicable) {
+        descuentoPorc = topeAplicable;
+        document.getElementById("cuentaDescuento").value = topeAplicable;
+    }
+
     const totalFinal = subtotal - (subtotal * descuentoPorc / 100);
 
     return { subtotal, descuentoPorc, totalFinal };
@@ -6236,7 +6298,7 @@ window.abrirModalPresupuesto = function () {
     document.getElementById("presuItemDescripcion").value = "";
     document.getElementById("presuItemMonto").value = "";
     document.getElementById("presuDescuento").value = "";
-    document.getElementById("presuNotas").value = "";
+    document.getElementById("presuNotas").value = configuracionActual.diasValidezPresupuestoDefecto || "";
     document.getElementById("mensajeEstadoPresupuesto").textContent = "";
 
     document.getElementById("modalPresupuesto").classList.add("abierto");
@@ -6281,7 +6343,15 @@ window.quitarItemPresupuesto = function (index) {
 function calcularTotalPresupuesto() {
 
     const subtotal = presupuestoItemsTemp.reduce((suma, item) => suma + item.monto, 0);
-    const descuentoPorc = Math.min(100, Math.max(0, Number(document.getElementById("presuDescuento").value) || 0));
+    const topeConfigurado = configuracionActual.descuentoMaximoPorc;
+    const topeAplicable = (rolActual !== "admin" && topeConfigurado) ? topeConfigurado : 100;
+    let descuentoPorc = Math.min(100, Math.max(0, Number(document.getElementById("presuDescuento").value) || 0));
+
+    if (descuentoPorc > topeAplicable) {
+        descuentoPorc = topeAplicable;
+        document.getElementById("presuDescuento").value = topeAplicable;
+    }
+
     const totalFinal = subtotal - (subtotal * descuentoPorc / 100);
 
     return { subtotal, descuentoPorc, totalFinal };
@@ -6406,8 +6476,17 @@ window.enviarPresupuestoWhatsApp = function (id) {
 
     const items = (p.items || []).map(i => `- ${i.descripcion}: ${formatoPlata(i.monto)}`).join("\n");
     const notas = p.notas ? `\n\n${p.notas}` : "";
+    const nombreNegocio = configuracionActual.nombreNegocio || "KM26 Performance";
 
-    const texto = `Hola ${cliente.nombre}! Te paso el presupuesto de KM26 Performance:\n\n${items}\n\nTotal: ${formatoPlata(p.total)}${notas}`;
+    const plantilla = configuracionActual.mensajeWhatsappPresupuesto && configuracionActual.mensajeWhatsappPresupuesto.trim()
+        ? configuracionActual.mensajeWhatsappPresupuesto
+        : `Hola {nombre}! Te paso el presupuesto de ${nombreNegocio}:\n\n{items}\n\nTotal: {total}{notas}`;
+
+    const texto = plantilla
+        .replace(/\{nombre\}/g, cliente.nombre || "")
+        .replace(/\{items\}/g, items)
+        .replace(/\{total\}/g, formatoPlata(p.total))
+        .replace(/\{notas\}/g, notas);
 
     const telefonoLimpio = String(cliente.telefono).replace(/\D/g, "");
     const url = `https://wa.me/549${telefonoLimpio}?text=${encodeURIComponent(texto)}`;
@@ -6450,6 +6529,10 @@ window.imprimirPresupuesto = function (id) {
             ? `<div class="datos" style="margin-top:14px;">Presupuesto válido por ${notasTexto} días.</div>`
             : `<div class="datos" style="margin-top:14px;"><strong>Notas:</strong> ${escapar(notasTexto)}</div>`;
 
+    const nombreNegocio = configuracionActual.nombreNegocio || "KM26 PERFORMANCE";
+    const lineaContacto = [configuracionActual.direccion, configuracionActual.telefono, configuracionActual.cuit]
+        .filter(Boolean).join(" · ");
+
     const html = `
         <!DOCTYPE html>
         <html lang="es"><head><meta charset="UTF-8"><title>Presupuesto ${escapar(nombreCliente)}</title>
@@ -6465,7 +6548,8 @@ window.imprimirPresupuesto = function (id) {
             .footer{margin-top:36px;font-size:11px;color:#888;}
         </style></head>
         <body>
-            <h1>KM26 PERFORMANCE</h1>
+            <h1>${escapar(nombreNegocio)}</h1>
+            ${lineaContacto ? `<div class="sub" style="margin-bottom:2px;">${escapar(lineaContacto)}</div>` : ""}
             <div class="sub">Presupuesto · ${fecha}</div>
             <div class="datos"><strong>Cliente:</strong> ${escapar(nombreCliente)} ${telefono ? "· " + escapar(telefono) : ""}</div>
             <div class="datos"><strong>Vehículo:</strong> ${escapar(detalleVehiculo)}</div>
@@ -6475,7 +6559,7 @@ window.imprimirPresupuesto = function (id) {
             </table>
             <div class="total">Total: ${formatoPlata(p.total)}</div>
             ${notasHtml}
-            <div class="footer">KM26 Performance — Presupuesto sujeto a disponibilidad de repuestos.</div>
+            <div class="footer">${escapar(nombreNegocio)} — Presupuesto sujeto a disponibilidad de repuestos.</div>
         </body></html>
     `;
 
@@ -7077,7 +7161,72 @@ function calcularReportes() {
 }
 
 // ======================================================================
-// RESPALDO DE DATOS
+// CONFIGURACIÓN (solo admin)
+// ======================================================================
+// Un único documento en Firestore: configuracion/general.
+// Todo lo que se guarda acá se usa de verdad en otras partes del panel
+// (impresión de presupuestos, stock mínimo por defecto, tope de descuento,
+// validez por defecto de un presupuesto, mensaje de WhatsApp).
+
+let configuracionActual = {};
+
+function escucharConfiguracion() {
+
+    onSnapshot(doc(db, "configuracion", "general"), (snap) => {
+        configuracionActual = snap.exists() ? snap.data() : {};
+    });
+
+}
+
+// Se llama cada vez que se entra a la pestaña Configuración, para no pisar
+// lo que el admin esté escribiendo si llegara una actualización en el medio.
+function renderFormConfiguracion() {
+
+    const el = document.getElementById("cfgNombreNegocio");
+    if (!el) return;
+
+    document.getElementById("cfgNombreNegocio").value = configuracionActual.nombreNegocio || "";
+    document.getElementById("cfgDireccion").value = configuracionActual.direccion || "";
+    document.getElementById("cfgTelefono").value = configuracionActual.telefono || "";
+    document.getElementById("cfgCuit").value = configuracionActual.cuit || "";
+    document.getElementById("cfgStockMinimo").value = configuracionActual.stockMinimoDefecto || "";
+    document.getElementById("cfgDescuentoMax").value = configuracionActual.descuentoMaximoPorc || "";
+    document.getElementById("cfgDiasValidez").value = configuracionActual.diasValidezPresupuestoDefecto || "";
+    document.getElementById("cfgMensajeWhatsapp").value = configuracionActual.mensajeWhatsappPresupuesto || "";
+
+}
+
+window.guardarConfiguracion = async function () {
+
+    const estado = document.getElementById("mensajeEstadoConfiguracion");
+
+    const datos = {
+        nombreNegocio: document.getElementById("cfgNombreNegocio").value.trim(),
+        direccion: document.getElementById("cfgDireccion").value.trim(),
+        telefono: document.getElementById("cfgTelefono").value.trim(),
+        cuit: document.getElementById("cfgCuit").value.trim(),
+        stockMinimoDefecto: parseInt(document.getElementById("cfgStockMinimo").value, 10) || null,
+        descuentoMaximoPorc: parseFloat(document.getElementById("cfgDescuentoMax").value) || null,
+        diasValidezPresupuestoDefecto: parseInt(document.getElementById("cfgDiasValidez").value, 10) || null,
+        mensajeWhatsappPresupuesto: document.getElementById("cfgMensajeWhatsapp").value
+    };
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await setDoc(doc(db, "configuracion", "general"), datos, { merge: true });
+        estado.textContent = "✅ Configuración guardada.";
+        estado.style.color = "#5fd98a";
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
 // ======================================================================
 // Genera un archivo Excel (una hoja por colección) con TODO lo cargado en
 // Firestore, para descargar y guardar donde el usuario quiera (disco externo,
