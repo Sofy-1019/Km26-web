@@ -2317,13 +2317,9 @@ header{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             Dashboard
         </button>
-        <button class="sidebar-nav-btn" data-nav="clientes" data-roles="admin,recepcion" onclick="cambiarTab('clientes')">
+        <button class="sidebar-nav-btn" data-nav="clientes" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('clientes')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            Clientes
-        </button>
-        <button class="sidebar-nav-btn" data-nav="vehiculos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
-            Vehículos
+            Clientes / Vehículos
         </button>
         <button class="sidebar-nav-btn" data-nav="turnos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('turnos')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -2340,10 +2336,6 @@ header{
         <button class="sidebar-nav-btn" data-nav="stock" data-roles="admin,recepcion" onclick="cambiarTab('stock')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
             Stock
-        </button>
-        <button class="sidebar-nav-btn" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos'); notificarHistoriaDesdeVehiculos()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
-            Historia del vehículo
         </button>
         <button class="sidebar-nav-btn" data-roles="admin,recepcion" onclick="abrirModalCuenta()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -2450,8 +2442,7 @@ header{
     <!-- Nav superior original: se conserva intacta (mismos onclick/data-roles) pero
          ahora vive dentro del overlay "Más opciones" en vez de mostrarse como barra -->
     <nav class="tabs" style="display:none;">
-        <button class="activo" data-tab="clientes" data-roles="admin,recepcion" onclick="cambiarTab('clientes')">Clientes</button>
-        <button data-tab="vehiculos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('vehiculos')">Vehículos</button>
+        <button class="activo" data-tab="clientes" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('clientes')">Clientes / Vehículos</button>
         <button data-tab="turnos" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('turnos')">Turnos</button>
         <button data-tab="presupuestos" data-roles="admin,recepcion" onclick="cambiarTab('presupuestos')">Presupuestos</button>
         <button data-tab="caja" data-roles="admin,recepcion" onclick="cambiarTab('caja')">Caja</button>
@@ -2464,7 +2455,7 @@ header{
 
         <div class="dash-fecha" id="dashFechaLinea" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
             <span class="badge-tiempo-real" id="dashEnVivo"><span class="punto-verde"></span> En vivo</span>
-            <span class="badge-tiempo-real" style="background:#0a1e33;color:#3f9cff;font-size:13px;padding:8px 16px;cursor:pointer;" onclick="cambiarTab('vehiculos')" title="Ver detalle">
+            <span class="badge-tiempo-real" style="background:#0a1e33;color:#3f9cff;font-size:13px;padding:8px 16px;cursor:pointer;" onclick="cambiarTab('clientes')" title="Ver detalle">
                 🔧 En taller ahora: <strong id="dashEnTallerAhora" style="font-size:15px;">0</strong>
             </span>
         </div>
@@ -2533,18 +2524,13 @@ header{
         </div>
 
         <div class="dash-panel" style="margin-bottom:20px;">
-            <div class="dash-panel-titulo">Vehículos en taller <a onclick="cambiarTab('vehiculos')">Ver todos</a></div>
+            <div class="dash-panel-titulo">Vehículos en taller <a onclick="cambiarTab('clientes')">Ver todos</a></div>
             <div class="dash-vehiculo-grid" id="dashVehiculosTaller"></div>
         </div>
 
     </section>
 
     <section class="seccion" id="tab-clientes">
-        <div class="fila-titulo"><h2>Clientes</h2></div>
-        <div id="tablaClientes"></div>
-    </section>
-
-    <section class="seccion" id="tab-vehiculos">
 
         <div class="tablero-taller">
             <div class="tablero-taller-total">
@@ -2554,8 +2540,8 @@ header{
             <div class="tablero-taller-grid" id="tallerTableroGrid"></div>
         </div>
 
-        <div class="fila-titulo"><h2>Vehículos</h2></div>
-        <div id="tablaVehiculos"></div>
+        <div class="fila-titulo"><h2>Clientes / Vehículos</h2></div>
+        <div id="tablaClientes"></div>
     </section>
 
     <section class="seccion" id="tab-presupuestos">
@@ -2807,7 +2793,7 @@ header{
     <button class="nav-inferior-mas" onclick="abrirOverlayRapido()" title="Acción rápida">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
-    <button class="nav-inferior-btn" data-nav="clientes" data-roles="admin,recepcion" onclick="cambiarTab('clientes')">
+    <button class="nav-inferior-btn" data-nav="clientes" data-roles="admin,recepcion,mecanico" onclick="cambiarTab('clientes')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         Clientes
     </button>
@@ -2822,10 +2808,6 @@ header{
     <div class="modal">
         <h3>Más opciones</h3>
         <div class="mas-lista" id="masLista">
-            <button class="mas-item" data-roles="admin,recepcion,mecanico" onclick="cerrarOverlayMas(); cambiarTab('vehiculos')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2M5 17a2 2 0 002 2h1a2 2 0 002-2M17 17a2 2 0 002 2h1a2 2 0 002-2"/></svg>
-                Vehículos
-            </button>
             <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('presupuestos')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
                 Presupuestos
@@ -3693,23 +3675,68 @@ function renderClientes(lista) {
         return;
     }
 
+    // El mecánico puede ver clientes y sus vehículos, pero no llamar/whatsappear
+    // ni editar/borrar clientes (solo admin y recepción tienen esas acciones).
+    const puedeGestionarClientes = rolActual === "admin" || rolActual === "recepcion";
+
     let html = '<div class="lista-cards">';
 
     lista.forEach(c => {
+
         const telefonoLimpio = c.telefono ? String(c.telefono).replace(/\D/g, "") : "";
+        const vehiculosDelCliente = vehiculosCache.filter(v => v.clienteId === c.id);
+
         html += `<div class="item-card">
             <div class="item-avatar">${getIniciales(c.nombre, c.apellido)}</div>
-            <div class="item-info" onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')" style="cursor:pointer;">
+            <div class="item-info" ${puedeGestionarClientes ? `onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')" style="cursor:pointer;"` : ""}>
                 <div class="item-titulo">${escapar(c.apellido)}, ${escapar(c.nombre)}</div>
                 <div class="item-sub">${escapar(c.telefono || c.email || "Sin datos de contacto")}</div>
             </div>
             <div class="item-acciones">
-                ${telefonoLimpio ? `<a class="btn-carpeta" href="tel:${telefonoLimpio}" title="Llamar" style="text-decoration:none;">📞</a>` : ""}
-                ${telefonoLimpio ? `<a class="btn-carpeta" href="https://wa.me/549${telefonoLimpio}" target="_blank" rel="noopener" title="WhatsApp" style="text-decoration:none;">🟢</a>` : ""}
-                <button class="btn-carpeta" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>
-                <button class="btn-carpeta" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')" title="Borrar">❌</button>
+                ${telefonoLimpio && puedeGestionarClientes ? `<a class="btn-carpeta" href="tel:${telefonoLimpio}" title="Llamar" style="text-decoration:none;">📞</a>` : ""}
+                ${telefonoLimpio && puedeGestionarClientes ? `<a class="btn-carpeta" href="https://wa.me/549${telefonoLimpio}" target="_blank" rel="noopener" title="WhatsApp" style="text-decoration:none;">🟢</a>` : ""}
+                ${puedeGestionarClientes ? `<button class="btn-carpeta" onclick="editarCliente('${c.id}')" title="Editar">✏️</button>` : ""}
+                ${puedeGestionarClientes ? `<button class="btn-carpeta" style="color:#ff6b6b;" onclick="borrarCliente('${c.id}', '${escaparComillas(c.nombre + " " + c.apellido)}')" title="Borrar">❌</button>` : ""}
             </div>
         </div>`;
+
+        if (vehiculosDelCliente.length === 0) {
+
+            html += `<div style="padding:6px 0 14px 54px;font-size:12px;color:#666;">Sin vehículos cargados${puedeGestionarClientes ? ` · <span style="color:#ff6b6b;cursor:pointer;" onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')">+ agregar</span>` : ""}</div>`;
+
+        } else {
+
+            html += `<div style="padding:0 0 14px 30px;display:flex;flex-direction:column;gap:6px;">`;
+
+            vehiculosDelCliente.forEach(v => {
+                html += `<div class="item-card" style="background:#161616;padding:10px 14px;">
+                    <div class="item-icono-auto" style="width:34px;height:34px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-titulo" style="font-size:13.5px;">${escapar(v.patente)} · ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
+                    </div>
+                    <div class="item-acciones">
+                        <select class="select-estado-taller" onchange="cambiarEstadoTaller('${v.id}', this.value)" title="Estado en el taller">
+                            ${ESTADOS_TALLER.map(e => `<option value="${e}" ${((v.estadoTaller || "") === e) ? "selected" : ""}>${e || "Sin asignar"}</option>`).join("")}
+                        </select>
+                        <button class="btn-carpeta" onclick="abrirFichaVehiculo('${v.id}')" title="Ficha completa">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                        </button>
+                        <button class="btn-carpeta" onclick="abrirHistorialDirecto('${v.id}', '${escaparComillas(v.patente)}')" title="Historia clínica">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
+                        </button>
+                        <button class="btn-carpeta" onclick="abrirInspeccion('${v.id}', '${escaparComillas(v.patente)}')" title="Inspección de ingreso">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </button>
+                    </div>
+                </div>`;
+            });
+
+            html += `</div>`;
+
+        }
+
     });
 
     html += "</div>";
@@ -3729,33 +3756,21 @@ function escaparComillas(s) {
 function ejecutarBusqueda(q) {
 
     q = q.trim().toLowerCase();
-    const enVehiculos = document.getElementById("tab-vehiculos").classList.contains("activa");
-
-    if (enVehiculos) {
-
-        if (!q) {
-            renderVehiculos(vehiculosCache);
-            return;
-        }
-
-        const filtrados = vehiculosCache.filter(v =>
-            String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(q.replace(/\s/g, ""))
-        );
-
-        renderVehiculos(filtrados);
-        return;
-
-    }
+    const qSinEspacios = q.replace(/\s/g, "");
 
     if (!q) {
         renderClientes(clientesCache);
         return;
     }
 
-    const filtrados = clientesCache.filter(c =>
-        (c.nombre + " " + c.apellido).toLowerCase().includes(q) ||
-        (c.telefono || "").includes(q)
-    );
+    const filtrados = clientesCache.filter(c => {
+        const coincideNombre = (c.nombre + " " + c.apellido).toLowerCase().includes(q);
+        const coincideTelefono = (c.telefono || "").includes(q);
+        const coincidePatente = vehiculosCache.some(v =>
+            v.clienteId === c.id && String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(qSinEspacios)
+        );
+        return coincideNombre || coincideTelefono || coincidePatente;
+    });
 
     renderClientes(filtrados);
 
@@ -4336,7 +4351,7 @@ function escucharVehiculos() {
     onSnapshot(q, (snapshot) => {
 
         vehiculosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderVehiculos(vehiculosCache);
+        renderClientes(clientesCache);
         renderTableroTaller();
 
         // Si hay una ficha abierta, también se refresca sola
@@ -4391,53 +4406,6 @@ function renderTableroTaller() {
         </div>`;
 
     }).join("");
-
-}
-
-function renderVehiculos(lista) {
-
-    const el = document.getElementById("tablaVehiculos");
-
-    if (!lista || lista.length === 0) {
-        el.innerHTML = '<div class="vacio">Todavía no hay vehículos cargados.</div>';
-        return;
-    }
-
-    let html = '<div class="lista-cards">';
-
-    lista.forEach(v => {
-
-        const cliente = clientesCache.find(c => c.id === v.clienteId);
-        const nombreCliente = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "(sin datos)";
-
-        html += `<div class="item-card">
-            <div class="item-icono-auto">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2M5 17a2 2 0 002 2h1a2 2 0 002-2M17 17a2 2 0 002 2h1a2 2 0 002-2"/></svg>
-            </div>
-            <div class="item-info">
-                <div class="item-titulo">${escapar(v.patente)} · ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
-                <div class="item-sub">${escapar(nombreCliente)}</div>
-            </div>
-            <div class="item-acciones">
-                <select class="select-estado-taller" onchange="cambiarEstadoTaller('${v.id}', this.value)" title="Estado en el taller">
-                    ${ESTADOS_TALLER.map(e => `<option value="${e}" ${((v.estadoTaller || "") === e) ? "selected" : ""}>${e || "Sin asignar"}</option>`).join("")}
-                </select>
-                <button class="btn-carpeta" onclick="abrirFichaVehiculo('${v.id}')" title="Ficha completa">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                </button>
-                <button class="btn-carpeta" onclick="abrirHistorialDirecto('${v.id}', '${escaparComillas(v.patente)}')" title="Historia clínica">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-8l-2-2z"/><path d="M12 11v6M9 14h6"/></svg>
-                </button>
-                <button class="btn-carpeta" onclick="abrirInspeccion('${v.id}', '${escaparComillas(v.patente)}')" title="Inspección de ingreso">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </button>
-            </div>
-        </div>`;
-
-    });
-
-    html += "</div>";
-    el.innerHTML = html;
 
 }
 
