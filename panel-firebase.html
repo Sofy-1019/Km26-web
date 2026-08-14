@@ -3097,6 +3097,202 @@ header{
     height:16px;
 }
 
+/* ======================================================================
+   PRESUPUESTOS — nuevo diseño (calcado del mockup)
+   ====================================================================== */
+
+.presu-filtros-fila{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+}
+
+.presu-filtros-fila input[type="date"]{
+    width:auto;
+}
+
+.presu-tabla-wrap{
+    background:#161616;
+    border-radius:14px;
+    overflow-x:auto;
+    margin-bottom:14px;
+}
+
+.presu-tabla{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    min-width:820px;
+}
+
+.presu-tabla thead th{
+    text-align:left;
+    padding:14px 16px;
+    color:#888;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    border-bottom:1px solid #262626;
+    white-space:nowrap;
+}
+
+.presu-tabla tbody td{
+    padding:14px 16px;
+    border-bottom:1px solid #1f1f1f;
+    vertical-align:middle;
+}
+
+.presu-tabla tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.presu-tabla tbody tr:hover{
+    background:#1c1c1c;
+}
+
+.presu-num-cell{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:700;
+    color:#fff;
+    white-space:nowrap;
+}
+
+.presu-num-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    flex-shrink:0;
+}
+
+.presu-cv-cell{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.presu-cv-cell .marca-icono{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#242428;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    flex-shrink:0;
+}
+
+.presu-cv-nombre{
+    font-weight:700;
+    color:#fff;
+    white-space:nowrap;
+}
+
+.presu-cv-sub{
+    font-size:11.5px;
+    color:#999;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-top:2px;
+}
+
+.presu-patente-chip{
+    background:#242428;
+    padding:2px 8px;
+    border-radius:6px;
+    font-size:10.5px;
+    color:#ccc;
+}
+
+.presu-fecha-cell{
+    white-space:nowrap;
+    color:#ddd;
+}
+
+.presu-fecha-hora{
+    font-size:11px;
+    color:#888;
+}
+
+.presu-importe-cell{
+    font-weight:800;
+    color:#fff;
+    white-space:nowrap;
+}
+
+.badge-estado-tabla{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11.5px;
+    font-weight:700;
+    padding:5px 12px;
+    border-radius:20px;
+    white-space:nowrap;
+}
+
+.badge-estado-tabla.Pendiente{ background:#2a2408; color:#f5a623; }
+.badge-estado-tabla.Aprobado{ background:#0d2418; color:#5fd98a; }
+.badge-estado-tabla.Convertido{ background:#0a1e33; color:#6ab6ff; }
+.badge-estado-tabla.Vencido{ background:#3a1416; color:#ff6b6b; }
+.badge-estado-tabla.Rechazado{ background:#2a2a2e; color:#999; }
+
+.presu-valido-cell{
+    white-space:nowrap;
+    color:#ccc;
+    font-size:12.5px;
+}
+
+.presu-valido-cell.urgente{
+    color:#ff6b6b;
+    font-weight:700;
+}
+
+.presu-acciones-cell{
+    display:flex;
+    gap:6px;
+}
+
+.presu-paginacion{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+    font-size:12.5px;
+    color:#999;
+}
+
+.presu-paginacion-botones{
+    display:flex;
+    gap:6px;
+    align-items:center;
+}
+
+.presu-pagina-btn{
+    width:30px;
+    height:30px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#ccc;
+    cursor:pointer;
+    font-size:12px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.presu-pagina-btn.activo{
+    border-color:#d71920;
+    color:#ff8a7a;
+    background:rgba(215,25,32,.12);
+}
+
 </style>
 </head>
 
@@ -3421,11 +3617,84 @@ header{
     </section>
 
     <section class="seccion" id="tab-presupuestos">
+
         <div class="fila-titulo">
             <h2>Presupuestos</h2>
-            <button class="btn-red" onclick="abrirModalPresupuesto()">+ Nuevo presupuesto</button>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-chico" onclick="exportarPresupuestosFiltrados()">⬇️ Exportar</button>
+                <button class="btn-red" onclick="abrirModalPresupuesto()">+ Nuevo presupuesto</button>
+            </div>
         </div>
-        <div id="listaPresupuestos"></div>
+
+        <div class="turnos-stats-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="turnos-stat-card rojo" style="cursor:pointer;" onclick="filtrarPresupuestos('todos')">
+                <div class="turnos-stat-icono">📄</div>
+                <div><div class="turnos-stat-numero" id="presuStatTodos">0</div><div class="turnos-stat-label">Todos · presupuestos</div></div>
+            </div>
+            <div class="turnos-stat-card ambar" style="cursor:pointer;" onclick="filtrarPresupuestos('pendientes')">
+                <div class="turnos-stat-icono">📋</div>
+                <div><div class="turnos-stat-numero" id="presuStatPendientes">0</div><div class="turnos-stat-label">Pendientes · por aprobar</div></div>
+            </div>
+            <div class="turnos-stat-card verde" style="cursor:pointer;" onclick="filtrarPresupuestos('aprobados')">
+                <div class="turnos-stat-icono">✅</div>
+                <div><div class="turnos-stat-numero" id="presuStatAprobados">0</div><div class="turnos-stat-label">Aprobados</div></div>
+            </div>
+            <div class="turnos-stat-card violeta" style="cursor:pointer;" onclick="filtrarPresupuestos('convertidos')">
+                <div class="turnos-stat-icono">🔄</div>
+                <div><div class="turnos-stat-numero" id="presuStatConvertidos">0</div><div class="turnos-stat-label">Convertidos · a cuenta</div></div>
+            </div>
+        </div>
+        <div class="turnos-stat-card" style="margin-bottom:16px;cursor:pointer;max-width:260px;" onclick="filtrarPresupuestos('vencidos')">
+            <div class="turnos-stat-icono" style="background:#2a2a2e;">📅</div>
+            <div><div class="turnos-stat-numero" id="presuStatVencidos">0</div><div class="turnos-stat-label">Vencidos · sin respuesta</div></div>
+        </div>
+
+        <div class="turnos-chips-fila" style="flex-wrap:wrap;">
+            <button class="cv-chip-toggle activo" id="chipPresuTodos" onclick="filtrarPresupuestos('todos')">Todos</button>
+            <button class="cv-chip-toggle" id="chipPresuPendientes" onclick="filtrarPresupuestos('pendientes')">Pendientes</button>
+            <button class="cv-chip-toggle" id="chipPresuAprobados" onclick="filtrarPresupuestos('aprobados')">Aprobados</button>
+            <button class="cv-chip-toggle" id="chipPresuConvertidos" onclick="filtrarPresupuestos('convertidos')">Convertidos</button>
+            <button class="cv-chip-toggle" id="chipPresuVencidos" onclick="filtrarPresupuestos('vencidos')">Vencidos</button>
+        </div>
+
+        <div class="presu-filtros-fila">
+            <input type="date" id="presuFiltroDesde" class="turno-estado-select" onchange="renderPresupuestos()">
+            <span style="color:#666;">–</span>
+            <input type="date" id="presuFiltroHasta" class="turno-estado-select" onchange="renderPresupuestos()">
+            <button class="btn-chico" onclick="document.getElementById('presuFiltroDesde').value='';document.getElementById('presuFiltroHasta').value='';renderPresupuestos();">Limpiar fechas</button>
+        </div>
+
+        <div class="presu-tabla-wrap">
+            <table class="presu-tabla">
+                <thead>
+                    <tr>
+                        <th>N° Presupuesto</th>
+                        <th>Cliente / Vehículo</th>
+                        <th onclick="ordenarPresupuestosPor('fecha')" style="cursor:pointer;">Fecha ⌄</th>
+                        <th onclick="ordenarPresupuestosPor('importe')" style="cursor:pointer;">Importe ⌄</th>
+                        <th>Estado</th>
+                        <th>Válido hasta</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="presuTablaBody"></tbody>
+            </table>
+        </div>
+
+        <div class="presu-paginacion">
+            <span id="presuPaginacionTexto">-</span>
+            <div class="presu-paginacion-botones" id="presuPaginacionBotones"></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:12px;color:#999;">Ver</span>
+                <select id="presuPorPagina" class="turno-estado-select" onchange="cambiarPorPaginaPresupuestos()">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+                <span style="font-size:12px;color:#999;">por página</span>
+            </div>
+        </div>
+
     </section>
 
     <section class="seccion" id="tab-turnos">
@@ -3858,6 +4127,41 @@ header{
         </div>
 
         <p id="mensajeEstadoIngresarVehiculo"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: ver detalle de un presupuesto ---------- -->
+<div class="overlay" id="modalVerPresupuesto">
+    <div class="modal" style="max-width:480px;">
+        <h3 id="verPresuTitulo">Presupuesto</h3>
+
+        <div style="font-size:13px;color:#ccc;margin-bottom:4px;" id="verPresuCliente"></div>
+        <div style="font-size:12px;color:#888;margin-bottom:14px;" id="verPresuVehiculo"></div>
+
+        <div id="verPresuItems" style="background:#1a1a1a;border-radius:10px;padding:12px 14px;margin-bottom:12px;"></div>
+
+        <div style="background:#1a1a1a;border-radius:10px;padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:#999;padding:4px 0;">
+                <span>Subtotal</span><span id="verPresuSubtotal">$0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:#5fd98a;padding:4px 0;">
+                <span>Descuento</span><span id="verPresuDescuento">$0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:19px;font-weight:800;padding:8px 0 0;border-top:1px solid #333;margin-top:6px;">
+                <span>Total</span><span id="verPresuTotal">$0</span>
+            </div>
+        </div>
+
+        <div style="font-size:12px;color:#999;margin-top:12px;" id="verPresuNotas"></div>
+
+        <div class="modal-botones" style="margin-top:16px;">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+            <button class="btn-carpeta" style="color:#fff;width:auto;padding:0 16px;" id="verPresuBtnImprimir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            </button>
+        </div>
+        <div class="modal-botones" style="margin-top:8px;" id="verPresuAccionesExtra"></div>
+
     </div>
 </div>
 
@@ -4906,6 +5210,7 @@ window.cerrarModales = function () {
     document.getElementById("modalFichaVehiculo").classList.remove("abierto");
     document.getElementById("modalQRVehiculo").classList.remove("abierto");
     document.getElementById("modalIngresarVehiculo").classList.remove("abierto");
+    document.getElementById("modalVerPresupuesto").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -6526,6 +6831,7 @@ window.enviarQRPorWhatsApp = function () {
 
 let stockCache = [];
 let cuentaItems = [];
+let presupuestoOrigenCuentaId = null;
 let presupuestoItemsTemp = [];
 let presupuestoEditandoId = null;
 let modoEscaner = "venta";
@@ -8026,6 +8332,7 @@ window.borrarTurno = async function (id) {
 window.abrirModalCuenta = function () {
 
     cuentaItems = [];
+    presupuestoOrigenCuentaId = null;
 
     document.getElementById("cuentaClienteBuscar").value = "";
     document.getElementById("cuentaCliente").value = "";
@@ -8266,11 +8573,18 @@ window.cobrarCuenta = async function () {
             }
         }
 
+        // Si esta cuenta vino de un presupuesto aprobado, lo marcamos "Convertido"
+        // (queda su historial completo, no se borra ni se confunde con Aprobado).
+        if (presupuestoOrigenCuentaId) {
+            await updateDoc(doc(db, "presupuestos", presupuestoOrigenCuentaId), { estado: "Convertido" });
+        }
+
         estado.textContent = "✅ ¡Cuenta cobrada! Total: " + formatoPlata(totalFinal);
         estado.style.color = "#5fd98a";
 
         setTimeout(() => {
             cuentaItems = [];
+            presupuestoOrigenCuentaId = null;
             document.getElementById("modalCuenta").classList.remove("abierto");
         }, 1200);
 
@@ -8299,57 +8613,328 @@ function escucharPresupuestos() {
 
 }
 
+let filtroPresuActivo = "todos";
+let ordenPresuColumna = "fecha";
+let ordenPresuDireccion = "desc";
+let presuPaginaActual = 1;
+let presuPorPagina = 10;
+
+// Calcula "válido hasta" a partir de la fecha de creación + los días de validez.
+// Usa el mismo criterio que ya usamos al imprimir: si en Notas hay solo un
+// número, son los días de validez; si no, se usa lo configurado en
+// Configuración, y si tampoco hay nada, 15 días por defecto.
+function calcularVencimientoPresupuesto(p) {
+
+    const fecha = toDateSegura(p.fecha);
+    if (!fecha) return null;
+
+    const notasTexto = (p.notas || "").trim();
+    const esSoloNumero = /^\d+$/.test(notasTexto);
+    const dias = esSoloNumero ? parseInt(notasTexto, 10) : (configuracionActual.diasValidezPresupuestoDefecto || 15);
+
+    const vencimiento = new Date(fecha);
+    vencimiento.setDate(vencimiento.getDate() + dias);
+    return vencimiento;
+
+}
+
+window.filtrarPresupuestos = function (filtro) {
+    filtroPresuActivo = filtro;
+    presuPaginaActual = 1;
+    ["Todos", "Pendientes", "Aprobados", "Convertidos", "Vencidos"].forEach(nombre => {
+        const el = document.getElementById("chipPresu" + nombre);
+        if (el) el.classList.toggle("activo", filtro === nombre.toLowerCase());
+    });
+    renderPresupuestos();
+};
+
+window.ordenarPresupuestosPor = function (columna) {
+    if (ordenPresuColumna === columna) {
+        ordenPresuDireccion = ordenPresuDireccion === "asc" ? "desc" : "asc";
+    } else {
+        ordenPresuColumna = columna;
+        ordenPresuDireccion = "desc";
+    }
+    renderPresupuestos();
+};
+
+window.cambiarPorPaginaPresupuestos = function () {
+    presuPorPagina = parseInt(document.getElementById("presuPorPagina").value, 10);
+    presuPaginaActual = 1;
+    renderPresupuestos();
+};
+
+window.irAPaginaPresupuestos = function (pagina) {
+    presuPaginaActual = pagina;
+    renderPresupuestos();
+};
+
+function obtenerListaPresupuestosFiltrada() {
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    let lista = presupuestosCache.slice();
+
+    if (filtroPresuActivo === "pendientes") {
+        lista = lista.filter(p => p.estado === "Borrador" || p.estado === "Enviado");
+    } else if (filtroPresuActivo === "aprobados") {
+        lista = lista.filter(p => p.estado === "Aprobado");
+    } else if (filtroPresuActivo === "convertidos") {
+        lista = lista.filter(p => p.estado === "Convertido");
+    } else if (filtroPresuActivo === "vencidos") {
+        lista = lista.filter(p => p.estado === "Vencido");
+    }
+
+    const desde = document.getElementById("presuFiltroDesde") ? document.getElementById("presuFiltroDesde").value : "";
+    const hasta = document.getElementById("presuFiltroHasta") ? document.getElementById("presuFiltroHasta").value : "";
+
+    if (desde) {
+        const fDesde = new Date(desde + "T00:00:00");
+        lista = lista.filter(p => { const f = toDateSegura(p.fecha); return f && f >= fDesde; });
+    }
+    if (hasta) {
+        const fHasta = new Date(hasta + "T23:59:59");
+        lista = lista.filter(p => { const f = toDateSegura(p.fecha); return f && f <= fHasta; });
+    }
+
+    lista.sort((a, b) => {
+        let va, vb;
+        if (ordenPresuColumna === "importe") { va = a.total || 0; vb = b.total || 0; }
+        else { va = toDateSegura(a.fecha) || 0; vb = toDateSegura(b.fecha) || 0; }
+        return ordenPresuDireccion === "asc" ? va - vb : vb - va;
+    });
+
+    return lista;
+
+}
+
 function renderPresupuestos() {
 
-    const el = document.getElementById("listaPresupuestos");
+    const el = document.getElementById("presuTablaBody");
     if (!el) return;
 
-    if (presupuestosCache.length === 0) {
-        el.innerHTML = '<div class="vacio">Todavía no hay presupuestos cargados.</div>';
+    // ---- Tarjetas de resumen (siempre sobre el total real, sin filtrar) ----
+    const pendientes = presupuestosCache.filter(p => p.estado === "Borrador" || p.estado === "Enviado");
+    const aprobados = presupuestosCache.filter(p => p.estado === "Aprobado");
+    const convertidos = presupuestosCache.filter(p => p.estado === "Convertido");
+    const vencidos = presupuestosCache.filter(p => p.estado === "Vencido");
+
+    document.getElementById("presuStatTodos").textContent = presupuestosCache.length;
+    document.getElementById("presuStatPendientes").textContent = pendientes.length;
+    document.getElementById("presuStatAprobados").textContent = aprobados.length;
+    document.getElementById("presuStatConvertidos").textContent = convertidos.length;
+    document.getElementById("presuStatVencidos").textContent = vencidos.length;
+
+    // ---- Lista filtrada + orden + paginación ----
+    const listaCompleta = obtenerListaPresupuestosFiltrada();
+    const totalPaginas = Math.max(1, Math.ceil(listaCompleta.length / presuPorPagina));
+    if (presuPaginaActual > totalPaginas) presuPaginaActual = totalPaginas;
+
+    const inicio = (presuPaginaActual - 1) * presuPorPagina;
+    const listaPagina = listaCompleta.slice(inicio, inicio + presuPorPagina);
+
+    if (listaCompleta.length === 0) {
+        el.innerHTML = '<tr><td colspan="7" class="vacio">No hay presupuestos con estos filtros.</td></tr>';
+        document.getElementById("presuPaginacionTexto").textContent = "Sin resultados";
+        document.getElementById("presuPaginacionBotones").innerHTML = "";
         return;
     }
 
-    el.innerHTML = presupuestosCache.map(p => {
+    const coloresBadge = { "Borrador": "#999", "Enviado": "#f5a623", "Aprobado": "#5fd98a", "Convertido": "#6ab6ff", "Rechazado": "#999", "Vencido": "#ff6b6b" };
+    const nombreVisible = { "Borrador": "Pendiente", "Enviado": "Pendiente", "Aprobado": "Aprobado", "Convertido": "Convertido", "Rechazado": "Rechazado", "Vencido": "Vencido" };
+
+    el.innerHTML = listaPagina.map(p => {
 
         const cliente = clientesCache.find(c => c.id === p.clienteId);
-        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
-        const telefono = cliente ? cliente.telefono : "";
+        const nombreCliente = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "(cliente eliminado)";
         const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
-        const detalleVehiculo = vehiculo ? ` · ${escapar(vehiculo.patente)}` : "";
-        const fecha = p.fecha && p.fecha.toDate ? p.fecha.toDate().toLocaleDateString("es-AR") : "";
-        const clase = claseEstado(p.estado);
-        const itemsTexto = (p.items || []).map(i => i.descripcion).join(" · ");
+        const inicialMarca = vehiculo && vehiculo.marca ? vehiculo.marca.charAt(0).toUpperCase() : "🚗";
 
-        return `<div class="presu-card ${clase}">
-            <div class="presu-cabecera">
-                <div>
-                    <div class="presu-cliente">${escapar(nombreCliente)}${detalleVehiculo}</div>
-                    <div class="presu-detalle">${fecha}</div>
+        const fecha = toDateSegura(p.fecha);
+        const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") : "-";
+        const horaTexto = fecha ? fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "";
+
+        const numeroTexto = p.numero ? "#" + String(p.numero).padStart(5, "0") : "#" + p.id.slice(-4).toUpperCase();
+        const estadoVisible = nombreVisible[p.estado] || p.estado;
+        const colorDot = coloresBadge[p.estado] || "#999";
+
+        const vencimiento = calcularVencimientoPresupuesto(p);
+        const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+        let validoHastaHtml = "—";
+        if (p.estado === "Convertido") {
+            validoHastaHtml = '<span style="color:#666;">Convertido</span>';
+        } else if (vencimiento) {
+            const diasRestantes = Math.round((vencimiento - hoy) / 86400000);
+            const urgente = diasRestantes <= 2;
+            const textoRestante = diasRestantes < 0 ? "Vencido" : diasRestantes === 0 ? "Vence hoy" : `${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`;
+            validoHastaHtml = `<div class="presu-valido-cell ${urgente ? "urgente" : ""}">${vencimiento.toLocaleDateString("es-AR")}<br>${textoRestante}</div>`;
+        }
+
+        return `<tr>
+            <td>
+                <div class="presu-num-cell">
+                    <span class="presu-num-dot" style="background:${colorDot};"></span>
+                    ${numeroTexto}
                 </div>
-                <div style="text-align:right;">
-                    <span class="badge-estado ${clase}">${escapar(p.estado)}</span>
-                    <div class="presu-total">${formatoPlata(p.total)}</div>
+            </td>
+            <td>
+                <div class="presu-cv-cell">
+                    <div class="marca-icono">${inicialMarca}</div>
+                    <div>
+                        <div class="presu-cv-nombre">${escapar(nombreCliente)}</div>
+                        <div class="presu-cv-sub">
+                            ${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") : "Sin vehículo"}
+                            ${vehiculo ? `<span class="presu-patente-chip">${escapar(vehiculo.patente)}</span>` : ""}
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="presu-items-lista">${escapar(itemsTexto)}</div>
-
-            <div class="presu-acciones">
-                <select class="turno-estado-select" onchange="cambiarEstadoPresupuesto('${p.id}', this.value)">
-                    ${["Borrador", "Enviado", "Aprobado", "Rechazado", "Vencido"].map(e => `<option value="${e}" ${p.estado === e ? "selected" : ""}>${e}</option>`).join("")}
-                </select>
-                <button class="btn-carpeta" style="color:#fff;" onclick="imprimirPresupuesto('${p.id}')" title="Imprimir para el cliente">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                </button>
-                ${telefono ? `<button class="icono-whatsapp-btn" style="width:auto;border-radius:20px;padding:9px 16px;gap:6px;display:inline-flex;align-items:center;" onclick="enviarPresupuestoWhatsApp('${p.id}')" title="Enviar por WhatsApp">${ICONO_WHATSAPP_SVG}</button>` : ""}
-                ${p.estado === "Aprobado" ? `<button class="btn-confirmar-gasto" onclick="convertirPresupuestoEnCobro('${p.id}')">💰 Cobrar</button>` : ""}
-                <button class="btn-chico" style="color:#fff;" onclick="borrarPresupuesto('${p.id}')">Borrar</button>
-            </div>
-        </div>`;
+            </td>
+            <td class="presu-fecha-cell">${fechaTexto}<div class="presu-fecha-hora">${horaTexto}</div></td>
+            <td class="presu-importe-cell">${formatoPlata(p.total)}</td>
+            <td>
+                ${p.estado === "Convertido"
+                    ? `<span class="badge-estado-tabla Convertido">🔄 Convertido</span>`
+                    : `<select class="turno-estado-select" onchange="cambiarEstadoPresupuesto('${p.id}', this.value)">
+                        ${["Borrador", "Enviado", "Aprobado", "Rechazado", "Vencido"].map(e => `<option value="${e}" ${p.estado === e ? "selected" : ""}>${nombreVisible[e]}</option>`).join("")}
+                    </select>`}
+            </td>
+            <td>${validoHastaHtml}</td>
+            <td>
+                <div class="presu-acciones-cell">
+                    <div class="icono-accion-turno" onclick="verPresupuesto('${p.id}')" title="Ver">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div class="icono-accion-turno" onclick="editarPresupuesto('${p.id}')" title="Editar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                    </div>
+                    <div class="icono-accion-turno" onclick="duplicarPresupuesto('${p.id}')" title="Duplicar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    </div>
+                    <div class="icono-accion-turno borrar" onclick="borrarPresupuesto('${p.id}')" title="Eliminar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/></svg>
+                    </div>
+                </div>
+            </td>
+        </tr>`;
 
     }).join("");
 
+    // ---- Paginación ----
+    const desdeN = inicio + 1;
+    const hastaN = Math.min(inicio + presuPorPagina, listaCompleta.length);
+    document.getElementById("presuPaginacionTexto").textContent = `Mostrando ${desdeN} a ${hastaN} de ${listaCompleta.length} presupuestos`;
+
+    let htmlPaginas = `<button class="presu-pagina-btn" onclick="irAPaginaPresupuestos(${Math.max(1, presuPaginaActual - 1)})" ${presuPaginaActual === 1 ? "disabled" : ""}>‹</button>`;
+    for (let i = 1; i <= totalPaginas; i++) {
+        if (i > 6 && i < totalPaginas - 1 && Math.abs(i - presuPaginaActual) > 1) continue;
+        htmlPaginas += `<button class="presu-pagina-btn ${i === presuPaginaActual ? "activo" : ""}" onclick="irAPaginaPresupuestos(${i})">${i}</button>`;
+    }
+    htmlPaginas += `<button class="presu-pagina-btn" onclick="irAPaginaPresupuestos(${Math.min(totalPaginas, presuPaginaActual + 1)})" ${presuPaginaActual === totalPaginas ? "disabled" : ""}>›</button>`;
+
+    document.getElementById("presuPaginacionBotones").innerHTML = htmlPaginas;
+
 }
+
+window.verPresupuesto = function (id) {
+
+    const p = presupuestosCache.find(x => x.id === id);
+    if (!p) return;
+
+    const cliente = clientesCache.find(c => c.id === p.clienteId);
+    const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
+    const numeroTexto = p.numero ? "#" + String(p.numero).padStart(5, "0") : "#" + p.id.slice(-4).toUpperCase();
+
+    document.getElementById("verPresuTitulo").textContent = `Presupuesto ${numeroTexto}`;
+    document.getElementById("verPresuCliente").textContent = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "(cliente eliminado)";
+    document.getElementById("verPresuVehiculo").textContent = vehiculo ? `${vehiculo.marca || ""} ${vehiculo.modelo || ""} · ${vehiculo.patente}` : "Sin vehículo asociado";
+
+    document.getElementById("verPresuItems").innerHTML = (p.items || []).map(i =>
+        `<div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;"><span>${escapar(i.descripcion)}</span><span>${formatoPlata(i.monto)}</span></div>`
+    ).join("") || '<div style="color:#777;font-size:12px;">Sin ítems.</div>';
+
+    const subtotal = p.subtotal || p.total || 0;
+    const descuentoMonto = subtotal - (p.total || 0);
+    document.getElementById("verPresuSubtotal").textContent = formatoPlata(subtotal);
+    document.getElementById("verPresuDescuento").textContent = descuentoMonto > 0 ? `-${formatoPlata(descuentoMonto)} (${p.descuentoPorc || 0}%)` : "$0";
+    document.getElementById("verPresuTotal").textContent = formatoPlata(p.total);
+    document.getElementById("verPresuNotas").textContent = p.notas ? "Notas: " + p.notas : "";
+
+    document.getElementById("verPresuBtnImprimir").onclick = () => imprimirPresupuesto(p.id);
+
+    const extra = document.getElementById("verPresuAccionesExtra");
+    let htmlExtra = "";
+    if (cliente && cliente.telefono) {
+        htmlExtra += `<button class="icono-whatsapp-btn" style="width:auto;border-radius:20px;padding:9px 16px;gap:6px;display:inline-flex;align-items:center;flex:1;justify-content:center;" onclick="enviarPresupuestoWhatsApp('${p.id}')">${ICONO_WHATSAPP_SVG} WhatsApp</button>`;
+    }
+    if (p.estado === "Aprobado") {
+        htmlExtra += `<button class="btn-confirmar-gasto" style="flex:1;" onclick="cerrarModales(); convertirPresupuestoEnCobro('${p.id}')">💰 Cobrar</button>`;
+    }
+    extra.innerHTML = htmlExtra;
+
+    document.getElementById("modalVerPresupuesto").classList.add("abierto");
+
+};
+
+// Por ahora "Editar" abre el mismo detalle: la edición completa de ítems de un
+// presupuesto ya creado todavía no está armada (se puede duplicar y rehacer).
+window.editarPresupuesto = function (id) {
+    window.verPresupuesto(id);
+};
+
+window.duplicarPresupuesto = async function (id) {
+
+    const p = presupuestosCache.find(x => x.id === id);
+    if (!p) return;
+
+    const confirmado = confirm("¿Crear una copia de este presupuesto en estado Borrador?");
+    if (!confirmado) return;
+
+    const numeroMax = presupuestosCache.reduce((max, x) => Math.max(max, Number(x.numero) || 0), 0);
+
+    await addDoc(collection(db, "presupuestos"), {
+        numero: numeroMax + 1,
+        clienteId: p.clienteId,
+        vehiculoId: p.vehiculoId || null,
+        items: p.items || [],
+        subtotal: p.subtotal || 0,
+        descuentoPorc: p.descuentoPorc || 0,
+        total: p.total || 0,
+        notas: p.notas || "",
+        estado: "Borrador",
+        fecha: serverTimestamp()
+    });
+
+};
+
+window.exportarPresupuestosFiltrados = function () {
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    const lista = obtenerListaPresupuestosFiltrada().map(p => {
+        const cliente = clientesCache.find(c => c.id === p.clienteId);
+        const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
+        const fecha = toDateSegura(p.fecha);
+        return {
+            Numero: p.numero || "",
+            Cliente: cliente ? `${cliente.apellido}, ${cliente.nombre}` : "",
+            Vehiculo: vehiculo ? `${vehiculo.marca || ""} ${vehiculo.modelo || ""} (${vehiculo.patente})` : "",
+            Fecha: fecha ? fecha.toLocaleDateString("es-AR") : "",
+            Importe: p.total || 0,
+            Estado: p.estado || "",
+            Notas: p.notas || ""
+        };
+    });
+
+    const hoja = XLSX.utils.json_to_sheet(lista.length ? lista : [{ info: "Sin datos" }]);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Presupuestos");
+    XLSX.writeFile(libro, `KM26_Presupuestos_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+};
 
 window.abrirModalPresupuesto = function () {
 
@@ -8498,7 +9083,14 @@ window.guardarPresupuesto = async function () {
 
         const { subtotal, descuentoPorc, totalFinal } = calcularTotalPresupuesto();
 
+        // Número secuencial real: el más alto que ya exista + 1 (no es un
+        // contador atómico de servidor, pero para el volumen de un taller
+        // alcanza y sobra, y nunca se repite hacia atrás).
+        const numeroMax = presupuestosCache.reduce((max, p) => Math.max(max, Number(p.numero) || 0), 0);
+        const numero = numeroMax + 1;
+
         await addDoc(collection(db, "presupuestos"), {
+            numero,
             clienteId, vehiculoId,
             items: presupuestoItemsTemp,
             subtotal, descuentoPorc, total: totalFinal,
@@ -8652,6 +9244,7 @@ window.convertirPresupuestoEnCobro = function (id) {
     const p = presupuestosCache.find(x => x.id === id);
     if (!p) return;
 
+    presupuestoOrigenCuentaId = id;
     cuentaItems = (p.items || []).map(item => ({ ...item }));
 
     const cliente = clientesCache.find(c => c.id === p.clienteId);
