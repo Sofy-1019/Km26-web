@@ -2219,6 +2219,218 @@ header{
     .dash-vehiculo-grid{ grid-template-columns:repeat(3,1fr); }
 }
 
+/* ======================================================================
+   DASHBOARD NUEVO (calcado del mockup de referencia)
+   ====================================================================== */
+
+.dash-header-nuevo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:6px;
+}
+
+.dash-header-nuevo h2{
+    font-size:20px;
+    color:#fff;
+    font-family:'Montserrat',sans-serif;
+    font-weight:800;
+}
+
+.dash-stats-inline{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:#ccc;
+}
+
+.dash-stats-inline strong{
+    color:#fff;
+    font-weight:800;
+}
+
+.dash-seccion-label{
+    font-size:11.5px;
+    font-weight:800;
+    color:#888;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin:18px 0 10px;
+}
+
+.dash-hoy-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-bottom:22px;
+}
+
+@media (min-width:900px){
+    .dash-hoy-grid{ grid-template-columns:repeat(4,1fr); }
+}
+
+.dash-hoy-card{
+    border-radius:16px;
+    padding:18px;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:.15s;
+}
+
+.dash-hoy-card:hover{
+    transform:translateY(-2px);
+}
+
+.dash-hoy-card.rojo{ background:linear-gradient(135deg,#c0392b,#7b241c); }
+.dash-hoy-card.ambar{ background:linear-gradient(135deg,#caa23b,#8a6a1f); }
+.dash-hoy-card.verde{ background:linear-gradient(135deg,#2f9e64,#1c5c3b); }
+.dash-hoy-card.rojo2{ background:linear-gradient(135deg,#b9384f,#7a1f30); }
+
+.dash-hoy-numero{
+    font-size:34px;
+    font-weight:800;
+    color:#fff;
+    font-family:'Montserrat',sans-serif;
+    line-height:1;
+}
+
+.dash-hoy-icono{
+    position:absolute;
+    top:16px;
+    right:16px;
+    font-size:22px;
+    opacity:.9;
+}
+
+.dash-hoy-label{
+    font-size:12.5px;
+    color:#fff;
+    opacity:.9;
+    margin-top:8px;
+    max-width:80%;
+}
+
+.dash-3col{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-bottom:14px;
+}
+
+@media (min-width:1024px){
+    .dash-3col{ grid-template-columns:repeat(3,1fr); }
+}
+
+.dash-2col{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-bottom:14px;
+}
+
+@media (min-width:1024px){
+    .dash-2col{ grid-template-columns:repeat(2,1fr); }
+}
+
+.dash-panel-nuevo{
+    background:#161616;
+    border-radius:16px;
+    padding:18px;
+}
+
+.dash-panel-nuevo-titulo{
+    font-size:12px;
+    font-weight:800;
+    color:#999;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    margin-bottom:14px;
+}
+
+.dash-panel-nuevo-link{
+    display:block;
+    margin-top:12px;
+    font-size:12px;
+    color:#6ab6ff;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.dash-acciones-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.dash-accion-btn{
+    border:none;
+    border-radius:12px;
+    padding:16px 10px;
+    color:#fff;
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    font-family:'Montserrat',sans-serif;
+    text-align:center;
+}
+
+.dash-accion-btn span{
+    font-size:20px;
+}
+
+.dash-accion-btn.azul{ background:#2f6fd1; }
+.dash-accion-btn.violeta{ background:#7c5cf0; }
+.dash-accion-btn.verde{ background:#1fa851; }
+.dash-accion-btn.naranja{ background:#d9622b; }
+.dash-accion-btn.whatsapp{ background:#1fa851; }
+
+.dash-vehiculo-taller-fila{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px dashed #262626;
+    cursor:pointer;
+}
+
+.dash-vehiculo-taller-fila:last-child{
+    border-bottom:none;
+}
+
+.dash-vehiculo-taller-estado{
+    font-size:11.5px;
+    font-weight:700;
+    margin-top:2px;
+}
+
+.dash-entaller-fila{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 14px;
+    border-radius:10px;
+    margin-bottom:8px;
+    font-size:13px;
+    font-weight:600;
+    color:#eee;
+}
+
+.dash-entaller-fila strong{
+    font-size:16px;
+}
+
+.dash-entaller-fila.azul{ background:#0a1e33; color:#6ab6ff; }
+.dash-entaller-fila.ambar{ background:#2a2408; color:#ffb35f; }
+.dash-entaller-fila.verde{ background:#0d2418; color:#5fd98a; }
+
 /* ---- Agenda semanal de turnos ---- */
 
 .agenda-semana-nav{
@@ -2617,58 +2829,86 @@ header{
 
     <section class="seccion activa" id="tab-dashboard">
 
-        <div class="dash-fecha" id="dashFechaLinea" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-            <span class="badge-tiempo-real" id="dashEnVivo"><span class="punto-verde"></span> En vivo</span>
-            <span class="badge-tiempo-real" style="background:#0a1e33;color:#3f9cff;font-size:13px;padding:8px 16px;cursor:pointer;" onclick="cambiarTab('clientes')" title="Ver detalle">
-                🔧 En taller ahora: <strong id="dashEnTallerAhora" style="font-size:15px;">0</strong>
-            </span>
-        </div>
-
-        <div class="dash-grid" id="dashGrid">
-            <div class="dash-card">
-                <div class="dash-card-label">Facturación hoy</div>
-                <div class="dash-card-valor" id="dashFacturacionHoy">-</div>
-            </div>
-            <div class="dash-card">
-                <div class="dash-card-label">Turnos hoy</div>
-                <div class="dash-card-valor" id="dashTurnosHoy">-</div>
-            </div>
-            <div class="dash-card">
-                <div class="dash-card-label">Autos en taller</div>
-                <div class="dash-card-valor" id="dashAutosTaller">-</div>
-            </div>
-            <div class="dash-card">
-                <div class="dash-card-label">Pendiente de cobro</div>
-                <div class="dash-card-valor" id="dashPendienteCobro">-</div>
-            </div>
-            <div class="dash-card">
-                <div class="dash-card-label">Presupuestos pendientes</div>
-                <div class="dash-card-valor" id="dashPresuPendientes">-</div>
-            </div>
-            <div class="dash-card">
-                <div class="dash-card-label">Stock bajo</div>
-                <div class="dash-card-valor" id="dashStockBajo">-</div>
+        <div class="dash-header-nuevo">
+            <h2>KM26 Performance</h2>
+            <div class="dash-stats-inline">
+                <span>🚗 En taller: <strong id="dashInlineEnTaller">0</strong></span>
+                <span>📅 Turnos hoy: <strong id="dashInlineTurnosHoy">0</strong></span>
+                <span>$ Facturado: <strong id="dashInlineFacturado">$0</strong></span>
             </div>
         </div>
 
-        <div class="dash-seccion-titulo" style="margin-top:4px;">Requiere atención</div>
-        <div id="dashAtencion"></div>
+        <div class="dash-seccion-label">Hoy</div>
 
-        <div class="dash-paneles dos-col" style="margin-top:22px;">
+        <div class="dash-hoy-grid">
+            <div class="dash-hoy-card rojo" onclick="cambiarTab('clientes')">
+                <div class="dash-hoy-numero" id="hoyVehiculosTaller">0</div>
+                <div class="dash-hoy-icono">🚗</div>
+                <div class="dash-hoy-label">Vehículos en taller</div>
+            </div>
+            <div class="dash-hoy-card ambar" onclick="cambiarTab('presupuestos')">
+                <div class="dash-hoy-numero" id="hoyPresuEsperando">0</div>
+                <div class="dash-hoy-icono">📄</div>
+                <div class="dash-hoy-label">Presupuestos esperando respuesta</div>
+            </div>
+            <div class="dash-hoy-card verde" onclick="cambiarTab('turnos')">
+                <div class="dash-hoy-numero" id="hoyTurnosHoy">0</div>
+                <div class="dash-hoy-icono">📅</div>
+                <div class="dash-hoy-label">Turnos para hoy</div>
+            </div>
+            <div class="dash-hoy-card rojo2" onclick="cambiarTab('presupuestos')">
+                <div class="dash-hoy-numero" id="hoyCobrosPendientes">0</div>
+                <div class="dash-hoy-icono">💲</div>
+                <div class="dash-hoy-label">Cobros pendientes</div>
+            </div>
+        </div>
 
-            <div class="dash-panel">
-                <div class="dash-panel-titulo">Próximos turnos <a onclick="cambiarTab('turnos')">Ver agenda completa</a></div>
+        <div class="dash-3col">
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Vehículos en taller</div>
+                <div id="dashVehiculosTallerLista"></div>
+                <a class="dash-panel-nuevo-link" onclick="cambiarTab('clientes')">Ver todos los vehículos en taller ›</a>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Acciones rápidas</div>
+                <div class="dash-acciones-grid">
+                    <button class="dash-accion-btn azul" onclick="cambiarTab('clientes')"><span>➕</span>Ingresar vehículo</button>
+                    <button class="dash-accion-btn violeta" onclick="abrirModalTurno()"><span>📅</span>Nuevo turno</button>
+                    <button class="dash-accion-btn azul" onclick="abrirModalPresupuesto()"><span>📄</span>Nuevo presupuesto</button>
+                    <button class="dash-accion-btn verde" onclick="abrirModalCuenta()"><span>💲</span>Registrar cobro</button>
+                    <button class="dash-accion-btn naranja" onclick="modoEscaner='venta'; abrirEscaner()"><span>📦</span>Venta rápida</button>
+                    <button class="dash-accion-btn whatsapp" onclick="cambiarTab('clientes')"><span>💬</span>WhatsApp</button>
+                </div>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Requiere atención</div>
+                <div id="dashAtencion"></div>
+                <a class="dash-panel-nuevo-link" onclick="cambiarTab('clientes')">Ver todas las alertas ›</a>
+            </div>
+
+        </div>
+
+        <div class="dash-2col">
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Mi día</div>
                 <div id="dashProximosTurnos"></div>
+                <a class="dash-panel-nuevo-link" onclick="cambiarTab('turnos')">Ver agenda completa ›</a>
             </div>
 
-            <div class="dash-panel">
-                <div class="dash-panel-titulo">Movimientos recientes <a onclick="cambiarTab('caja')">Ver todos</a></div>
-                <div id="dashMovimientos"></div>
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">En taller</div>
+                <div class="dash-entaller-fila azul"><span>🚗 En taller</span><strong id="etEnTaller">0</strong></div>
+                <div class="dash-entaller-fila ambar"><span>📦 Esperando repuestos</span><strong id="etEsperandoRepuestos">0</strong></div>
+                <div class="dash-entaller-fila verde"><span>✅ Listos para entregar</span><strong id="etListosEntregar">0</strong></div>
             </div>
 
         </div>
 
-        <div class="dash-paneles">
+        <div class="dash-paneles" style="margin-top:22px;">
 
             <div class="dash-panel">
                 <div class="dash-panel-titulo">Facturación (mes actual)</div>
@@ -2676,20 +2916,15 @@ header{
             </div>
 
             <div class="dash-panel">
+                <div class="dash-panel-titulo">Movimientos recientes <a onclick="cambiarTab('caja')">Ver todos</a></div>
+                <div id="dashMovimientos"></div>
+            </div>
+
+            <div class="dash-panel">
                 <div class="dash-panel-titulo">Presupuestos recientes <a onclick="cambiarTab('presupuestos')">Ver todos</a></div>
                 <div id="dashPresuRecientes"></div>
             </div>
 
-            <div class="dash-panel">
-                <div class="dash-panel-titulo">Stock bajo <a onclick="cambiarTab('stock')">Ver todos</a></div>
-                <div id="dashStockBajoLista"></div>
-            </div>
-
-        </div>
-
-        <div class="dash-panel" style="margin-bottom:20px;">
-            <div class="dash-panel-titulo">Vehículos en taller <a onclick="cambiarTab('clientes')">Ver todos</a></div>
-            <div class="dash-vehiculo-grid" id="dashVehiculosTaller"></div>
         </div>
 
     </section>
@@ -4279,8 +4514,8 @@ function getIniciales(nombre, apellido) {
 
 function renderDashboard() {
 
-    const elFactHoy = document.getElementById("dashFacturacionHoy");
-    if (!elFactHoy) return; // el DOM del dashboard todavía no existe (raro, pero por las dudas)
+    const elTitulo = document.getElementById("dashInlineEnTaller");
+    if (!elTitulo) return; // el DOM del dashboard todavía no existe (raro, pero por las dudas)
 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -4294,7 +4529,6 @@ function renderDashboard() {
         const f = m.fecha.toDate();
         if (f >= hoy && m.tipo === "Ingreso") facturacionHoy += Number(m.monto) || 0;
     });
-    elFactHoy.textContent = formatoPlata(facturacionHoy);
 
     // Turnos de hoy
     const turnosHoy = turnosCache.filter(t => {
@@ -4302,27 +4536,43 @@ function renderDashboard() {
         const f = t.fechaHora.toDate();
         return f >= hoy && f < mananaInicio && t.estado !== "Cancelado";
     });
-    document.getElementById("dashTurnosHoy").textContent = turnosHoy.length;
 
-    // Autos en taller: turnos cuyo estado actual es "En taller" (dato real, no inventado)
-    const autosEnTaller = turnosCache.filter(t => t.estado === "En taller");
-    document.getElementById("dashAutosTaller").textContent = autosEnTaller.length;
+    // Vehículos en taller: usa SIEMPRE vehiculo.estadoTaller (el mismo dato que se
+    // ve y se edita en la pestaña Clientes/Vehículos), para no tener dos conceptos
+    // distintos de "en taller" en el sistema.
+    const vehiculosEnTaller = vehiculosCache.filter(v => v.estadoTaller && CONFIG_ESTADO_TALLER[v.estadoTaller]);
+    const esperandoRepuestos = vehiculosEnTaller.filter(v => v.estadoTaller === "Esperando repuestos");
+    const listosEntregar = vehiculosEnTaller.filter(v => v.estadoTaller === "Terminado");
 
-    // Pendiente de cobro: presupuestos aprobados todavía no cobrados
-    const presuAprobadosSinCobrar = presupuestosCache.filter(p => p.estado === "Aprobado");
-    const totalPendiente = presuAprobadosSinCobrar.reduce((s, p) => s + (Number(p.total) || 0), 0);
-    document.getElementById("dashPendienteCobro").textContent = formatoPlata(totalPendiente);
-
-    // Presupuestos pendientes de decisión (Borrador o Enviado, todavía sin aprobar/rechazar)
+    // Presupuestos esperando respuesta del cliente (ya enviados, todavía sin decisión)
+    const presuEsperandoRespuesta = presupuestosCache.filter(p => p.estado === "Enviado");
     const presuPendientesDecision = presupuestosCache.filter(p => p.estado === "Borrador" || p.estado === "Enviado");
-    document.getElementById("dashPresuPendientes").textContent = presuPendientesDecision.length;
 
-    // Stock bajo
+    // Cobros pendientes: presupuestos aprobados todavía no cobrados
+    const presuAprobadosSinCobrar = presupuestosCache.filter(p => p.estado === "Aprobado");
+
+    // ---------- Header con stats en línea + tarjetas "Hoy" ----------
+
+    document.getElementById("dashInlineEnTaller").textContent = vehiculosEnTaller.length;
+    document.getElementById("dashInlineTurnosHoy").textContent = turnosHoy.length;
+    document.getElementById("dashInlineFacturado").textContent = formatoPlata(facturacionHoy);
+
+    document.getElementById("hoyVehiculosTaller").textContent = vehiculosEnTaller.length;
+    document.getElementById("hoyPresuEsperando").textContent = presuEsperandoRespuesta.length;
+    document.getElementById("hoyTurnosHoy").textContent = turnosHoy.length;
+    document.getElementById("hoyCobrosPendientes").textContent = presuAprobadosSinCobrar.length;
+
+    // ---------- Panel "En taller" (mini resumen) ----------
+
+    document.getElementById("etEnTaller").textContent = vehiculosEnTaller.length;
+    document.getElementById("etEsperandoRepuestos").textContent = esperandoRepuestos.length;
+    document.getElementById("etListosEntregar").textContent = listosEntregar.length;
+
+    // Stock bajo (se sigue usando para "Requiere atención")
     const stockBajo = stockCache.filter(p => {
         const min = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
         return (Number(p.cantidad) || 0) <= min;
     });
-    document.getElementById("dashStockBajo").textContent = stockBajo.length;
 
     // ---------- "Requiere atención" (solo situaciones con datos reales) ----------
 
@@ -4346,12 +4596,9 @@ function renderDashboard() {
         filas.push({ texto: "Turnos de hoy sin confirmar", badge: turnosSinConfirmar.length, tab: "turnos" });
     }
 
-    const vehiculosListos = turnosCache.filter(t => {
-        if (!t.fechaHora || !t.fechaHora.toDate) return false;
-        return t.estado === "Finalizado" && t.fechaHora.toDate() >= hoy && t.fechaHora.toDate() < mananaInicio;
-    });
-    if (vehiculosListos.length > 0) {
-        filas.push({ texto: "Vehículos listos para entregar (turnos de hoy finalizados)", badge: vehiculosListos.length, tab: "turnos" });
+    const vehiculosSinPresupuesto = vehiculosEnTaller.filter(v => !presupuestosCache.some(p => p.vehiculoId === v.id));
+    if (vehiculosSinPresupuesto.length > 0) {
+        filas.push({ texto: "Vehículos en taller sin presupuesto", badge: vehiculosSinPresupuesto.length, tab: "clientes" });
     }
 
     // Nota: "Cliente con saldo pendiente" no se incluye porque el sistema todavía
@@ -4362,7 +4609,7 @@ function renderDashboard() {
     } else {
         elAtencion.innerHTML = filas.map(f => `
             <div class="dash-atencion-fila" onclick="cambiarTab('${f.tab}')">
-                <span>${escapar(f.texto)}</span>
+                <span>⚠️ ${escapar(f.texto)}</span>
                 <span class="dash-atencion-badge">${f.badge}</span>
             </div>
         `).join("");
@@ -4387,20 +4634,20 @@ function renderDashboard() {
         }
     }
 
-    // ---------- Próximos turnos (lista, no solo el primero) ----------
+    // ---------- Mi día (turnos de HOY, no "próximos" en general) ----------
 
     const elProximos = document.getElementById("dashProximosTurnos");
     const ahora = new Date();
-    const proximos = turnosCache
-        .filter(t => t.fechaHora && t.fechaHora.toDate && t.fechaHora.toDate() >= ahora && t.estado !== "Cancelado")
+    const deHoy = turnosHoy
+        .filter(t => t.fechaHora.toDate() >= (ahora < hoy ? hoy : ahora) || t.fechaHora.toDate() >= hoy)
         .sort((a, b) => a.fechaHora.toDate() - b.fechaHora.toDate())
-        .slice(0, 5);
+        .slice(0, 6);
 
     if (elProximos) {
-        if (proximos.length === 0) {
-            elProximos.innerHTML = '<div class="vacio">No hay turnos próximos.</div>';
+        if (deHoy.length === 0) {
+            elProximos.innerHTML = '<div class="vacio">No hay turnos para hoy.</div>';
         } else {
-            elProximos.innerHTML = proximos.map(t => {
+            elProximos.innerHTML = deHoy.map(t => {
                 const fecha = t.fechaHora.toDate();
                 const cliente = clientesCache.find(c => c.id === t.clienteId);
                 const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
@@ -4476,7 +4723,6 @@ function renderDashboard() {
         if (recientes.length === 0) {
             elPresuRecientes.innerHTML = '<div class="vacio">Sin presupuestos todavía.</div>';
         } else {
-            const clase = window.claseEstadoLocal || null; // no-op, se usa claseEstado() de abajo
             elPresuRecientes.innerHTML = recientes.map(p => {
                 const cliente = clientesCache.find(c => c.id === p.clienteId);
                 const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
@@ -4492,41 +4738,25 @@ function renderDashboard() {
         }
     }
 
-    // ---------- Stock bajo (lista) ----------
+    // ---------- Vehículos en taller (lista con estado real, sin inventar checklist) ----------
 
-    const elStockLista = document.getElementById("dashStockBajoLista");
-    if (elStockLista) {
-        if (stockBajo.length === 0) {
-            elStockLista.innerHTML = '<div class="vacio">Sin alertas de stock.</div>';
-        } else {
-            elStockLista.innerHTML = stockBajo.slice(0, 6).map(p => {
-                const min = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
-                return `<div class="dash-stock-fila">
-                    <span>${escapar(p.nombre)}</span>
-                    <span style="color:#ffb35f;font-weight:700;white-space:nowrap;">${p.cantidad} / mín. ${min}</span>
-                </div>`;
-            }).join("");
-        }
-    }
-
-    // ---------- Vehículos en taller ----------
-
-    const elVehTaller = document.getElementById("dashVehiculosTaller");
+    const elVehTaller = document.getElementById("dashVehiculosTallerLista");
     if (elVehTaller) {
-        if (autosEnTaller.length === 0) {
+        if (vehiculosEnTaller.length === 0) {
             elVehTaller.innerHTML = '<div class="vacio">No hay vehículos en taller ahora mismo.</div>';
         } else {
-            elVehTaller.innerHTML = autosEnTaller.map(t => {
-                const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
-                const cliente = clientesCache.find(c => c.id === t.clienteId);
+            elVehTaller.innerHTML = vehiculosEnTaller.slice(0, 5).map(v => {
+                const cliente = clientesCache.find(c => c.id === v.clienteId);
                 const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(sin datos)";
-                return `<div class="dash-vehiculo-card">
-                    <div class="item-icono-auto">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
+                const cfg = CONFIG_ESTADO_TALLER[v.estadoTaller];
+                return `<div class="dash-vehiculo-taller-fila" onclick="abrirFichaVehiculo('${v.id}')">
+                    <div class="item-icono-auto" style="width:36px;height:36px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
                     </div>
                     <div class="item-info">
-                        <div class="item-titulo">${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") : "(vehículo eliminado)"}</div>
-                        <div class="item-sub">${vehiculo ? escapar(vehiculo.patente) + " · " : ""}${escapar(nombreCliente)}</div>
+                        <div class="item-titulo" style="font-size:13.5px;">${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
+                        <div class="item-sub">${escapar(nombreCliente)}</div>
+                        <div class="dash-vehiculo-taller-estado" style="color:${cfg.color};">${cfg.icono} ${escapar(v.estadoTaller)}</div>
                     </div>
                 </div>`;
             }).join("");
@@ -4561,10 +4791,10 @@ function escucharVehiculos() {
 const ESTADOS_TALLER = ["", "Esperando aprobación", "En reparación", "Esperando repuestos", "Terminado"];
 
 const CONFIG_ESTADO_TALLER = {
-    "Esperando aprobación": { clase: "estado-aprobacion", icono: "⏳" },
-    "En reparación": { clase: "estado-reparacion", icono: "🔧" },
-    "Esperando repuestos": { clase: "estado-repuestos", icono: "📦" },
-    "Terminado": { clase: "estado-terminado", icono: "✓" }
+    "Esperando aprobación": { clase: "estado-aprobacion", icono: "⏳", color: "#f5a623" },
+    "En reparación": { clase: "estado-reparacion", icono: "🔧", color: "#3f9cff" },
+    "Esperando repuestos": { clase: "estado-repuestos", icono: "📦", color: "#a855f7" },
+    "Terminado": { clase: "estado-terminado", icono: "✓", color: "#14b8a6" }
 };
 
 window.cambiarEstadoTaller = async function (id, nuevoEstado) {
@@ -4579,9 +4809,6 @@ function renderTableroTaller() {
 
     const vehiculosEnTaller = vehiculosCache.filter(v => v.estadoTaller && CONFIG_ESTADO_TALLER[v.estadoTaller]);
     elTotal.textContent = vehiculosEnTaller.length;
-
-    const elDashTotal = document.getElementById("dashEnTallerAhora");
-    if (elDashTotal) elDashTotal.textContent = vehiculosEnTaller.length;
 
     elGrid.innerHTML = Object.keys(CONFIG_ESTADO_TALLER).map(estado => {
 
