@@ -2642,6 +2642,461 @@ header{
     max-width:118px;
 }
 
+/* ======================================================================
+   CLIENTES / VEHÍCULOS — vista "En taller ahora" (calcada del mockup)
+   ====================================================================== */
+
+.cv-buscador-fila{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+}
+
+.cv-chips-fila{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+}
+
+.cv-chip{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#161616;
+    border:1px solid #2a2a2a;
+    border-radius:14px;
+    padding:12px 16px;
+    cursor:pointer;
+    transition:.15s;
+    flex:1;
+    min-width:150px;
+}
+
+.cv-chip.activo{
+    border-color:#d71920;
+}
+
+.cv-chip-icono{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    flex-shrink:0;
+    color:#fff;
+}
+
+.cv-chip-numero{
+    font-size:18px;
+    font-weight:800;
+    font-family:'Montserrat',sans-serif;
+    color:#fff;
+}
+
+.cv-chip-label{
+    font-size:11px;
+    color:#999;
+}
+
+.cv-grid-taller{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-top:14px;
+}
+
+@media (min-width:700px){
+    .cv-grid-taller{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media (min-width:1200px){
+    .cv-grid-taller{ grid-template-columns:repeat(3,1fr); }
+}
+
+.cv-grid-taller.vista-lista{
+    grid-template-columns:1fr;
+}
+
+.cv-card-vehiculo{
+    background:#161616;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid #262626;
+}
+
+.cv-card-foto{
+    position:relative;
+    height:110px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.cv-card-foto svg{
+    width:56px;
+    height:56px;
+    opacity:.35;
+}
+
+.cv-card-badge-estado{
+    position:absolute;
+    top:10px;
+    left:10px;
+    font-size:10.5px;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:20px;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+
+.cv-card-cuerpo{
+    padding:14px 16px;
+}
+
+.cv-card-patente{
+    font-weight:800;
+    font-size:15px;
+    color:#fff;
+    font-family:'Montserrat',sans-serif;
+}
+
+.cv-card-modelo{
+    font-size:12.5px;
+    color:#aaa;
+    margin-bottom:10px;
+}
+
+.cv-card-linea{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:#ccc;
+    margin-bottom:5px;
+}
+
+.cv-card-linea.presupuesto{
+    color:#5fd98a;
+    font-weight:700;
+}
+
+.cv-card-acciones{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.cv-card-acciones .btn-whatsapp-lindo{
+    flex:1;
+    justify-content:center;
+    padding:9px 10px;
+    font-size:12px;
+}
+
+.cv-card-acciones .btn-chico{
+    flex:1;
+    text-align:center;
+}
+
+/* ======================================================================
+   TURNOS — nuevo diseño (calcado del mockup)
+   ====================================================================== */
+
+.turnos-chips-fila{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+}
+
+.cv-chip-toggle{
+    background:#161616;
+    border:1px solid #333;
+    color:#ccc;
+    padding:9px 20px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:'Montserrat',sans-serif;
+}
+
+.cv-chip-toggle.activo{
+    border-color:#d71920;
+    color:#ff8a7a;
+    background:rgba(215,25,32,.12);
+}
+
+.turnos-stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-bottom:16px;
+}
+
+@media (min-width:900px){
+    .turnos-stats-grid{ grid-template-columns:repeat(4,1fr); }
+}
+
+.turnos-stat-card{
+    background:#161616;
+    border-radius:14px;
+    padding:16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-bottom:3px solid transparent;
+    position:relative;
+    overflow:hidden;
+}
+
+.turnos-stat-card::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:3px;
+}
+
+.turnos-stat-card.rojo::after{ background:#d71920; }
+.turnos-stat-card.ambar::after{ background:#c99a3f; }
+.turnos-stat-card.verde::after{ background:#2fdb6e; }
+.turnos-stat-card.violeta::after{ background:#8b5cf6; }
+
+.turnos-stat-icono{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+}
+
+.turnos-stat-card.rojo .turnos-stat-icono{ background:#3a1416; }
+.turnos-stat-card.ambar .turnos-stat-icono{ background:#3a2e13; }
+.turnos-stat-card.verde .turnos-stat-icono{ background:#0d2418; }
+.turnos-stat-card.violeta .turnos-stat-icono{ background:#241a3a; }
+
+.turnos-stat-numero{
+    font-size:24px;
+    font-weight:800;
+    color:#fff;
+    font-family:'Montserrat',sans-serif;
+    line-height:1.1;
+}
+
+.turnos-stat-label{
+    font-size:11.5px;
+    color:#999;
+}
+
+.turnos-2col{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+}
+
+@media (min-width:1024px){
+    .turnos-2col{ grid-template-columns:290px 1fr; }
+}
+
+.mini-cal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.mini-cal-titulo{
+    font-size:12px;
+    font-weight:800;
+    color:#999;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+}
+
+.mini-cal-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+}
+
+.mini-cal-nav .btn-redondo{
+    width:26px;
+    height:26px;
+    font-size:14px;
+}
+
+.mini-cal-dias-header{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    text-align:center;
+    font-size:10px;
+    color:#777;
+    margin-bottom:6px;
+}
+
+.mini-cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:3px;
+}
+
+.mini-cal-dia{
+    aspect-ratio:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border-radius:8px;
+    font-size:11.5px;
+    color:#ccc;
+    cursor:pointer;
+    position:relative;
+}
+
+.mini-cal-dia.fuera{
+    color:#444;
+}
+
+.mini-cal-dia.hoy{
+    background:#d71920;
+    color:#fff;
+    font-weight:800;
+}
+
+.mini-cal-dia.seleccionado:not(.hoy){
+    background:#2a2a2e;
+    border:1px solid #d71920;
+}
+
+.mini-cal-dia .punto{
+    width:4px;
+    height:4px;
+    border-radius:50%;
+    background:#f5a623;
+    margin-top:1px;
+}
+
+.turno-fila-nueva{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#1a1a1a;
+    border-left:4px solid #555;
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:9px;
+    flex-wrap:wrap;
+}
+
+.turno-fila-nueva .hora-col{
+    min-width:64px;
+    font-weight:800;
+    font-size:13px;
+    color:#fff;
+}
+
+.turno-fila-nueva .marca-icono{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#242428;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    flex-shrink:0;
+}
+
+.turno-fila-nueva .veh-col{
+    min-width:130px;
+}
+
+.turno-fila-nueva .veh-modelo{
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+}
+
+.turno-fila-nueva .veh-patente{
+    font-size:11px;
+    color:#888;
+}
+
+.turno-fila-nueva .cli-col{
+    min-width:150px;
+    flex:1;
+}
+
+.turno-fila-nueva .cli-nombre{
+    font-size:12.5px;
+    font-weight:600;
+    color:#eee;
+}
+
+.turno-fila-nueva .cli-tel{
+    font-size:11px;
+    color:#5fd98a;
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+
+.turno-fila-nueva .serv-col{
+    min-width:150px;
+    flex:1;
+    font-size:12px;
+    color:#ccc;
+}
+
+.turno-fila-nueva .serv-mecanico{
+    font-size:11px;
+    color:#888;
+}
+
+.turno-fila-nueva .acciones-col{
+    display:flex;
+    gap:6px;
+    margin-left:auto;
+}
+
+.icono-accion-turno{
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#1a1a1c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#ccc;
+}
+
+.icono-accion-turno.borrar{
+    color:#ff6b6b;
+    border-color:#5a1f22;
+}
+
+.icono-accion-turno svg{
+    width:16px;
+    height:16px;
+}
+
 </style>
 </head>
 
@@ -2874,7 +3329,7 @@ header{
             <div class="dash-panel-nuevo">
                 <div class="dash-panel-nuevo-titulo">Acciones rápidas</div>
                 <div class="dash-acciones-grid">
-                    <button class="dash-accion-btn azul" onclick="cambiarTab('clientes')"><span>➕</span>Ingresar vehículo</button>
+                    <button class="dash-accion-btn azul" onclick="abrirModalIngresarVehiculo()"><span>➕</span>Ingresar vehículo</button>
                     <button class="dash-accion-btn violeta" onclick="abrirModalTurno()"><span>📅</span>Nuevo turno</button>
                     <button class="dash-accion-btn azul" onclick="abrirModalPresupuesto()"><span>📄</span>Nuevo presupuesto</button>
                     <button class="dash-accion-btn verde" onclick="abrirModalCuenta()"><span>💲</span>Registrar cobro</button>
@@ -2931,15 +3386,37 @@ header{
 
     <section class="seccion" id="tab-clientes">
 
-        <div class="tablero-taller">
-            <div class="tablero-taller-total">
-                <span class="numero" id="tallerTotalNumero">0</span>
-                <span class="etiqueta">Vehículos en taller ahora</span>
-            </div>
-            <div class="tablero-taller-grid" id="tallerTableroGrid"></div>
+        <div class="fila-titulo">
+            <h2>Clientes / Vehículos</h2>
         </div>
 
-        <div class="fila-titulo"><h2>Clientes / Vehículos</h2></div>
+        <div class="cv-buscador-fila">
+            <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="buscadorClientesVeh" placeholder="Buscar por patente, cliente, modelo o teléfono...">
+            </div>
+            <button class="btn-red" style="white-space:nowrap;" onclick="abrirModalIngresarVehiculo()">+ Ingresar vehículo</button>
+        </div>
+
+        <div class="cv-chips-fila" id="cvChipsFiltro"></div>
+
+        <div class="fila-titulo" style="margin-top:20px;">
+            <h2 style="font-size:15px;color:#999;text-transform:uppercase;letter-spacing:.5px;">En taller ahora</h2>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <select id="cvOrdenarPor" class="turno-estado-select" onchange="renderTarjetasEnTaller()">
+                    <option value="recientes">Más recientes</option>
+                    <option value="patente">Patente (A-Z)</option>
+                    <option value="cliente">Cliente (A-Z)</option>
+                </select>
+                <button class="btn-chico" id="cvBtnVistaGrilla" onclick="cambiarVistaCV('grilla')" title="Vista en grilla">▦</button>
+                <button class="btn-chico" id="cvBtnVistaLista" onclick="cambiarVistaCV('lista')" title="Vista en lista">☰</button>
+            </div>
+        </div>
+
+        <div class="cv-grid-taller" id="cvGridTaller"></div>
+        <a class="dash-panel-nuevo-link" id="cvVerTodosLink" onclick="verTodosVehiculosTaller()" style="display:inline-block;margin:4px 0 20px;">Ver todos los vehículos en taller ›</a>
+
+        <div class="fila-titulo" style="margin-top:8px;"><h2 style="font-size:15px;color:#999;text-transform:uppercase;letter-spacing:.5px;">Todos los clientes</h2></div>
         <div id="tablaClientes"></div>
     </section>
 
@@ -2963,13 +3440,79 @@ header{
         </div>
 
         <div id="vistaListaTurnos">
-            <div class="fila-titulo" style="margin-top:6px;">
-                <div style="display:flex;gap:8px;">
-                    <button class="btn-chico" id="btnFiltroProximos" style="border-color:#d71920;" onclick="filtrarTurnos('proximos')">Próximos</button>
-                    <button class="btn-chico" id="btnFiltroTodos" onclick="filtrarTurnos('todos')">Todos</button>
+
+            <div class="turnos-chips-fila">
+                <button class="cv-chip-toggle activo" id="btnFiltroProximos" onclick="filtrarTurnos('proximos')">Próximos</button>
+                <button class="cv-chip-toggle" id="btnFiltroTodos" onclick="filtrarTurnos('todos')">Todos</button>
+            </div>
+
+            <div class="turnos-stats-grid">
+                <div class="turnos-stat-card rojo">
+                    <div class="turnos-stat-icono">📅</div>
+                    <div><div class="turnos-stat-numero" id="turnosStatHoy">0</div><div class="turnos-stat-label" id="turnosStatHoyFecha">Hoy</div></div>
+                </div>
+                <div class="turnos-stat-card ambar">
+                    <div class="turnos-stat-icono">📅</div>
+                    <div><div class="turnos-stat-numero" id="turnosStatManana">0</div><div class="turnos-stat-label" id="turnosStatMananaFecha">Mañana</div></div>
+                </div>
+                <div class="turnos-stat-card verde">
+                    <div class="turnos-stat-icono">📅</div>
+                    <div><div class="turnos-stat-numero" id="turnosStatSemana">0</div><div class="turnos-stat-label" id="turnosStatSemanaFecha">Esta semana</div></div>
+                </div>
+                <div class="turnos-stat-card violeta">
+                    <div class="turnos-stat-icono">📅</div>
+                    <div><div class="turnos-stat-numero" id="turnosStatMes">0</div><div class="turnos-stat-label" id="turnosStatMesFecha">Este mes</div></div>
                 </div>
             </div>
-            <div id="listaTurnos"></div>
+
+            <div class="turnos-2col">
+
+                <div class="turnos-panel-izq">
+
+                    <div class="dash-panel-nuevo">
+                        <div class="mini-cal-header">
+                            <span class="mini-cal-titulo">Calendario</span>
+                        </div>
+                        <div class="mini-cal-nav">
+                            <button class="btn-redondo" onclick="moverMesMiniCalendario(-1)">‹</button>
+                            <span id="miniCalMesTexto">-</span>
+                            <button class="btn-redondo" onclick="moverMesMiniCalendario(1)">›</button>
+                        </div>
+                        <div class="mini-cal-dias-header">
+                            <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+                        </div>
+                        <div class="mini-cal-grid" id="miniCalGrid"></div>
+                    </div>
+
+                    <div class="dash-panel-nuevo" style="margin-top:14px;">
+                        <div class="dash-panel-nuevo-titulo">Filtros rápidos</div>
+                        <label style="display:block;font-size:12px;color:#999;margin:8px 0 5px;">Estado</label>
+                        <select id="filtroTurnoEstado" class="turno-estado-select" style="width:100%;" onchange="renderTurnos()">
+                            <option value="">Todos</option>
+                        </select>
+                        <label style="display:block;font-size:12px;color:#999;margin:12px 0 5px;">Mecánico</label>
+                        <select id="filtroTurnoMecanico" class="turno-estado-select" style="width:100%;" onchange="renderTurnos()">
+                            <option value="">Todos</option>
+                        </select>
+                        <label style="display:block;font-size:12px;color:#999;margin:12px 0 5px;">Servicio</label>
+                        <select id="filtroTurnoServicio" class="turno-estado-select" style="width:100%;" onchange="renderTurnos()">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="dash-panel-nuevo">
+                    <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Próximos turnos</span>
+                        <button class="btn-chico" onclick="cambiarVistaTurnos('agenda')">📅 Ver agenda completa</button>
+                    </div>
+                    <div id="listaTurnos"></div>
+                    <button class="btn-chico" id="btnVerMasTurnos" style="width:100%;margin-top:10px;display:none;" onclick="verMasTurnos()">Ver más turnos ▾</button>
+                </div>
+
+            </div>
+
         </div>
 
         <div id="vistaAgendaTurnos" style="display:none;">
@@ -3278,6 +3821,43 @@ header{
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarOverlayRapido()">Cerrar</button>
         </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: ingresar vehículo (busca cliente o crea uno rápido) ---------- -->
+<div class="overlay" id="modalIngresarVehiculo">
+    <div class="modal">
+        <h3>+ Ingresar vehículo</h3>
+
+        <label>Cliente (buscá por nombre o patente)</label>
+        <input type="text" id="ivClienteBuscar" placeholder="Ej: Esteban o AB123CD" autocomplete="off" oninput="buscarClienteIngresarVehiculo()" onfocus="buscarClienteIngresarVehiculo()">
+        <input type="hidden" id="ivClienteId">
+        <div id="ivClienteResultados" style="display:none;background:#1a1a1a;border:1px solid #333;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto;"></div>
+        <p style="font-size:11px;color:#777;margin-top:6px;">¿Es un cliente nuevo? <span style="color:#ff6b6b;cursor:pointer;" onclick="cerrarModales(); abrirModalCliente();">Cargalo primero acá</span> y volvé a esta pantalla.</p>
+
+        <label>Patente</label>
+        <input type="text" id="ivPatente" placeholder="AB123CD">
+        <label>Marca</label>
+        <input type="text" id="ivMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off" oninput="actualizarModelos(this.value)">
+        <label>Modelo</label>
+        <input type="text" id="ivModelo" placeholder="Vento" list="listaModelos" autocomplete="off">
+        <label>Año</label>
+        <input type="text" id="ivAnio" placeholder="2020">
+
+        <label>Estado inicial en el taller (opcional)</label>
+        <select id="ivEstadoTaller">
+            <option value="">Todavía no entra al taller</option>
+            <option value="Esperando aprobación">⏳ Esperando aprobación</option>
+            <option value="En reparación">🔧 En reparación</option>
+            <option value="Esperando repuestos">📦 Esperando repuestos</option>
+        </select>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarIngresarVehiculo()">Guardar</button>
+        </div>
+
+        <p id="mensajeEstadoIngresarVehiculo"></p>
     </div>
 </div>
 
@@ -3744,19 +4324,31 @@ header{
         <label>Vehículo (opcional)</label>
         <select id="tVehiculo"></select>
 
-        <label>Fecha</label>
-        <input type="date" id="tFecha">
-
-        <label>Hora</label>
-        <input type="time" id="tHora">
+        <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+                <label>Fecha</label>
+                <input type="date" id="tFecha">
+            </div>
+            <div>
+                <label>Hora</label>
+                <input type="time" id="tHora">
+            </div>
+        </div>
 
         <label>Servicio</label>
         <input type="text" id="tServicio" placeholder="Cambio de aceite, diagnóstico, etc.">
+
+        <label>Mecánico asignado (opcional)</label>
+        <select id="tMecanico">
+            <option value="">Sin asignar</option>
+        </select>
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
             <button class="btn-red" onclick="guardarTurno()">Guardar</button>
         </div>
+
+        <div class="modal-botones" id="accionesTurno" style="display:none;"></div>
 
         <p id="mensajeEstadoTurno"></p>
     </div>
@@ -3916,6 +4508,24 @@ header{
     <option value="Mitsubishi">
     <option value="Hyundai">
     <option value="Kia">
+    <option value="BYD">
+    <option value="Haval">
+    <option value="JAC">
+    <option value="Geely">
+    <option value="Baic">
+    <option value="Foton">
+    <option value="Iveco">
+    <option value="Volvo">
+    <option value="Audi">
+    <option value="BMW">
+    <option value="Mercedes-Benz">
+    <option value="Subaru">
+    <option value="Alfa Romeo">
+    <option value="Isuzu">
+    <option value="Great Wall">
+    <option value="Lifan">
+    <option value="DFSK">
+    <option value="Changan">
 </datalist>
 
 <datalist id="listaModelos"></datalist>
@@ -3952,25 +4562,44 @@ const storage = getStorage(app);
 // ---------- Marcas y modelos comunes en Argentina (para autocompletar) ----------
 
 const MODELOS_POR_MARCA = {
-    "volkswagen": ["Gol", "Polo", "Vento", "Virtus", "Nivus", "T-Cross", "Taos", "Amarok", "Suran", "Voyage", "Saveiro", "Fox"],
-    "ford": ["Fiesta", "Focus", "Ka", "EcoSport", "Ranger", "Territory", "Mondeo"],
-    "chevrolet": ["Onix", "Cruze", "Prisma", "Spin", "S10", "Tracker", "Corsa", "Astra"],
-    "fiat": ["Cronos", "Argo", "Mobi", "Toro", "Strada", "Palio", "Uno", "Siena"],
-    "renault": ["Sandero", "Logan", "Duster", "Kangoo", "Captur", "Kwid", "Clio", "Fluence", "Alaskan"],
-    "peugeot": ["208", "2008", "3008", "Partner", "408", "308"],
-    "toyota": ["Corolla", "Hilux", "Etios", "Yaris", "SW4", "RAV4"],
-    "honda": ["Civic", "HR-V", "City", "Fit", "CR-V"],
-    "nissan": ["Versa", "Kicks", "Frontier", "March", "Sentra"],
-    "citroën": ["C3", "C4 Cactus", "Berlingo"],
-    "citroen": ["C3", "C4 Cactus", "Berlingo"],
-    "jeep": ["Renegade", "Compass"],
-    "ram": ["1500", "700", "2500"],
-    "chery": ["Tiggo 2", "Tiggo 3", "Tiggo 7", "Arrizo"],
+    "volkswagen": ["Gol", "Polo", "Vento", "Virtus", "Nivus", "T-Cross", "Taos", "Amarok", "Suran", "Voyage", "Saveiro", "Fox", "Up!", "Tiguan", "Passat", "Bora", "Golf", "Crossfox", "Spacefox", "Jetta"],
+    "ford": ["Fiesta", "Focus", "Ka", "EcoSport", "Ranger", "Territory", "Mondeo", "Bronco Sport", "Maverick", "Escort", "Orion", "Transit", "Cargo", "F-100", "F-150"],
+    "chevrolet": ["Onix", "Cruze", "Prisma", "Spin", "S10", "Tracker", "Corsa", "Astra", "Celta", "Agile", "Meriva", "Vectra", "Zafira", "Captiva", "Trailblazer", "Montana", "Camaro"],
+    "fiat": ["Cronos", "Argo", "Mobi", "Toro", "Strada", "Palio", "Uno", "Siena", "Punto", "Idea", "Doblo", "Fiorino", "Linea", "500", "Ducato", "Pulse", "Fastback", "Titano"],
+    "renault": ["Sandero", "Logan", "Duster", "Kangoo", "Captur", "Kwid", "Clio", "Fluence", "Alaskan", "Megane", "Scenic", "Symbol", "Stepway", "Koleos", "Oroch", "Master", "Trafic", "Twingo", "9", "12", "19"],
+    "peugeot": ["208", "2008", "3008", "Partner", "408", "308", "207", "307", "406", "Expert", "Boxer", "5008", "Rifter", "Landtrek"],
+    "toyota": ["Corolla", "Hilux", "Etios", "Yaris", "SW4", "RAV4", "Corolla Cross", "Camry", "Hiace", "C-HR", "Prius", "Land Cruiser", "Yaris Cross"],
+    "honda": ["Civic", "HR-V", "City", "Fit", "CR-V", "WR-V", "Accord"],
+    "nissan": ["Versa", "Kicks", "Frontier", "March", "Sentra", "X-Trail", "Note", "Tiida", "Leaf"],
+    "citroën": ["C3", "C4 Cactus", "Berlingo", "C4 Lounge", "C4", "Jumpy", "Jumper", "C3 Aircross", "AMI"],
+    "citroen": ["C3", "C4 Cactus", "Berlingo", "C4 Lounge", "C4", "Jumpy", "Jumper", "C3 Aircross", "AMI"],
+    "jeep": ["Renegade", "Compass", "Commander", "Wrangler", "Grand Cherokee"],
+    "ram": ["1500", "700", "2500", "Rampage"],
+    "chery": ["Tiggo 2", "Tiggo 3", "Tiggo 7", "Tiggo 7 Pro", "Tiggo 8", "Arrizo", "Arrizo 5", "QQ", "iCar"],
     "ds": ["DS3", "DS4", "DS7"],
-    "suzuki": ["Fun", "S-Presso", "Vitara"],
-    "mitsubishi": ["L200", "ASX", "Outlander"],
-    "hyundai": ["HB20", "Creta", "Tucson"],
-    "kia": ["Rio", "Sportage", "Cerato"]
+    "suzuki": ["Fun", "S-Presso", "Vitara", "Swift", "Baleno", "Jimny", "Ertiga"],
+    "mitsubishi": ["L200", "ASX", "Outlander", "Eclipse Cross", "Montero"],
+    "hyundai": ["HB20", "Creta", "Tucson", "Santa Fe", "Accent", "i10", "i20", "Elantra", "Grand i10", "Kona"],
+    "kia": ["Rio", "Sportage", "Cerato", "Picanto", "Soul", "Sorento", "Seltos", "K2500"],
+    "byd": ["Song Plus", "Yuan Plus", "Dolphin", "Seal", "King", "Han", "Tan"],
+    "haval": ["H6", "Jolion", "H6 GT"],
+    "jac": ["T40", "T50", "T60", "T80", "S3", "iEV40"],
+    "geely": ["Coolray", "Emgrand", "Azkarra", "GX3"],
+    "baic": ["X35", "X55", "D20"],
+    "foton": ["Toano", "Tunland", "Aumark"],
+    "iveco": ["Daily", "Tector", "Cursor"],
+    "volvo": ["XC40", "XC60", "XC90", "S60", "FH", "FM"],
+    "audi": ["A3", "A4", "Q3", "Q5", "A1"],
+    "bmw": ["Serie 1", "Serie 3", "X1", "X3", "X5"],
+    "mercedes-benz": ["Clase A", "Clase C", "GLA", "Sprinter", "Vito", "Actros"],
+    "mercedes": ["Clase A", "Clase C", "GLA", "Sprinter", "Vito", "Actros"],
+    "subaru": ["Impreza", "Forester", "XV", "Outback"],
+    "alfa romeo": ["Giulietta", "Giulia", "Stelvio"],
+    "isuzu": ["D-Max"],
+    "great wall": ["Poer", "Wingle 5"],
+    "lifan": ["X60", "Foison"],
+    "dfsk": ["Glory 580", "K01"],
+    "changan": ["CS35", "Alsvin"]
 };
 
 function actualizarModelos(marcaTexto) {
@@ -4195,11 +4824,19 @@ function ejecutarBusqueda(q) {
 
 document.getElementById("buscador").addEventListener("input", function () {
     document.getElementById("buscadorDesktop").value = this.value;
+    document.getElementById("buscadorClientesVeh").value = this.value;
     ejecutarBusqueda(this.value);
 });
 
 document.getElementById("buscadorDesktop").addEventListener("input", function () {
     document.getElementById("buscador").value = this.value;
+    document.getElementById("buscadorClientesVeh").value = this.value;
+    ejecutarBusqueda(this.value);
+});
+
+document.getElementById("buscadorClientesVeh").addEventListener("input", function () {
+    document.getElementById("buscador").value = this.value;
+    document.getElementById("buscadorDesktop").value = this.value;
     ejecutarBusqueda(this.value);
 });
 
@@ -4268,6 +4905,7 @@ window.cerrarModales = function () {
     document.getElementById("modalServicio").classList.remove("abierto");
     document.getElementById("modalFichaVehiculo").classList.remove("abierto");
     document.getElementById("modalQRVehiculo").classList.remove("abierto");
+    document.getElementById("modalIngresarVehiculo").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -4798,30 +5436,173 @@ const CONFIG_ESTADO_TALLER = {
 };
 
 window.cambiarEstadoTaller = async function (id, nuevoEstado) {
-    await updateDoc(doc(db, "vehiculos", id), { estadoTaller: nuevoEstado || null });
+
+    const v = vehiculosCache.find(x => x.id === id);
+    const datos = { estadoTaller: nuevoEstado || null };
+
+    // Si el vehículo recién entra al taller (antes no tenía estado), guardamos
+    // la fecha real de ingreso para poder mostrar "Ingresó hace X días".
+    // Si sale del taller (queda "Sin asignar"), se borra esa fecha.
+    if (nuevoEstado && (!v || !v.estadoTaller)) {
+        datos.fechaIngresoTaller = serverTimestamp();
+    } else if (!nuevoEstado) {
+        datos.fechaIngresoTaller = null;
+    }
+
+    await updateDoc(doc(db, "vehiculos", id), datos);
+
 };
+
+// ---------- "En taller ahora": chips de filtro + tarjetas (calcado del mockup) ----------
+
+let filtroTallerActivo = "todos";
+let vistaClientesVehiculos = "grilla";
+let mostrarTodosEnTaller = false;
+
+const CHIPS_TALLER = [
+    { key: "Esperando aprobación", label: "Esperando aprobación", color: "#f5a623", bg: "#2a2408" },
+    { key: "En reparación", label: "En reparación", color: "#3f9cff", bg: "#0a1e33" },
+    { key: "Esperando repuestos", label: "Esperando repuestos", color: "#a855f7", bg: "#22123a" },
+    { key: "Terminado", label: "Terminado", color: "#14b8a6", bg: "#0a2e2c" }
+];
 
 function renderTableroTaller() {
 
-    const elGrid = document.getElementById("tallerTableroGrid");
-    const elTotal = document.getElementById("tallerTotalNumero");
-    if (!elGrid) return;
+    const elChips = document.getElementById("cvChipsFiltro");
+    if (!elChips) return;
 
     const vehiculosEnTaller = vehiculosCache.filter(v => v.estadoTaller && CONFIG_ESTADO_TALLER[v.estadoTaller]);
-    elTotal.textContent = vehiculosEnTaller.length;
 
-    elGrid.innerHTML = Object.keys(CONFIG_ESTADO_TALLER).map(estado => {
+    let html = CHIPS_TALLER.map(c => {
+        const cantidad = vehiculosEnTaller.filter(v => v.estadoTaller === c.key).length;
+        return `<div class="cv-chip ${filtroTallerActivo === c.key ? "activo" : ""}" onclick="filtrarPorEstadoTaller('${c.key}')">
+            <div class="cv-chip-icono" style="background:${c.color};">${CONFIG_ESTADO_TALLER[c.key].icono}</div>
+            <div>
+                <div class="cv-chip-numero">${cantidad}</div>
+                <div class="cv-chip-label">${c.label}</div>
+            </div>
+        </div>`;
+    }).join("");
 
-        const cfg = CONFIG_ESTADO_TALLER[estado];
-        const vehiculosDeEsteEstado = vehiculosEnTaller.filter(v => v.estadoTaller === estado);
-        const patentes = vehiculosDeEsteEstado.map(v => escapar(v.patente)).join(" · ");
+    html += `<div class="cv-chip ${filtroTallerActivo === "todos" ? "activo" : ""}" onclick="filtrarPorEstadoTaller('todos')">
+        <div class="cv-chip-icono" style="background:#555;">🚗</div>
+        <div>
+            <div class="cv-chip-numero">${vehiculosEnTaller.length}</div>
+            <div class="cv-chip-label">Todos los vehículos</div>
+        </div>
+    </div>`;
 
-        return `<div class="tablero-taller-item ${cfg.clase}">
-            <div class="tablero-taller-icono">${cfg.icono}</div>
-            <div class="tablero-taller-info">
-                <div class="tablero-taller-nombre">${estado}</div>
-                <div class="tablero-taller-cantidad">${vehiculosDeEsteEstado.length}</div>
-                <div class="tablero-taller-patentes">${patentes || "—"}</div>
+    elChips.innerHTML = html;
+
+    renderTarjetasEnTaller();
+
+}
+
+window.filtrarPorEstadoTaller = function (key) {
+    filtroTallerActivo = key;
+    mostrarTodosEnTaller = false;
+    renderTableroTaller();
+};
+
+window.verTodosVehiculosTaller = function () {
+    mostrarTodosEnTaller = !mostrarTodosEnTaller;
+    document.getElementById("cvVerTodosLink").textContent = mostrarTodosEnTaller
+        ? "Ver menos ‹"
+        : "Ver todos los vehículos en taller ›";
+    renderTarjetasEnTaller();
+};
+
+window.cambiarVistaCV = function (vista) {
+    vistaClientesVehiculos = vista;
+    document.getElementById("cvBtnVistaGrilla").classList.toggle("activo", vista === "grilla");
+    document.getElementById("cvBtnVistaLista").classList.toggle("activo", vista === "lista");
+    renderTarjetasEnTaller();
+};
+
+function iconoAutoGenerico() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2M5 17a2 2 0 002 2h1a2 2 0 002-2M17 17a2 2 0 002 2h1a2 2 0 002-2"/><circle cx="7.5" cy="14.5" r="1.2"/><circle cx="16.5" cy="14.5" r="1.2"/></svg>`;
+}
+
+function renderTarjetasEnTaller() {
+
+    const el = document.getElementById("cvGridTaller");
+    if (!el) return;
+
+    let lista = vehiculosCache.filter(v => v.estadoTaller && CONFIG_ESTADO_TALLER[v.estadoTaller]);
+
+    if (filtroTallerActivo !== "todos") {
+        lista = lista.filter(v => v.estadoTaller === filtroTallerActivo);
+    }
+
+    const orden = document.getElementById("cvOrdenarPor") ? document.getElementById("cvOrdenarPor").value : "recientes";
+
+    lista = lista.slice().sort((a, b) => {
+        if (orden === "patente") return (a.patente || "").localeCompare(b.patente || "");
+        if (orden === "cliente") {
+            const ca = clientesCache.find(c => c.id === a.clienteId);
+            const cb = clientesCache.find(c => c.id === b.clienteId);
+            return (ca ? ca.apellido : "").localeCompare(cb ? cb.apellido : "");
+        }
+        // recientes: por fecha de ingreso al taller, la más nueva primero
+        const fa = toDateSegura(a.fechaIngresoTaller);
+        const fb = toDateSegura(b.fechaIngresoTaller);
+        return (fb || 0) - (fa || 0);
+    });
+
+    el.className = "cv-grid-taller" + (vistaClientesVehiculos === "lista" ? " vista-lista" : "");
+
+    const totalReal = lista.length;
+    if (!mostrarTodosEnTaller) lista = lista.slice(0, 6);
+
+    document.getElementById("cvVerTodosLink").style.display = totalReal > 6 ? "inline-block" : "none";
+
+    if (lista.length === 0) {
+        el.innerHTML = '<div class="vacio" style="grid-column:1/-1;">No hay vehículos en taller con este filtro.</div>';
+        return;
+    }
+
+    el.innerHTML = lista.map(v => {
+
+        const cliente = clientesCache.find(c => c.id === v.clienteId);
+        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(sin datos)";
+        const cfg = CONFIG_ESTADO_TALLER[v.estadoTaller];
+
+        const fechaIngreso = toDateSegura(v.fechaIngresoTaller);
+        let textoIngreso = "";
+        if (fechaIngreso) {
+            const dias = Math.max(0, Math.round((new Date() - fechaIngreso) / 86400000));
+            textoIngreso = dias === 0 ? "Ingresó hoy" : `Ingresó hace ${dias} día${dias > 1 ? "s" : ""}`;
+        }
+
+        const presuDelVehiculo = presupuestosCache
+            .filter(p => p.vehiculoId === v.id)
+            .sort((a, b) => (toDateSegura(b.fecha) || 0) - (toDateSegura(a.fecha) || 0))[0];
+
+        let lineaEstadoTrabajo = "";
+        if (presuDelVehiculo) {
+            lineaEstadoTrabajo = `<div class="cv-card-linea presupuesto">📄 Presupuesto: ${formatoPlata(presuDelVehiculo.total)}</div>`;
+        } else if (v.estadoTaller === "Terminado") {
+            lineaEstadoTrabajo = `<div class="cv-card-linea presupuesto">✓ Listo para retirar</div>`;
+        }
+
+        const telefonoLimpio = cliente && cliente.telefono ? String(cliente.telefono).replace(/\D/g, "") : "";
+
+        return `<div class="cv-card-vehiculo">
+            <div class="cv-card-foto" style="background:linear-gradient(135deg,${cfg.color}33,${cfg.color}11);">
+                <span class="cv-card-badge-estado" style="background:${cfg.color};">${cfg.icono} ${escapar(v.estadoTaller)}</span>
+                ${iconoAutoGenerico()}
+            </div>
+            <div class="cv-card-cuerpo">
+                <div class="cv-card-patente">${escapar(v.patente)}</div>
+                <div class="cv-card-modelo">${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
+                <div class="cv-card-linea">👤 ${escapar(nombreCliente)}</div>
+                ${cliente && cliente.telefono ? `<div class="cv-card-linea">📞 ${escapar(cliente.telefono)}</div>` : ""}
+                ${textoIngreso ? `<div class="cv-card-linea">🕐 ${textoIngreso}</div>` : ""}
+                ${lineaEstadoTrabajo}
+                <div class="cv-card-acciones">
+                    ${telefonoLimpio ? `<a class="btn-whatsapp-lindo" href="https://wa.me/549${telefonoLimpio}" target="_blank" rel="noopener">${ICONO_WHATSAPP_SVG}WhatsApp</a>` : ""}
+                    <button class="btn-chico" onclick="abrirFichaVehiculo('${v.id}')">Abrir ficha</button>
+                </div>
             </div>
         </div>`;
 
@@ -4928,6 +5709,127 @@ function renderFichaHistorialCompleto() {
     vehiculos.forEach(v => renderHistorialVehiculo(v.id));
 
 }
+
+// ---------- Ingresar vehículo (desde la pestaña Clientes/Vehículos) ----------
+
+window.abrirModalIngresarVehiculo = function () {
+
+    document.getElementById("ivClienteBuscar").value = "";
+    document.getElementById("ivClienteId").value = "";
+    document.getElementById("ivClienteResultados").style.display = "none";
+    document.getElementById("ivPatente").value = "";
+    document.getElementById("ivMarca").value = "";
+    document.getElementById("ivModelo").value = "";
+    document.getElementById("ivAnio").value = "";
+    document.getElementById("ivEstadoTaller").value = "";
+    document.getElementById("mensajeEstadoIngresarVehiculo").textContent = "";
+
+    document.getElementById("modalIngresarVehiculo").classList.add("abierto");
+    setTimeout(() => document.getElementById("ivClienteBuscar").focus(), 100);
+
+};
+
+window.buscarClienteIngresarVehiculo = function () {
+
+    const texto = document.getElementById("ivClienteBuscar").value.trim().toLowerCase();
+    const elResultados = document.getElementById("ivClienteResultados");
+
+    if (!texto) {
+        elResultados.style.display = "none";
+        elResultados.innerHTML = "";
+        return;
+    }
+
+    const textoSinEspacios = texto.replace(/\s/g, "");
+
+    const coincidencias = clientesCache.filter(c => {
+        const nombreCompleto = `${c.nombre} ${c.apellido}`.toLowerCase();
+        const tieneVehiculoConEsaPatente = vehiculosCache.some(v =>
+            v.clienteId === c.id && String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(textoSinEspacios)
+        );
+        return nombreCompleto.includes(texto) || tieneVehiculoConEsaPatente;
+    }).slice(0, 8);
+
+    if (coincidencias.length === 0) {
+        elResultados.innerHTML = '<div style="padding:10px 12px;color:#777;font-size:12.5px;">Sin resultados. ¿Es un cliente nuevo? Cargalo primero en "+ Nuevo cliente".</div>';
+        elResultados.style.display = "block";
+        return;
+    }
+
+    elResultados.innerHTML = coincidencias.map(c => `
+        <div style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #262626;" onclick="seleccionarClienteIngresarVehiculo('${c.id}')">
+            <div style="font-size:13px;font-weight:600;">${escapar(c.apellido)}, ${escapar(c.nombre)}</div>
+        </div>
+    `).join("");
+
+    elResultados.style.display = "block";
+
+};
+
+window.seleccionarClienteIngresarVehiculo = function (clienteId) {
+
+    const cliente = clientesCache.find(c => c.id === clienteId);
+    if (!cliente) return;
+
+    document.getElementById("ivClienteId").value = clienteId;
+    document.getElementById("ivClienteBuscar").value = `${cliente.apellido}, ${cliente.nombre}`;
+    document.getElementById("ivClienteResultados").style.display = "none";
+
+};
+
+document.addEventListener("click", function (e) {
+    const buscador = document.getElementById("ivClienteBuscar");
+    const resultados = document.getElementById("ivClienteResultados");
+    if (buscador && resultados && !buscador.contains(e.target) && !resultados.contains(e.target)) {
+        resultados.style.display = "none";
+    }
+});
+
+window.guardarIngresarVehiculo = async function () {
+
+    const clienteId = document.getElementById("ivClienteId").value;
+    const patente = document.getElementById("ivPatente").value.trim().toUpperCase();
+    const marca = document.getElementById("ivMarca").value.trim();
+    const modelo = document.getElementById("ivModelo").value.trim();
+    const anio = document.getElementById("ivAnio").value.trim();
+    const estadoTaller = document.getElementById("ivEstadoTaller").value;
+    const estado = document.getElementById("mensajeEstadoIngresarVehiculo");
+
+    if (!clienteId) {
+        estado.textContent = "Elegí un cliente (buscalo por nombre o patente).";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    if (!patente) {
+        estado.textContent = "Ponele al menos la patente.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        const datos = { clienteId, patente, marca, modelo, anio, creado: serverTimestamp() };
+        if (estadoTaller) {
+            datos.estadoTaller = estadoTaller;
+            datos.fechaIngresoTaller = serverTimestamp();
+        }
+
+        await addDoc(collection(db, "vehiculos"), datos);
+
+        estado.textContent = "¡Vehículo ingresado!";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 600);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
 
 window.agregarVehiculo = async function () {
 
@@ -6681,21 +7583,165 @@ function revisarRecordatoriosTurnos() {
 
 setInterval(revisarRecordatoriosTurnos, 60000);
 
+let diaSeleccionadoMiniCal = null;
+let cantidadTurnosVisibles = 5;
+
 window.filtrarTurnos = function (tipo) {
 
     filtroTurnosActual = tipo;
+    cantidadTurnosVisibles = 5;
 
-    document.getElementById("btnFiltroProximos").style.borderColor = tipo === "proximos" ? "#d71920" : "#333";
-    document.getElementById("btnFiltroTodos").style.borderColor = tipo === "todos" ? "#d71920" : "#333";
+    document.getElementById("btnFiltroProximos").classList.toggle("activo", tipo === "proximos");
+    document.getElementById("btnFiltroTodos").classList.toggle("activo", tipo === "todos");
 
     renderTurnos();
 
+};
+
+// Rellena los 3 selects de "Filtros rápidos" con datos reales (nunca inventados):
+// los estados posibles, los mecánicos que existan como usuarios con rol mecánico,
+// y los servicios que ya se hayan escrito alguna vez en un turno.
+function actualizarFiltrosRapidosTurnos() {
+
+    const selEstado = document.getElementById("filtroTurnoEstado");
+    const selMecanico = document.getElementById("filtroTurnoMecanico");
+    const selServicio = document.getElementById("filtroTurnoServicio");
+    if (!selEstado) return;
+
+    const valorEstado = selEstado.value;
+    selEstado.innerHTML = '<option value="">Todos</option>' + ESTADOS_TURNO.map(e => `<option value="${e}">${e}</option>`).join("");
+    selEstado.value = valorEstado;
+
+    const valorMecanico = selMecanico.value;
+    const mecanicos = usuariosCache.filter(u => u.rol === "mecanico");
+    selMecanico.innerHTML = '<option value="">Todos</option>' + mecanicos.map(m => `<option value="${escaparComillas(m.nombre)}">${escapar(m.nombre)}</option>`).join("");
+    selMecanico.value = valorMecanico;
+
+    const valorServicio = selServicio.value;
+    const servicios = [...new Set(turnosCache.map(t => t.servicio).filter(Boolean))].sort();
+    selServicio.innerHTML = '<option value="">Todos</option>' + servicios.map(s => `<option value="${escaparComillas(s)}">${escapar(s)}</option>`).join("");
+    selServicio.value = valorServicio;
+
+}
+
+// ---------- Mini calendario (navegación por mes + puntito en días con turnos) ----------
+
+let mesMiniCalOffset = 0;
+
+window.moverMesMiniCalendario = function (delta) {
+    mesMiniCalOffset += delta;
+    renderMiniCalendario();
+};
+
+window.seleccionarDiaMiniCal = function (isoFecha) {
+    const d = new Date(isoFecha);
+    if (diaSeleccionadoMiniCal && diaSeleccionadoMiniCal.getTime() === d.getTime()) {
+        diaSeleccionadoMiniCal = null; // tocar el mismo día de nuevo lo destildea
+    } else {
+        diaSeleccionadoMiniCal = d;
+    }
+    renderMiniCalendario();
+    renderTurnos();
+};
+
+function renderMiniCalendario() {
+
+    const el = document.getElementById("miniCalGrid");
+    if (!el) return;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const base = new Date(hoy.getFullYear(), hoy.getMonth() + mesMiniCalOffset, 1);
+    const mesTexto = base.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+    document.getElementById("miniCalMesTexto").textContent = mesTexto.charAt(0).toUpperCase() + mesTexto.slice(1);
+
+    // Lunes como primer día de la semana
+    let primerDiaSemana = base.getDay() - 1;
+    if (primerDiaSemana < 0) primerDiaSemana = 6;
+
+    const inicioGrilla = new Date(base);
+    inicioGrilla.setDate(inicioGrilla.getDate() - primerDiaSemana);
+
+    let html = "";
+    const cursor = new Date(inicioGrilla);
+
+    for (let i = 0; i < 42; i++) {
+
+        const esDelMes = cursor.getMonth() === base.getMonth();
+        const esHoy = cursor.getTime() === hoy.getTime();
+        const esSeleccionado = diaSeleccionadoMiniCal && cursor.getTime() === diaSeleccionadoMiniCal.getTime();
+
+        const tieneTurnos = turnosCache.some(t => {
+            if (!t.fechaHora || !t.fechaHora.toDate || t.estado === "Cancelado") return false;
+            const f = t.fechaHora.toDate();
+            f.setHours(0, 0, 0, 0);
+            return f.getTime() === cursor.getTime();
+        });
+
+        html += `<div class="mini-cal-dia ${esDelMes ? "" : "fuera"} ${esHoy ? "hoy" : ""} ${esSeleccionado ? "seleccionado" : ""}" onclick="seleccionarDiaMiniCal('${cursor.toISOString()}')">
+            ${cursor.getDate()}
+            ${tieneTurnos ? '<span class="punto"></span>' : ""}
+        </div>`;
+
+        cursor.setDate(cursor.getDate() + 1);
+
+        if (cursor.getMonth() !== base.getMonth() && cursor.getDay() === 1 && i >= 27) break;
+
+    }
+
+    el.innerHTML = html;
+
+}
+
+// ---------- Tarjetas de resumen (Hoy / Mañana / Esta semana / Este mes) ----------
+
+function renderTurnosStats() {
+
+    const elHoy = document.getElementById("turnosStatHoy");
+    if (!elHoy) return;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const manana = new Date(hoy); manana.setDate(hoy.getDate() + 1);
+    const pasadoManana = new Date(hoy); pasadoManana.setDate(hoy.getDate() + 2);
+    const inicioSemana = new Date(hoy); inicioSemana.setDate(hoy.getDate() - hoy.getDay() + 1);
+    const finSemana = new Date(inicioSemana); finSemana.setDate(inicioSemana.getDate() + 7);
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);
+
+    const activos = turnosCache.filter(t => t.fechaHora && t.fechaHora.toDate && t.estado !== "Cancelado");
+
+    const contarEntre = (desde, hasta) => activos.filter(t => t.fechaHora.toDate() >= desde && t.fechaHora.toDate() < hasta).length;
+
+    document.getElementById("turnosStatHoy").textContent = contarEntre(hoy, manana);
+    document.getElementById("turnosStatHoyFecha").textContent = "Hoy · " + hoy.toLocaleDateString("es-AR", { day: "numeric", month: "long" });
+
+    document.getElementById("turnosStatManana").textContent = contarEntre(manana, pasadoManana);
+    document.getElementById("turnosStatMananaFecha").textContent = "Mañana · " + manana.toLocaleDateString("es-AR", { day: "numeric", month: "long" });
+
+    document.getElementById("turnosStatSemana").textContent = contarEntre(inicioSemana, finSemana);
+    document.getElementById("turnosStatSemanaFecha").textContent = "Esta semana · " + inicioSemana.toLocaleDateString("es-AR", { day: "numeric", month: "short" }) + " - " + new Date(finSemana - 86400000).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
+
+    document.getElementById("turnosStatMes").textContent = contarEntre(inicioMes, finMes);
+    const mesTexto = inicioMes.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+    document.getElementById("turnosStatMesFecha").textContent = "Este mes · " + mesTexto.charAt(0).toUpperCase() + mesTexto.slice(1);
+
+}
+
+window.verMasTurnos = function () {
+    cantidadTurnosVisibles += 10;
+    renderTurnos();
 };
 
 function renderTurnos() {
 
     const el = document.getElementById("listaTurnos");
     if (!el) return;
+
+    renderTurnosStats();
+    actualizarFiltrosRapidosTurnos();
+    if (!document.getElementById("miniCalGrid").children.length) renderMiniCalendario();
 
     const ahora = new Date();
     ahora.setHours(0, 0, 0, 0);
@@ -6706,15 +7752,36 @@ function renderTurnos() {
         lista = lista.filter(t => t.fechaHora.toDate() >= ahora && t.estado !== "Cancelado");
     }
 
+    const filtroEstado = document.getElementById("filtroTurnoEstado").value;
+    if (filtroEstado) lista = lista.filter(t => t.estado === filtroEstado);
+
+    const filtroMecanico = document.getElementById("filtroTurnoMecanico").value;
+    if (filtroMecanico) lista = lista.filter(t => t.mecanico === filtroMecanico);
+
+    const filtroServicio = document.getElementById("filtroTurnoServicio").value;
+    if (filtroServicio) lista = lista.filter(t => t.servicio === filtroServicio);
+
+    if (diaSeleccionadoMiniCal) {
+        const finDia = new Date(diaSeleccionadoMiniCal);
+        finDia.setDate(finDia.getDate() + 1);
+        lista = lista.filter(t => t.fechaHora.toDate() >= diaSeleccionadoMiniCal && t.fechaHora.toDate() < finDia);
+    }
+
     if (lista.length === 0) {
-        el.innerHTML = '<div class="vacio">No hay turnos para mostrar.</div>';
+        el.innerHTML = '<div class="vacio">No hay turnos para mostrar con estos filtros.</div>';
+        document.getElementById("btnVerMasTurnos").style.display = "none";
         return;
     }
+
+    const totalReal = lista.length;
+    const listaVisible = lista.slice(0, cantidadTurnosVisibles);
+
+    document.getElementById("btnVerMasTurnos").style.display = totalReal > listaVisible.length ? "block" : "none";
 
     let grupoActual = null;
     let html = "";
 
-    lista.forEach(t => {
+    listaVisible.forEach(t => {
 
         const fecha = t.fechaHora.toDate();
         const claveDia = fecha.toDateString();
@@ -6739,20 +7806,40 @@ function renderTurnos() {
         const cliente = clientesCache.find(c => c.id === t.clienteId);
         const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
         const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
-        const detalleVehiculo = vehiculo ? ` · ${escapar(vehiculo.patente)}` : "";
         const hora = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+        const colorBorde = { "Pendiente": "#f5a623", "Confirmado": "#2fdb6e", "En taller": "#3f9cff", "Finalizado": "#888", "Cancelado": "#ff4d55", "No asistió": "#d71920" }[t.estado] || "#555";
+        const inicialMarca = vehiculo && vehiculo.marca ? vehiculo.marca.charAt(0).toUpperCase() : "🚗";
 
-        html += `<div class="turno-fila ${claseEstado(t.estado)}">
-            <div class="turno-hora">${hora}</div>
-            <div class="turno-info">
-                <div class="turno-cliente">${escapar(nombreCliente)}${detalleVehiculo}</div>
-                <div class="turno-detalle">${escapar(t.servicio || "")}</div>
+        html += `<div class="turno-fila-nueva" style="border-left-color:${colorBorde};">
+            <div class="hora-col">${hora}</div>
+            <div class="marca-icono">${vehiculo ? inicialMarca : "🚗"}</div>
+            <div class="veh-col">
+                <div class="veh-modelo">${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") : "Sin vehículo"}</div>
+                <div class="veh-patente">${vehiculo ? escapar(vehiculo.patente) : ""}</div>
+            </div>
+            <div class="cli-col">
+                <div class="cli-nombre">${escapar(nombreCliente)}</div>
+                ${cliente && cliente.telefono ? `<div class="cli-tel">${ICONO_WHATSAPP_SVG_MINI} ${escapar(cliente.telefono)}</div>` : ""}
+            </div>
+            <div class="serv-col">
+                <div>${escapar(t.servicio || "-")}</div>
+                ${t.mecanico ? `<div class="serv-mecanico">Mecánico: ${escapar(t.mecanico)}</div>` : ""}
             </div>
             <select class="turno-estado-select" onchange="cambiarEstadoTurno('${t.id}', this.value)">
                 ${ESTADOS_TURNO.map(e => `<option value="${e}" ${t.estado === e ? "selected" : ""}>${e}</option>`).join("")}
             </select>
-            ${cliente && cliente.telefono ? `<button class="btn-red" style="padding:9px 16px;font-size:12px;border-radius:20px;" onclick="recordarTurnoWhatsApp('${t.id}')" title="Recordar por WhatsApp">📲 Recordar</button>` : ""}
-            <button class="btn-chico" onclick="borrarTurno('${t.id}')" style="color:#ff6b6b;">Borrar</button>
+            <div class="acciones-col">
+                <div class="icono-accion-turno" onclick="abrirModalTurno('${t.id}')" title="Ver / Editar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="icono-accion-turno" onclick="abrirModalTurno('${t.id}')" title="Editar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                </div>
+                ${cliente && cliente.telefono ? `<div class="icono-accion-turno" onclick="recordarTurnoWhatsApp('${t.id}')" title="Recordar por WhatsApp">📲</div>` : ""}
+                <div class="icono-accion-turno borrar" onclick="borrarTurno('${t.id}')" title="Eliminar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/></svg>
+                </div>
+            </div>
         </div>`;
 
     });
@@ -6760,6 +7847,10 @@ function renderTurnos() {
     el.innerHTML = html;
 
 }
+
+const ICONO_WHATSAPP_SVG_MINI = '<svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:#5fd98a;display:inline;vertical-align:middle;"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.4 5L2 22l5.1-1.3c1.5.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.4.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.1.2-.1.3-.3.5-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.6-.1.2-.2.7-.8.9-1 .2-.2.4-.2.6-.1l1.7.8c.2.1.4.2.4.3.1.2.1.7-.1 1.3z"/></svg>';
+
+
 
 // Manda un recordatorio de turno por WhatsApp con un clic. El mensaje se abre
 // ya redactado en WhatsApp — el mecánico solo tiene que tocar "Enviar" ahí.
@@ -6799,22 +7890,54 @@ window.recordarTurnoWhatsApp = function (id) {
 
 };
 
-window.abrirModalTurno = function () {
-
-    document.getElementById("modalTurnoTitulo").textContent = "Nuevo turno";
-    document.getElementById("tId").value = "";
-    document.getElementById("tServicio").value = "";
-    document.getElementById("tFecha").value = new Date().toISOString().split("T")[0];
-    document.getElementById("tHora").value = "09:00";
+window.abrirModalTurno = function (id) {
 
     const selectCliente = document.getElementById("tCliente");
     selectCliente.innerHTML = clientesCache
         .map(c => `<option value="${c.id}">${escapar(c.apellido)}, ${escapar(c.nombre)}</option>`)
         .join("");
 
-    window.actualizarVehiculosTurno();
+    const selectMecanico = document.getElementById("tMecanico");
+    const mecanicos = usuariosCache.filter(u => u.rol === "mecanico");
+    selectMecanico.innerHTML = '<option value="">Sin asignar</option>' +
+        mecanicos.map(m => `<option value="${escaparComillas(m.nombre)}">${escapar(m.nombre)}</option>`).join("");
 
     document.getElementById("mensajeEstadoTurno").textContent = "";
+
+    if (id) {
+
+        const t = turnosCache.find(x => x.id === id);
+        if (!t) return;
+
+        document.getElementById("modalTurnoTitulo").textContent = "Editar turno";
+        document.getElementById("tId").value = t.id;
+        selectCliente.value = t.clienteId || "";
+        window.actualizarVehiculosTurno();
+        document.getElementById("tVehiculo").value = t.vehiculoId || "";
+
+        const fecha = t.fechaHora && t.fechaHora.toDate ? t.fechaHora.toDate() : null;
+        document.getElementById("tFecha").value = fecha ? fecha.toISOString().split("T")[0] : "";
+        document.getElementById("tHora").value = fecha ? fecha.toTimeString().slice(0, 5) : "";
+        document.getElementById("tServicio").value = t.servicio || "";
+        selectMecanico.value = t.mecanico || "";
+
+        document.getElementById("accionesTurno").innerHTML =
+            `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="borrarTurno('${t.id}')">🗑️ Eliminar turno</button>`;
+        document.getElementById("accionesTurno").style.display = "flex";
+
+    } else {
+
+        document.getElementById("modalTurnoTitulo").textContent = "Nuevo turno";
+        document.getElementById("tId").value = "";
+        document.getElementById("tServicio").value = "";
+        document.getElementById("tFecha").value = new Date().toISOString().split("T")[0];
+        document.getElementById("tHora").value = "09:00";
+        selectMecanico.value = "";
+        window.actualizarVehiculosTurno();
+        document.getElementById("accionesTurno").style.display = "none";
+
+    }
+
     document.getElementById("modalTurno").classList.add("abierto");
 
 };
@@ -6832,11 +7955,13 @@ window.actualizarVehiculosTurno = function () {
 
 window.guardarTurno = async function () {
 
+    const id = document.getElementById("tId").value;
     const clienteId = document.getElementById("tCliente").value;
     const vehiculoId = document.getElementById("tVehiculo").value;
     const fecha = document.getElementById("tFecha").value;
     const hora = document.getElementById("tHora").value;
     const servicio = document.getElementById("tServicio").value.trim();
+    const mecanico = document.getElementById("tMecanico").value;
     const estado = document.getElementById("mensajeEstadoTurno");
 
     if (!clienteId || !fecha || !hora) {
@@ -6852,12 +7977,23 @@ window.guardarTurno = async function () {
 
     try {
 
-        await addDoc(collection(db, "turnos"), {
-            clienteId, vehiculoId: vehiculoId || null,
-            fechaHora, servicio,
-            estado: "Pendiente",
-            creado: serverTimestamp()
-        });
+        if (id) {
+
+            await updateDoc(doc(db, "turnos", id), {
+                clienteId, vehiculoId: vehiculoId || null,
+                fechaHora, servicio, mecanico
+            });
+
+        } else {
+
+            await addDoc(collection(db, "turnos"), {
+                clienteId, vehiculoId: vehiculoId || null,
+                fechaHora, servicio, mecanico,
+                estado: "Pendiente",
+                creado: serverTimestamp()
+            });
+
+        }
 
         estado.textContent = "¡Turno guardado!";
         estado.style.color = "#5fd98a";
@@ -6881,6 +8017,7 @@ window.borrarTurno = async function (id) {
     if (!confirmado) return;
 
     await deleteDoc(doc(db, "turnos", id));
+    window.cerrarModales();
 
 };
 
@@ -7857,6 +8994,7 @@ function escucharUsuarios() {
 
         determinarRolActual();
         renderUsuarios();
+        if (typeof actualizarFiltrosRapidosTurnos === "function") actualizarFiltrosRapidosTurnos();
 
     });
 
