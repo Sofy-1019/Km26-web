@@ -12,6 +12,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 
+:root{
+    --acento-app:#d71920;
+}
+
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
 
 h1,h2,h3,
@@ -126,7 +130,7 @@ textarea:-webkit-autofill{
 }
 
 .btn-red{
-    background:linear-gradient(180deg,#ef2c33,#c1141b);
+    background:var(--acento-app,#d71920);
     color:#fff;
     border:none;
     padding:14px 32px;
@@ -135,10 +139,11 @@ textarea:-webkit-autofill{
     font-size:15px;
     cursor:pointer;
     font-family:'Montserrat',sans-serif;
+    filter:brightness(1);
 }
 
 .btn-red:hover{
-    background:linear-gradient(180deg,#ff3941,#d71920);
+    filter:brightness(1.15);
 }
 
 #errorLogin{
@@ -2860,9 +2865,9 @@ header{
 }
 
 .cv-chip-toggle.activo{
-    border-color:#d71920;
-    color:#ff8a7a;
-    background:rgba(215,25,32,.12);
+    border-color:var(--acento-app,#d71920);
+    color:var(--acento-app,#ff8a7a);
+    background:color-mix(in srgb, var(--acento-app,#d71920) 12%, transparent);
 }
 
 .turnos-stats-grid{
@@ -3326,9 +3331,9 @@ header{
 }
 
 .presu-pagina-btn.activo{
-    border-color:#d71920;
-    color:#ff8a7a;
-    background:rgba(215,25,32,.12);
+    border-color:var(--acento-app,#d71920);
+    color:var(--acento-app,#ff8a7a);
+    background:color-mix(in srgb, var(--acento-app,#d71920) 12%, transparent);
 }
 
 /* ======================================================================
@@ -3526,6 +3531,164 @@ header{
 .rep-comparacion.negativo{ color:#ff6b6b; }
 .rep-comparacion.neutro{ color:#888; }
 
+/* ======================================================================
+   CONFIGURACIÓN — nuevo diseño con 7 paneles numerados
+   ====================================================================== */
+
+.cfg-accesos-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-bottom:20px;
+}
+
+@media (min-width:900px){
+    .cfg-accesos-grid{ grid-template-columns:repeat(6,1fr); }
+}
+
+.cfg-acceso-card{
+    background:#161616;
+    border-radius:14px;
+    padding:16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.cfg-acceso-card:hover{
+    background:#1e1e1e;
+}
+
+.cfg-acceso-card strong{
+    display:block;
+    font-size:12.5px;
+    color:#fff;
+}
+
+.cfg-acceso-card span{
+    font-size:10.5px;
+    color:#888;
+}
+
+.cfg-acceso-icono{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    flex-shrink:0;
+    color:#fff;
+}
+
+.cfg-acceso-icono.rojo{ background:#c0392b; }
+.cfg-acceso-icono.azul{ background:#2f6fd1; }
+.cfg-acceso-icono.verde{ background:#1fa851; }
+.cfg-acceso-icono.ambar{ background:#c99a3f; }
+.cfg-acceso-icono.violeta{ background:#7c5cf0; }
+.cfg-acceso-icono.azul2{ background:#3f9cff; }
+
+.cfg-panel-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-bottom:20px;
+}
+
+@media (min-width:1100px){
+    .cfg-panel-grid{ grid-template-columns:repeat(3,1fr); }
+}
+
+.cfg-panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:15px;
+    font-weight:800;
+    margin-bottom:14px;
+}
+
+.cfg-dato{
+    display:flex;
+    gap:10px;
+    padding:8px 0;
+    border-bottom:1px dashed #262626;
+    font-size:12.5px;
+}
+
+.cfg-dato:last-child{ border-bottom:none; }
+
+.cfg-dato-label{
+    color:#888;
+    font-size:10.5px;
+}
+
+.cfg-dato-valor{
+    color:#fff;
+    font-weight:600;
+}
+
+.cfg-fila-simple{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px dashed #262626;
+    font-size:12.5px;
+    color:#ccc;
+}
+
+.cfg-fila-simple:last-child{ border-bottom:none; }
+
+.cfg-fila-simple strong{ color:#fff; }
+
+.cfg-edicion label{
+    font-size:12px;
+    color:#ccc;
+    display:block;
+    margin-top:10px;
+    margin-bottom:4px;
+}
+
+.cfg-edicion label:first-child{ margin-top:0; }
+
+.cfg-colores-fila{
+    display:flex;
+    gap:10px;
+    margin-top:8px;
+}
+
+.cfg-color-swatch{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    cursor:pointer;
+    border:2px solid transparent;
+}
+
+.cfg-color-swatch.activo{
+    border-color:#fff;
+    transform:scale(1.1);
+}
+
+.cfg-metodo-chip{
+    display:inline-block;
+    background:#0d2418;
+    color:#5fd98a;
+    font-size:10.5px;
+    padding:4px 10px;
+    border-radius:12px;
+    margin:0 6px 6px 0;
+}
+
+/* Tamaño de fuente y vista compacta (reales, vía clase en <body>) */
+body.fuente-chica{ font-size:13px; }
+body.fuente-grande{ font-size:16px; }
+body.vista-compacta .dash-panel-nuevo{ padding:12px; }
+body.vista-compacta .presu-tabla tbody td{ padding:9px 12px; }
+body.vista-compacta .turnos-stat-card{ padding:11px; }
+
 .cc-fila-2col{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -3646,6 +3809,29 @@ header{
 <body>
 
 <!-- ---------- Login ---------- -->
+<!-- ---------- Modal: cambiar contraseña ---------- -->
+<div class="overlay" id="modalCambiarContrasena">
+    <div class="modal">
+        <h3>🔒 Cambiar contraseña</h3>
+
+        <label>Contraseña actual</label>
+        <input type="password" id="passActual" placeholder="••••••••">
+
+        <label>Contraseña nueva</label>
+        <input type="password" id="passNueva" placeholder="Mínimo 6 caracteres">
+
+        <label>Repetir contraseña nueva</label>
+        <input type="password" id="passNuevaRepetir" placeholder="Mínimo 6 caracteres">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="confirmarCambioContrasena()">Cambiar contraseña</button>
+        </div>
+
+        <p id="mensajeEstadoContrasena"></p>
+    </div>
+</div>
+
 <div id="pantallaLogin">
     <img src="images/icon-192.png" alt="KM26">
     <h1>Panel de gestión</h1>
@@ -5140,41 +5326,209 @@ header{
         <div class="fila-titulo"><h2 style="color:#ff6b6b;">⚙️ Configuración</h2></div>
         <p style="font-size:12px;color:#888;margin-bottom:20px;">Solo vos, como administrador, podés ver y cambiar esto. Se aplica a todo el panel, para todos los usuarios.</p>
 
-        <div class="fila-titulo" style="margin-top:10px;"><h2 style="font-size:16px;color:#ff6b6b;">Datos del negocio</h2></div>
-        <p style="font-size:11.5px;color:#777;margin-bottom:10px;">Aparecen en el encabezado de los presupuestos impresos.</p>
+        <div class="cfg-accesos-grid">
+            <div class="cfg-acceso-card" onclick="document.getElementById('cfgPanelTaller').scrollIntoView({behavior:'smooth'})">
+                <div class="cfg-acceso-icono rojo">🏪</div>
+                <div><strong>Datos del taller</strong><span>Información general del negocio</span></div>
+            </div>
+            <div class="cfg-acceso-card" onclick="cambiarTab('usuarios')">
+                <div class="cfg-acceso-icono azul">👥</div>
+                <div><strong>Usuarios y permisos</strong><span>Gestioná usuarios y accesos</span></div>
+            </div>
+            <div class="cfg-acceso-card" onclick="document.getElementById('cfgPanelCobros').scrollIntoView({behavior:'smooth'})">
+                <div class="cfg-acceso-icono verde">💲</div>
+                <div><strong>Cuentas y cobros</strong><span>Métodos de pago y config.</span></div>
+            </div>
+            <div class="cfg-acceso-card" onclick="document.getElementById('cfgPanelStock').scrollIntoView({behavior:'smooth'})">
+                <div class="cfg-acceso-icono ambar">📦</div>
+                <div><strong>Stock y alertas</strong><span>Control de inventario y notif.</span></div>
+            </div>
+            <div class="cfg-acceso-card" onclick="document.getElementById('cfgPanelPresupuestos').scrollIntoView({behavior:'smooth'})">
+                <div class="cfg-acceso-icono violeta">📄</div>
+                <div><strong>Presupuestos</strong><span>Configuración de presupuestos</span></div>
+            </div>
+            <div class="cfg-acceso-card" onclick="document.getElementById('cfgPanelApariencia').scrollIntoView({behavior:'smooth'})">
+                <div class="cfg-acceso-icono azul2">🎨</div>
+                <div><strong>Apariencia</strong><span>Personalización del sistema</span></div>
+            </div>
+        </div>
 
-        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Nombre del negocio</label>
-        <input type="text" id="cfgNombreNegocio" placeholder="KM26 PERFORMANCE" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
+        <div class="cfg-panel-grid">
 
-        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Dirección (opcional)</label>
-        <input type="text" id="cfgDireccion" placeholder="Ej: Av. Siempre Viva 123, CABA" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
+            <!-- 1. Datos del taller -->
+            <div class="dash-panel-nuevo" id="cfgPanelTaller">
+                <div class="cfg-panel-header">
+                    <span style="color:#ff6b6b;">1. Datos del taller</span>
+                    <button class="btn-chico" onclick="alternarEdicionCfg('Taller')">✏️ Editar</button>
+                </div>
+                <div id="cfgVerTaller" class="cfg-vista">
+                    <div class="cfg-dato"><span>🏪</span><div><div class="cfg-dato-label">Nombre del negocio</div><div class="cfg-dato-valor" id="cfgVerNombre">-</div></div></div>
+                    <div class="cfg-dato"><span>📍</span><div><div class="cfg-dato-label">Dirección</div><div class="cfg-dato-valor" id="cfgVerDireccion">-</div></div></div>
+                    <div class="cfg-dato"><span>📞</span><div><div class="cfg-dato-label">Teléfono</div><div class="cfg-dato-valor" id="cfgVerTelefono">-</div></div></div>
+                    <div class="cfg-dato"><span>✉️</span><div><div class="cfg-dato-label">Email</div><div class="cfg-dato-valor" id="cfgVerEmail">-</div></div></div>
+                    <div class="cfg-dato"><span>🌐</span><div><div class="cfg-dato-label">Web / Redes</div><div class="cfg-dato-valor" id="cfgVerWeb">-</div></div></div>
+                    <div class="cfg-dato"><span>🧾</span><div><div class="cfg-dato-label">CUIT / Razón social</div><div class="cfg-dato-valor" id="cfgVerCuit">-</div></div></div>
+                </div>
+                <div id="cfgEditTaller" class="cfg-edicion" style="display:none;">
+                    <label>Nombre del negocio</label>
+                    <input type="text" id="cfgNombreNegocio" placeholder="KM26 PERFORMANCE">
+                    <label>Dirección (opcional)</label>
+                    <input type="text" id="cfgDireccion" placeholder="Av. Siempre Viva 123, CABA">
+                    <label>Teléfono (opcional)</label>
+                    <input type="text" id="cfgTelefono" placeholder="11 5555-1234">
+                    <label>Email (opcional)</label>
+                    <input type="text" id="cfgEmail" placeholder="info@tutaller.com.ar">
+                    <label>Web / Redes (opcional)</label>
+                    <input type="text" id="cfgWeb" placeholder="www.tutaller.com.ar / @tutaller">
+                    <label>CUIT / Razón social (opcional)</label>
+                    <input type="text" id="cfgCuit" placeholder="20-12345678-9">
+                    <button class="btn-red" style="width:100%;margin-top:10px;" onclick="guardarConfiguracion()">Guardar</button>
+                </div>
+            </div>
 
-        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Teléfono (opcional)</label>
-        <input type="text" id="cfgTelefono" placeholder="11 5555-1234" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:14px;">
+            <!-- 2. Presupuestos -->
+            <div class="dash-panel-nuevo" id="cfgPanelPresupuestos">
+                <div class="cfg-panel-header">
+                    <span style="color:#ff6b6b;">2. Presupuestos</span>
+                    <button class="btn-chico" onclick="alternarEdicionCfg('Presu')">✏️ Editar</button>
+                </div>
+                <div id="cfgVerPresu" class="cfg-vista">
+                    <div class="cfg-fila-simple"><span>Prefijo de numeración</span><strong id="cfgVerPrefijo">PR-</strong></div>
+                    <div class="cfg-fila-simple"><span>Validez por defecto</span><strong id="cfgVerValidez">-</strong></div>
+                    <div class="cfg-fila-simple"><span>Mostrar logo en PDF</span><strong id="cfgVerLogoPdf">-</strong></div>
+                    <div class="cfg-fila-simple"><span>Mostrar condiciones comerciales</span><strong id="cfgVerCondiciones">-</strong></div>
+                    <div style="font-size:11px;color:#777;margin-top:8px;">Texto final: <span id="cfgVerTextoFinal">-</span></div>
+                </div>
+                <div id="cfgEditPresu" class="cfg-edicion" style="display:none;">
+                    <label>Prefijo de numeración</label>
+                    <input type="text" id="cfgPrefijoPresupuesto" placeholder="PR-">
+                    <label>Días de validez por defecto</label>
+                    <input type="number" id="cfgDiasValidez" placeholder="15">
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="cfgMostrarLogoPdf" style="width:auto;"> Mostrar logo en el PDF impreso</label>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;"><input type="checkbox" id="cfgMostrarCondiciones" style="width:auto;"> Mostrar condiciones comerciales</label>
+                    <label style="margin-top:12px;">Condiciones comerciales (si el check está activo)</label>
+                    <input type="text" id="cfgCondicionesComerciales" placeholder="Precios sujetos a disponibilidad de repuestos.">
+                    <label>Texto final personalizado</label>
+                    <input type="text" id="cfgTextoFinal" placeholder="Gracias por confiar en nosotros">
+                    <label>Descuento máximo permitido sin ser admin (%)</label>
+                    <input type="number" id="cfgDescuentoMax" placeholder="20" min="0" max="100">
+                    <label>Mensaje de WhatsApp (usá {nombre} {items} {total} {notas})</label>
+                    <textarea id="cfgMensajeWhatsapp" rows="3" placeholder="Hola {nombre}!..."></textarea>
+                    <button class="btn-red" style="width:100%;margin-top:10px;" onclick="guardarConfiguracion()">Guardar</button>
+                </div>
+            </div>
 
-        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">CUIT / Razón social (opcional)</label>
-        <input type="text" id="cfgCuit" placeholder="20-12345678-9" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
+            <!-- 3. Cuentas y Cobros -->
+            <div class="dash-panel-nuevo" id="cfgPanelCobros">
+                <div class="cfg-panel-header">
+                    <span style="color:#ff6b6b;">3. Cuentas y Cobros</span>
+                    <button class="btn-chico" onclick="alternarEdicionCfg('Cobros')">✏️ Editar</button>
+                </div>
+                <div id="cfgVerCobros" class="cfg-vista">
+                    <div style="font-size:11px;color:#777;margin-bottom:6px;">Métodos de cobro aceptados</div>
+                    <div id="cfgVerMetodosPago" style="margin-bottom:10px;"></div>
+                    <div class="cfg-fila-simple"><span>Alias / CBU</span><strong id="cfgVerAlias">-</strong></div>
+                    <div class="cfg-fila-simple"><span>Recargo con tarjeta</span><strong id="cfgVerRecargo">-</strong></div>
+                    <div id="cfgVerQR" style="margin-top:10px;"></div>
+                </div>
+                <div id="cfgEditCobros" class="cfg-edicion" style="display:none;">
+                    <div style="font-size:12px;color:#999;margin-bottom:6px;">Métodos de cobro aceptados</div>
+                    <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="cfgMetodoEfectivo" style="width:auto;"> Efectivo</label>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:6px;"><input type="checkbox" id="cfgMetodoTransferencia" style="width:auto;"> Transferencia</label>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:6px;"><input type="checkbox" id="cfgMetodoDebito" style="width:auto;"> Tarjeta de Débito</label>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:6px;"><input type="checkbox" id="cfgMetodoCredito" style="width:auto;"> Tarjeta de Crédito</label>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:6px;"><input type="checkbox" id="cfgMetodoMercadoPago" style="width:auto;"> Mercado Pago</label>
+                    <label style="margin-top:12px;">Alias / CBU</label>
+                    <input type="text" id="cfgAliasCbu" placeholder="km26.performance">
+                    <label>Recargo con tarjeta (%)</label>
+                    <input type="number" id="cfgRecargoTarjeta" placeholder="0">
+                    <p style="font-size:10.5px;color:#777;margin-top:4px;">Se guarda como referencia — todavía no se aplica solo al calcular un cobro.</p>
+                    <button class="btn-red" style="width:100%;margin-top:10px;" onclick="guardarConfiguracion()">Guardar</button>
+                </div>
+            </div>
 
-        <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Stock</h2></div>
+            <!-- 4. Stock y Alertas -->
+            <div class="dash-panel-nuevo" id="cfgPanelStock">
+                <div class="cfg-panel-header">
+                    <span style="color:#ff6b6b;">4. Stock y Alertas</span>
+                    <button class="btn-chico" onclick="alternarEdicionCfg('Stock')">✏️ Editar</button>
+                </div>
+                <div id="cfgVerStock" class="cfg-vista">
+                    <div class="cfg-fila-simple"><span>Stock mínimo global</span><strong id="cfgVerStockMinimo">-</strong></div>
+                    <div class="cfg-fila-simple"><span>Mostrar alerta en Dashboard</span><strong id="cfgVerAlertaDashboard">-</strong></div>
+                </div>
+                <div id="cfgEditStock" class="cfg-edicion" style="display:none;">
+                    <label>Stock mínimo por defecto para productos nuevos</label>
+                    <input type="number" id="cfgStockMinimo" placeholder="3">
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:12px;"><input type="checkbox" id="cfgAlertaDashboard" style="width:auto;" checked> Mostrar "stock bajo" en Requiere atención (Dashboard)</label>
+                    <p style="font-size:10.5px;color:#777;margin-top:10px;">"Notificar por email" no está disponible: esta app no tiene un servidor propio para enviar correos.</p>
+                    <button class="btn-red" style="width:100%;margin-top:10px;" onclick="guardarConfiguracion()">Guardar</button>
+                </div>
+            </div>
 
-        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Stock mínimo por defecto para productos nuevos</label>
-        <input type="number" id="cfgStockMinimo" placeholder="3" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:22px;">
+            <!-- 5. Usuarios y Permisos -->
+            <div class="dash-panel-nuevo" id="cfgPanelUsuarios">
+                <div class="cfg-panel-header">
+                    <span style="color:#ff6b6b;">5. Usuarios y Permisos</span>
+                    <a class="dash-panel-nuevo-link" onclick="cambiarTab('usuarios')">Ir a Usuarios ›</a>
+                </div>
+                <div id="cfgResumenUsuarios"></div>
+                <p style="font-size:10.5px;color:#777;margin-top:10px;">Los permisos por sección (ver caja, editar stock, etc.) ya están aplicados según el rol de cada usuario en toda la app — se gestionan desde la pestaña Usuarios, no hacen falta casilleros extra acá.</p>
+            </div>
 
-        <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Presupuestos y cuentas</h2></div>
+            <!-- 6. Apariencia -->
+            <div class="dash-panel-nuevo" id="cfgPanelApariencia">
+                <div class="cfg-panel-header">
+                    <span style="color:#ff6b6b;">6. Apariencia del sistema</span>
+                </div>
+                <label style="font-size:12px;">Color principal</label>
+                <div class="cfg-colores-fila" id="cfgColoresSelector">
+                    <div class="cfg-color-swatch activo" style="background:#d71920;" data-color="#d71920" onclick="cambiarColorPrincipal('#d71920')"></div>
+                    <div class="cfg-color-swatch" style="background:#3f6fd1;" data-color="#3f6fd1" onclick="cambiarColorPrincipal('#3f6fd1')"></div>
+                    <div class="cfg-color-swatch" style="background:#1fa851;" data-color="#1fa851" onclick="cambiarColorPrincipal('#1fa851')"></div>
+                    <div class="cfg-color-swatch" style="background:#7c5cf0;" data-color="#7c5cf0" onclick="cambiarColorPrincipal('#7c5cf0')"></div>
+                    <div class="cfg-color-swatch" style="background:#d9622b;" data-color="#d9622b" onclick="cambiarColorPrincipal('#d9622b')"></div>
+                </div>
+                <p style="font-size:10.5px;color:#777;margin:6px 0 14px;">Se aplica a los botones y acentos principales del sistema.</p>
 
-        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Descuento máximo permitido sin ser admin (%)</label>
-        <input type="number" id="cfgDescuentoMax" placeholder="20" min="0" max="100" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
-        <p style="font-size:11px;color:#777;margin-bottom:14px;">Recepción y mecánicos no van a poder cargar más que este porcentaje. Los admin no tienen límite.</p>
+                <label>Tema</label>
+                <select id="cfgTema" onchange="cambiarTemaSistema()">
+                    <option value="oscuro">Oscuro</option>
+                    <option value="claro">Claro (próximamente)</option>
+                </select>
 
-        <label style="display:block;font-size:12.5px;color:#fff;font-weight:600;margin-bottom:6px;">Días de validez por defecto de un presupuesto nuevo</label>
-        <input type="number" id="cfgDiasValidez" placeholder="10" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:14px;margin-bottom:6px;">
-        <p style="font-size:11px;color:#777;margin-bottom:22px;">Se completa solo en "Notas" al crear un presupuesto nuevo (se puede borrar o cambiar igual).</p>
+                <label style="margin-top:12px;">Tamaño de fuente</label>
+                <select id="cfgTamanoFuente" onchange="cambiarTamanoFuente()">
+                    <option value="chico">Chico</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="grande">Grande</option>
+                </select>
 
-        <div class="fila-titulo"><h2 style="font-size:16px;color:#ff6b6b;">Mensaje de WhatsApp para presupuestos</h2></div>
-        <p style="font-size:11px;color:#777;margin-bottom:10px;">Usá <code>{nombre}</code>, <code>{items}</code>, <code>{total}</code> y <code>{notas}</code> donde quieras que se reemplacen solos por los datos reales.</p>
-        <textarea id="cfgMensajeWhatsapp" rows="5" placeholder="Hola {nombre}! Te paso el presupuesto de KM26 Performance:&#10;&#10;{items}&#10;&#10;Total: {total}&#10;{notas}" style="width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#fff;font-size:13px;margin-bottom:22px;font-family:'Montserrat',sans-serif;"></textarea>
+                <label style="display:flex;align-items:center;gap:8px;margin-top:14px;">
+                    <input type="checkbox" id="cfgVistaCompacta" style="width:auto;" onchange="cambiarVistaCompacta()"> Vista compacta
+                </label>
+            </div>
 
-        <button class="btn-red" style="padding:14px 26px;font-size:14px;" onclick="guardarConfiguracion()">Guardar configuración</button>
+            <!-- 7. Seguridad y Respaldo -->
+            <div class="dash-panel-nuevo" id="cfgPanelSeguridad">
+                <div class="cfg-panel-header">
+                    <span style="color:#ff6b6b;">7. Seguridad y respaldo</span>
+                </div>
+                <div class="cfg-fila-simple"><span>Último respaldo</span><strong id="cfgVerUltimoRespaldo">Todavía no se hizo ninguno</strong></div>
+                <div style="font-size:11px;color:#777;margin:12px 0 6px;">Acciones de respaldo</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+                    <button class="btn-chico" onclick="cambiarTab('respaldo')">⬇️ Ir a Respaldo de datos</button>
+                </div>
+                <div style="font-size:11px;color:#777;margin-bottom:6px;">Seguridad</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn-chico" onclick="abrirModalCambiarContrasena()">🔒 Cambiar contraseña</button>
+                    <button class="btn-chico" disabled style="opacity:.5;cursor:not-allowed;" title="Próximamente">📱 Autenticación en dos pasos (próx.)</button>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="btn-red" style="padding:14px 26px;font-size:14px;margin-top:6px;" onclick="guardarConfiguracion()">Guardar toda la configuración</button>
         <p id="mensajeEstadoConfiguracion" style="margin-top:12px;font-size:13px;"></p>
 
     </section>
@@ -6263,7 +6617,8 @@ header{
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {
-    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
+    EmailAuthProvider, reauthenticateWithCredential, updatePassword
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
     getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, setDoc,
@@ -6644,6 +6999,7 @@ window.cerrarModales = function () {
     document.getElementById("modalCobrarCC").classList.remove("abierto");
     document.getElementById("modalVerCuentaCC").classList.remove("abierto");
     document.getElementById("modalCompraProveedor").classList.remove("abierto");
+    document.getElementById("modalCambiarContrasena").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -6965,7 +7321,7 @@ function renderDashboard() {
         filas.push({ texto: "Presupuestos aprobados sin cobrar", badge: presuAprobadosSinCobrar.length, tab: "presupuestos" });
     }
 
-    if (stockBajo.length > 0) {
+    if (stockBajo.length > 0 && configuracionActual.alertaStockDashboard !== false) {
         filas.push({ texto: "Repuestos con stock bajo", badge: stockBajo.length, tab: "stock" });
     }
 
@@ -12582,7 +12938,7 @@ function renderPresupuestos() {
         const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") : "-";
         const horaTexto = fecha ? fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "";
 
-        const numeroTexto = p.numero ? "#" + String(p.numero).padStart(5, "0") : "#" + p.id.slice(-4).toUpperCase();
+        const numeroTexto = p.numero ? (configuracionActual.prefijoPresupuesto || "PR-") + String(p.numero).padStart(5, "0") : "#" + p.id.slice(-4).toUpperCase();
         const estadoVisible = nombreVisible[p.estado] || p.estado;
         const colorDot = coloresBadge[p.estado] || "#999";
 
@@ -12670,7 +13026,7 @@ window.verPresupuesto = function (id) {
 
     const cliente = clientesCache.find(c => c.id === p.clienteId);
     const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
-    const numeroTexto = p.numero ? "#" + String(p.numero).padStart(5, "0") : "#" + p.id.slice(-4).toUpperCase();
+    const numeroTexto = p.numero ? (configuracionActual.prefijoPresupuesto || "PR-") + String(p.numero).padStart(5, "0") : "#" + p.id.slice(-4).toUpperCase();
 
     document.getElementById("verPresuTitulo").textContent = `Presupuesto ${numeroTexto}`;
     document.getElementById("verPresuCliente").textContent = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "(cliente eliminado)";
@@ -13025,13 +13381,27 @@ window.imprimirPresupuesto = function (id) {
     const lineaContacto = [configuracionActual.direccion, configuracionActual.telefono, configuracionActual.cuit]
         .filter(Boolean).join(" · ");
 
+    const prefijo = configuracionActual.prefijoPresupuesto || "PR-";
+    const numeroTexto = p.numero ? prefijo + String(p.numero).padStart(5, "0") : "";
+
+    const mostrarLogo = configuracionActual.mostrarLogoPdf !== false;
+    const logoHtml = mostrarLogo ? `<img src="images/icon-192.png" alt="" style="width:44px;height:44px;border-radius:50%;vertical-align:middle;margin-right:10px;" onerror="this.style.display='none'">` : "";
+
+    const condicionesHtml = (configuracionActual.mostrarCondiciones && configuracionActual.condicionesComerciales)
+        ? `<div class="datos" style="margin-top:10px;color:#666;">${escapar(configuracionActual.condicionesComerciales)}</div>`
+        : "";
+
+    const textoFinal = configuracionActual.textoFinalPresupuesto
+        ? escapar(configuracionActual.textoFinalPresupuesto)
+        : `${escapar(nombreNegocio)} — Presupuesto sujeto a disponibilidad de repuestos.`;
+
     const html = `
         <!DOCTYPE html>
         <html lang="es"><head><meta charset="UTF-8"><title>Presupuesto ${escapar(nombreCliente)}</title>
         <style>
             *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
             body{padding:32px;color:#111;}
-            h1{font-size:20px;margin-bottom:2px;color:#c1141b;}
+            h1{font-size:20px;margin-bottom:2px;color:#c1141b;display:inline-block;vertical-align:middle;}
             .sub{color:#666;font-size:12px;margin-bottom:20px;}
             table{width:100%;border-collapse:collapse;margin-top:10px;}
             td,th{padding:8px 6px;border-bottom:1px solid #ddd;font-size:13px;text-align:left;}
@@ -13040,9 +13410,9 @@ window.imprimirPresupuesto = function (id) {
             .footer{margin-top:36px;font-size:11px;color:#888;}
         </style></head>
         <body>
-            <h1>${escapar(nombreNegocio)}</h1>
+            <div>${logoHtml}<h1>${escapar(nombreNegocio)}</h1></div>
             ${lineaContacto ? `<div class="sub" style="margin-bottom:2px;">${escapar(lineaContacto)}</div>` : ""}
-            <div class="sub">Presupuesto · ${fecha}</div>
+            <div class="sub">Presupuesto ${numeroTexto ? numeroTexto + " · " : ""}${fecha}</div>
             <div class="datos"><strong>Cliente:</strong> ${escapar(nombreCliente)} ${telefono ? "· " + escapar(telefono) : ""}</div>
             <div class="datos"><strong>Vehículo:</strong> ${escapar(detalleVehiculo)}</div>
             <table>
@@ -13051,7 +13421,8 @@ window.imprimirPresupuesto = function (id) {
             </table>
             <div class="total">Total: ${formatoPlata(p.total)}</div>
             ${notasHtml}
-            <div class="footer">${escapar(nombreNegocio)} — Presupuesto sujeto a disponibilidad de repuestos.</div>
+            ${condicionesHtml}
+            <div class="footer">${textoFinal}</div>
         </body></html>
     `;
 
@@ -14004,6 +14375,7 @@ function escucharConfiguracion() {
 
     onSnapshot(doc(db, "configuracion", "general"), (snap) => {
         configuracionActual = snap.exists() ? snap.data() : {};
+        if (typeof aplicarPreferenciasApariencia === "function") aplicarPreferenciasApariencia();
     });
 
 }
@@ -14015,16 +14387,200 @@ function renderFormConfiguracion() {
     const el = document.getElementById("cfgNombreNegocio");
     if (!el) return;
 
+    // ---- Campos de edición ----
     document.getElementById("cfgNombreNegocio").value = configuracionActual.nombreNegocio || "";
     document.getElementById("cfgDireccion").value = configuracionActual.direccion || "";
     document.getElementById("cfgTelefono").value = configuracionActual.telefono || "";
+    document.getElementById("cfgEmail").value = configuracionActual.email || "";
+    document.getElementById("cfgWeb").value = configuracionActual.web || "";
     document.getElementById("cfgCuit").value = configuracionActual.cuit || "";
-    document.getElementById("cfgStockMinimo").value = configuracionActual.stockMinimoDefecto || "";
-    document.getElementById("cfgDescuentoMax").value = configuracionActual.descuentoMaximoPorc || "";
+
+    document.getElementById("cfgPrefijoPresupuesto").value = configuracionActual.prefijoPresupuesto || "PR-";
     document.getElementById("cfgDiasValidez").value = configuracionActual.diasValidezPresupuestoDefecto || "";
+    document.getElementById("cfgMostrarLogoPdf").checked = configuracionActual.mostrarLogoPdf !== false;
+    document.getElementById("cfgMostrarCondiciones").checked = !!configuracionActual.mostrarCondiciones;
+    document.getElementById("cfgCondicionesComerciales").value = configuracionActual.condicionesComerciales || "";
+    document.getElementById("cfgTextoFinal").value = configuracionActual.textoFinalPresupuesto || "";
+    document.getElementById("cfgDescuentoMax").value = configuracionActual.descuentoMaximoPorc || "";
     document.getElementById("cfgMensajeWhatsapp").value = configuracionActual.mensajeWhatsappPresupuesto || "";
 
+    const metodos = configuracionActual.metodosPago || { efectivo: true, transferencia: true, debito: true, credito: true, mercadopago: true };
+    document.getElementById("cfgMetodoEfectivo").checked = metodos.efectivo !== false;
+    document.getElementById("cfgMetodoTransferencia").checked = metodos.transferencia !== false;
+    document.getElementById("cfgMetodoDebito").checked = metodos.debito !== false;
+    document.getElementById("cfgMetodoCredito").checked = metodos.credito !== false;
+    document.getElementById("cfgMetodoMercadoPago").checked = metodos.mercadopago !== false;
+    document.getElementById("cfgAliasCbu").value = configuracionActual.aliasCbu || "";
+    document.getElementById("cfgRecargoTarjeta").value = configuracionActual.recargoTarjetaPorc || "";
+
+    document.getElementById("cfgStockMinimo").value = configuracionActual.stockMinimoDefecto || "";
+    document.getElementById("cfgAlertaDashboard").checked = configuracionActual.alertaStockDashboard !== false;
+
+    document.getElementById("cfgTema").value = configuracionActual.tema || "oscuro";
+    document.getElementById("cfgTamanoFuente").value = configuracionActual.tamanoFuente || "normal";
+    document.getElementById("cfgVistaCompacta").checked = !!configuracionActual.vistaCompacta;
+
+    // ---- Vistas de solo lectura ----
+    document.getElementById("cfgVerNombre").textContent = configuracionActual.nombreNegocio || "KM26 Performance";
+    document.getElementById("cfgVerDireccion").textContent = configuracionActual.direccion || "Sin cargar";
+    document.getElementById("cfgVerTelefono").textContent = configuracionActual.telefono || "Sin cargar";
+    document.getElementById("cfgVerEmail").textContent = configuracionActual.email || "Sin cargar";
+    document.getElementById("cfgVerWeb").textContent = configuracionActual.web || "Sin cargar";
+    document.getElementById("cfgVerCuit").textContent = configuracionActual.cuit || "Sin cargar";
+
+    document.getElementById("cfgVerPrefijo").textContent = configuracionActual.prefijoPresupuesto || "PR-";
+    document.getElementById("cfgVerValidez").textContent = (configuracionActual.diasValidezPresupuestoDefecto || 15) + " días";
+    document.getElementById("cfgVerLogoPdf").textContent = configuracionActual.mostrarLogoPdf !== false ? "Sí" : "No";
+    document.getElementById("cfgVerCondiciones").textContent = configuracionActual.mostrarCondiciones ? "Sí" : "No";
+    document.getElementById("cfgVerTextoFinal").textContent = configuracionActual.textoFinalPresupuesto || "(sin definir)";
+
+    const nombresMetodos = { efectivo: "Efectivo", transferencia: "Transferencia", debito: "Débito", credito: "Crédito", mercadopago: "Mercado Pago" };
+    document.getElementById("cfgVerMetodosPago").innerHTML = Object.keys(nombresMetodos)
+        .filter(k => metodos[k] !== false)
+        .map(k => `<span class="cfg-metodo-chip">${nombresMetodos[k]}</span>`).join("") || '<span style="color:#777;font-size:11px;">Ninguno activo</span>';
+    document.getElementById("cfgVerAlias").textContent = configuracionActual.aliasCbu || "Sin cargar";
+    document.getElementById("cfgVerRecargo").textContent = configuracionActual.recargoTarjetaPorc ? configuracionActual.recargoTarjetaPorc + "%" : "Sin recargo";
+
+    const elQR = document.getElementById("cfgVerQR");
+    if (elQR) {
+        elQR.innerHTML = "";
+        if (configuracionActual.aliasCbu && typeof QRCode !== "undefined") {
+            const contenedor = document.createElement("div");
+            elQR.appendChild(contenedor);
+            new QRCode(contenedor, { text: configuracionActual.aliasCbu, width: 100, height: 100 });
+        }
+    }
+
+    document.getElementById("cfgVerStockMinimo").textContent = (configuracionActual.stockMinimoDefecto || 3) + " unidades";
+    document.getElementById("cfgVerAlertaDashboard").textContent = configuracionActual.alertaStockDashboard !== false ? "Activado" : "Desactivado";
+
+    document.getElementById("cfgVerUltimoRespaldo").textContent = configuracionActual.ultimoRespaldo && configuracionActual.ultimoRespaldo.toDate
+        ? configuracionActual.ultimoRespaldo.toDate().toLocaleDateString("es-AR") + " - " + configuracionActual.ultimoRespaldo.toDate().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+        : "Todavía no se hizo ninguno";
+
+    // Selector de color: marca el swatch activo
+    const colorGuardado = configuracionActual.colorPrincipal || "#d71920";
+    document.querySelectorAll(".cfg-color-swatch").forEach(el => el.classList.toggle("activo", el.dataset.color === colorGuardado));
+
+    // Resumen de usuarios (solo lectura)
+    const elResumenUsuarios = document.getElementById("cfgResumenUsuarios");
+    if (elResumenUsuarios) {
+        if (usuariosCache.length === 0) {
+            elResumenUsuarios.innerHTML = '<div class="vacio">Sin usuarios cargados.</div>';
+        } else {
+            elResumenUsuarios.innerHTML = usuariosCache.map(u => `
+                <div class="cfg-fila-simple"><span>${escapar(u.nombre || u.email)}</span><strong>${escapar(u.rol || "-")}</strong></div>
+            `).join("");
+        }
+    }
+
+    aplicarPreferenciasApariencia();
+
 }
+
+// Aplica lo guardado (color principal, tamaño de fuente, vista compacta) en
+// cuanto carga la configuración, para que se vea igual cada vez que se entra.
+function aplicarPreferenciasApariencia() {
+
+    const color = configuracionActual.colorPrincipal || "#d71920";
+    document.documentElement.style.setProperty("--acento-app", color);
+
+    document.body.classList.remove("fuente-chica", "fuente-grande");
+    if (configuracionActual.tamanoFuente === "chico") document.body.classList.add("fuente-chica");
+    if (configuracionActual.tamanoFuente === "grande") document.body.classList.add("fuente-grande");
+
+    document.body.classList.toggle("vista-compacta", !!configuracionActual.vistaCompacta);
+
+}
+
+window.alternarEdicionCfg = function (seccion) {
+    const ver = document.getElementById("cfgVer" + seccion);
+    const edit = document.getElementById("cfgEdit" + seccion);
+    const abrir = edit.style.display === "none";
+    ver.style.display = abrir ? "none" : "block";
+    edit.style.display = abrir ? "block" : "none";
+};
+
+window.cambiarColorPrincipal = async function (color) {
+    document.querySelectorAll(".cfg-color-swatch").forEach(el => el.classList.toggle("activo", el.dataset.color === color));
+    document.documentElement.style.setProperty("--acento-app", color);
+    await setDoc(doc(db, "configuracion", "general"), { colorPrincipal: color }, { merge: true });
+};
+
+window.cambiarTemaSistema = function () {
+    const sel = document.getElementById("cfgTema");
+    if (sel.value === "claro") {
+        alert("El modo claro todavía no está disponible — va a llegar en una próxima actualización. Por ahora seguimos en modo oscuro.");
+        sel.value = "oscuro";
+    }
+};
+
+window.cambiarTamanoFuente = async function () {
+    const valor = document.getElementById("cfgTamanoFuente").value;
+    document.body.classList.remove("fuente-chica", "fuente-grande");
+    if (valor === "chico") document.body.classList.add("fuente-chica");
+    if (valor === "grande") document.body.classList.add("fuente-grande");
+    await setDoc(doc(db, "configuracion", "general"), { tamanoFuente: valor }, { merge: true });
+};
+
+window.cambiarVistaCompacta = async function () {
+    const activo = document.getElementById("cfgVistaCompacta").checked;
+    document.body.classList.toggle("vista-compacta", activo);
+    await setDoc(doc(db, "configuracion", "general"), { vistaCompacta: activo }, { merge: true });
+};
+
+window.abrirModalCambiarContrasena = function () {
+    document.getElementById("passActual").value = "";
+    document.getElementById("passNueva").value = "";
+    document.getElementById("passNuevaRepetir").value = "";
+    document.getElementById("mensajeEstadoContrasena").textContent = "";
+    document.getElementById("modalCambiarContrasena").classList.add("abierto");
+};
+
+window.confirmarCambioContrasena = async function () {
+
+    const actual = document.getElementById("passActual").value;
+    const nueva = document.getElementById("passNueva").value;
+    const repetir = document.getElementById("passNuevaRepetir").value;
+    const estado = document.getElementById("mensajeEstadoContrasena");
+
+    if (!actual || !nueva) {
+        estado.textContent = "Completá los dos campos de contraseña.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    if (nueva.length < 6) {
+        estado.textContent = "La contraseña nueva tiene que tener al menos 6 caracteres.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    if (nueva !== repetir) {
+        estado.textContent = "Las dos contraseñas nuevas no coinciden.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Cambiando contraseña...";
+    estado.style.color = "#999";
+
+    try {
+
+        const credencial = EmailAuthProvider.credential(usuarioActual.email, actual);
+        await reauthenticateWithCredential(usuarioActual, credencial);
+        await updatePassword(usuarioActual, nueva);
+
+        estado.textContent = "✅ Contraseña cambiada con éxito.";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 1200);
+
+    } catch (err) {
+        estado.textContent = err.code === "auth/wrong-password" ? "La contraseña actual no es correcta." : "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
 
 window.guardarConfiguracion = async function () {
 
@@ -14034,11 +14590,35 @@ window.guardarConfiguracion = async function () {
         nombreNegocio: document.getElementById("cfgNombreNegocio").value.trim(),
         direccion: document.getElementById("cfgDireccion").value.trim(),
         telefono: document.getElementById("cfgTelefono").value.trim(),
+        email: document.getElementById("cfgEmail").value.trim(),
+        web: document.getElementById("cfgWeb").value.trim(),
         cuit: document.getElementById("cfgCuit").value.trim(),
-        stockMinimoDefecto: parseInt(document.getElementById("cfgStockMinimo").value, 10) || null,
-        descuentoMaximoPorc: parseFloat(document.getElementById("cfgDescuentoMax").value) || null,
+
+        prefijoPresupuesto: document.getElementById("cfgPrefijoPresupuesto").value.trim() || "PR-",
         diasValidezPresupuestoDefecto: parseInt(document.getElementById("cfgDiasValidez").value, 10) || null,
-        mensajeWhatsappPresupuesto: document.getElementById("cfgMensajeWhatsapp").value
+        mostrarLogoPdf: document.getElementById("cfgMostrarLogoPdf").checked,
+        mostrarCondiciones: document.getElementById("cfgMostrarCondiciones").checked,
+        condicionesComerciales: document.getElementById("cfgCondicionesComerciales").value.trim(),
+        textoFinalPresupuesto: document.getElementById("cfgTextoFinal").value.trim(),
+        descuentoMaximoPorc: parseFloat(document.getElementById("cfgDescuentoMax").value) || null,
+        mensajeWhatsappPresupuesto: document.getElementById("cfgMensajeWhatsapp").value,
+
+        metodosPago: {
+            efectivo: document.getElementById("cfgMetodoEfectivo").checked,
+            transferencia: document.getElementById("cfgMetodoTransferencia").checked,
+            debito: document.getElementById("cfgMetodoDebito").checked,
+            credito: document.getElementById("cfgMetodoCredito").checked,
+            mercadopago: document.getElementById("cfgMetodoMercadoPago").checked
+        },
+        aliasCbu: document.getElementById("cfgAliasCbu").value.trim(),
+        recargoTarjetaPorc: parseFloat(document.getElementById("cfgRecargoTarjeta").value) || null,
+
+        stockMinimoDefecto: parseInt(document.getElementById("cfgStockMinimo").value, 10) || null,
+        alertaStockDashboard: document.getElementById("cfgAlertaDashboard").checked,
+
+        tema: "oscuro",
+        tamanoFuente: document.getElementById("cfgTamanoFuente").value,
+        vistaCompacta: document.getElementById("cfgVistaCompacta").checked
     };
 
     estado.textContent = "Guardando...";
@@ -14049,6 +14629,13 @@ window.guardarConfiguracion = async function () {
         await setDoc(doc(db, "configuracion", "general"), datos, { merge: true });
         estado.textContent = "✅ Configuración guardada.";
         estado.style.color = "#5fd98a";
+
+        // Vuelve todos los paneles a modo "solo lectura" después de guardar
+        ["Taller", "Presu", "Cobros", "Stock"].forEach(s => {
+            const ver = document.getElementById("cfgVer" + s);
+            const edit = document.getElementById("cfgEdit" + s);
+            if (ver && edit) { ver.style.display = "block"; edit.style.display = "none"; }
+        });
 
     } catch (err) {
         estado.textContent = "Error: " + err.message;
@@ -14152,6 +14739,8 @@ window.exportarRespaldoCompleto = function () {
 
         const fechaTexto = new Date().toISOString().split("T")[0];
         XLSX.writeFile(libro, `KM26_Respaldo_Completo_${fechaTexto}.xlsx`);
+
+        setDoc(doc(db, "configuracion", "general"), { ultimoRespaldo: serverTimestamp() }, { merge: true }).catch(() => {});
 
         estado.textContent = "✅ Respaldo descargado. Revisá la carpeta de Descargas de tu dispositivo (o de tu navegador) y guardalo donde prefieras.";
         estado.style.color = "#5fd98a";
