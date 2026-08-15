@@ -5592,6 +5592,18 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     <div class="modal">
         <h3>Más opciones</h3>
         <div class="mas-lista" id="masLista">
+            <button class="mas-item" data-roles="admin,recepcion,mecanico" onclick="cerrarOverlayMas(); cambiarTab('clientes')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Clientes / Vehículos
+            </button>
+            <button class="mas-item" data-roles="admin,recepcion,mecanico" onclick="cerrarOverlayMas(); cambiarTab('turnos')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Turnos
+            </button>
+            <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('cuentas')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Cuentas / Cobros
+            </button>
             <button class="mas-item" data-roles="admin,recepcion" onclick="cerrarOverlayMas(); cambiarTab('presupuestos')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
                 Presupuestos
@@ -5680,10 +5692,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <label>Patente</label>
         <input type="text" id="ivPatente" placeholder="AB123CD">
         <label>Marca</label>
-        <input type="text" id="ivMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off" oninput="actualizarModelos(this.value, 'ivModelo')" onfocus="actualizarModelos(this.value, 'ivModelo')">
+        <select id="ivMarca" onchange="cambioMarcaSelect('iv')"></select>
+        <input type="text" id="ivMarcaOtra" placeholder="Escribí la marca" style="display:none;margin-top:8px;">
         <label>Modelo</label>
-        <input type="text" id="ivModelo" placeholder="Vento" list="listaModelos" autocomplete="off" onfocus="mostrarDesplegableModelos('ivModelo')">
-        <div id="ivModeloResultados" class="desplegable-modelos" style="display:none;"></div>
+        <select id="ivModelo" onchange="cambioModeloSelect('iv')"></select>
+        <input type="text" id="ivModeloOtro" placeholder="Escribí el modelo" style="display:none;margin-top:8px;">
         <label>Año</label>
         <input type="text" id="ivAnio" placeholder="2020">
 
@@ -5787,10 +5800,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <label>Patente</label>
                 <input type="text" id="vPatente" placeholder="AB123CD">
                 <label>Marca</label>
-                <input type="text" id="vMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off" onfocus="actualizarModelos(this.value, 'vModelo')">
+                <select id="vMarca" onchange="cambioMarcaSelect('v')"></select>
+                <input type="text" id="vMarcaOtra" placeholder="Escribí la marca" style="display:none;margin-top:8px;">
                 <label>Modelo</label>
-                <input type="text" id="vModelo" placeholder="Vento" list="listaModelos" autocomplete="off" onfocus="mostrarDesplegableModelos('vModelo')">
-                <div id="vModeloResultados" class="desplegable-modelos" style="display:none;"></div>
+                <select id="vModelo" onchange="cambioModeloSelect('v')"></select>
+                <input type="text" id="vModeloOtro" placeholder="Escribí el modelo" style="display:none;margin-top:8px;">
                 <label>Año</label>
                 <input type="text" id="vAnio" placeholder="2020">
                 <div class="modal-botones">
@@ -5820,10 +5834,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <label>Patente</label>
         <input type="text" id="evPatente">
         <label>Marca</label>
-        <input type="text" id="evMarca" list="listaMarcas" autocomplete="off" onfocus="actualizarModelos(this.value, 'evModelo')">
+        <select id="evMarca" onchange="cambioMarcaSelect('ev')"></select>
+        <input type="text" id="evMarcaOtra" placeholder="Escribí la marca" style="display:none;margin-top:8px;">
         <label>Modelo</label>
-        <input type="text" id="evModelo" list="listaModelos" autocomplete="off" onfocus="mostrarDesplegableModelos('evModelo')">
-        <div id="evModeloResultados" class="desplegable-modelos" style="display:none;"></div>
+        <select id="evModelo" onchange="cambioModeloSelect('ev')"></select>
+        <input type="text" id="evModeloOtro" placeholder="Escribí el modelo" style="display:none;margin-top:8px;">
         <label>Año</label>
         <input type="text" id="evAnio">
 
@@ -6603,46 +6618,6 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <!-- Listas de autocompletado: marcas y modelos comunes en Argentina -->
-<datalist id="listaMarcas">
-    <option value="Volkswagen">
-    <option value="Ford">
-    <option value="Chevrolet">
-    <option value="Fiat">
-    <option value="Renault">
-    <option value="Peugeot">
-    <option value="Toyota">
-    <option value="Honda">
-    <option value="Nissan">
-    <option value="Citroën">
-    <option value="Jeep">
-    <option value="RAM">
-    <option value="Chery">
-    <option value="DS">
-    <option value="Suzuki">
-    <option value="Mitsubishi">
-    <option value="Hyundai">
-    <option value="Kia">
-    <option value="BYD">
-    <option value="Haval">
-    <option value="JAC">
-    <option value="Geely">
-    <option value="Baic">
-    <option value="Foton">
-    <option value="Iveco">
-    <option value="Volvo">
-    <option value="Audi">
-    <option value="BMW">
-    <option value="Mercedes-Benz">
-    <option value="Subaru">
-    <option value="Alfa Romeo">
-    <option value="Isuzu">
-    <option value="Great Wall">
-    <option value="Lifan">
-    <option value="DFSK">
-    <option value="Changan">
-</datalist>
-
-<datalist id="listaModelos"></datalist>
 
 <!-- Firebase (SDK vía CDN, sin necesidad de instalar nada) -->
 <script type="module">
@@ -6718,80 +6693,92 @@ const MODELOS_POR_MARCA = {
 };
 
 // Al elegir/escribir la marca, se arma la lista de modelos de esa marca y se
-// abre sola (en los navegadores que lo permiten, como Chrome/Edge) para elegir
-// directo — sin dejar de poder escribir un modelo que no esté en la lista.
-// Guarda, por cada campo de modelo, cuáles son sus modelos disponibles ahora
-// (según la marca escrita), para poder mostrarlos en el desplegable propio.
-let modelosDisponiblesPorCampo = {};
+// Lista de marcas conocidas, con el mismo nombre/casing que se usa como texto
+// visible y como clave (en minúscula) para buscar sus modelos en MODELOS_POR_MARCA.
+const LISTA_MARCAS = [
+    "Volkswagen", "Ford", "Chevrolet", "Fiat", "Renault", "Peugeot", "Toyota",
+    "Honda", "Nissan", "Citroën", "Jeep", "RAM", "Chery", "DS", "Suzuki",
+    "Mitsubishi", "Hyundai", "Kia", "BYD", "Haval", "JAC", "Geely", "Baic",
+    "Foton", "Iveco", "Volvo", "Audi", "BMW", "Mercedes-Benz", "Subaru",
+    "Alfa Romeo", "Isuzu", "Great Wall", "Lifan", "DFSK", "Changan"
+];
 
-function actualizarModelos(marcaTexto, idCampoModelo, autoAbrir) {
-
-    const clave = marcaTexto.trim().toLowerCase();
-    const datalist = document.getElementById("listaModelos");
-    const modelos = MODELOS_POR_MARCA[clave] || [];
-
-    datalist.innerHTML = modelos.map(m => `<option value="${m}">`).join("");
-
-    if (idCampoModelo) {
-        modelosDisponiblesPorCampo[idCampoModelo] = modelos;
-        // Si ya hay una marca con modelos conocidos, se muestra el desplegable
-        // directo (no hace falta ni tocar el campo Modelo) — salvo que se pida
-        // explícitamente no abrirlo (por ejemplo, al abrir "Editar vehículo").
-        if (autoAbrir !== false && modelos.length > 0) mostrarDesplegableModelos(idCampoModelo);
-        else if (autoAbrir !== false) ocultarDesplegableModelos(idCampoModelo);
-    }
-
+// Arma el <select> de Marca de los 3 formularios (ivMarca, vMarca, evMarca) con
+// las marcas conocidas + una opción "Otra marca" para las que no están en la lista.
+// Usar un <select> real (en vez de texto libre) es lo que garantiza que la
+// selección funcione siempre, en cualquier celular y cualquier navegador.
+function armarSelectMarcas(idSelect) {
+    const sel = document.getElementById(idSelect);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Elegí una marca...</option>' +
+        LISTA_MARCAS.map(m => `<option value="${m}">${m}</option>`).join("") +
+        '<option value="__otra__">Otra marca (escribir)</option>';
 }
 
-// Desplegable propio de modelos: mismo patrón que ya usamos (y sabemos que
-// funciona bien) en los buscadores de cliente y de producto — no depende de
-// que el navegador soporte abrir un <datalist> con JS, que es poco confiable.
-window.mostrarDesplegableModelos = function (idCampoModelo) {
+["ivMarca", "vMarca", "evMarca"].forEach(armarSelectMarcas);
 
-    const modelos = modelosDisponiblesPorCampo[idCampoModelo] || [];
-    const contenedor = document.getElementById(idCampoModelo + "Resultados");
-    if (!contenedor) return;
+// Se dispara al elegir una marca del select: arma el select de Modelo con los
+// modelos de esa marca, o muestra el campo de texto libre si eligió "Otra marca".
+window.cambioMarcaSelect = function (prefijo) {
 
-    if (modelos.length === 0) {
-        contenedor.style.display = "none";
+    const marca = document.getElementById(prefijo + "Marca").value;
+    const campoOtraMarca = document.getElementById(prefijo + "MarcaOtra");
+    const selectModelo = document.getElementById(prefijo + "Modelo");
+    const campoOtroModelo = document.getElementById(prefijo + "ModeloOtro");
+
+    if (marca === "__otra__") {
+        campoOtraMarca.style.display = "block";
+        campoOtraMarca.focus();
+    } else {
+        campoOtraMarca.style.display = "none";
+        campoOtraMarca.value = "";
+    }
+
+    const clave = marca.trim().toLowerCase();
+    const modelos = MODELOS_POR_MARCA[clave] || [];
+
+    if (modelos.length > 0) {
+        selectModelo.innerHTML = '<option value="">Elegí un modelo...</option>' +
+            modelos.map(m => `<option value="${m}">${m}</option>`).join("") +
+            '<option value="__otro__">Otro modelo (escribir)</option>';
+    } else {
+        // Marca sin modelos precargados (o "Otra marca"): directo texto libre
+        selectModelo.innerHTML = '<option value="__otro__">Escribir el modelo</option>';
+        selectModelo.value = "__otro__";
+        campoOtroModelo.style.display = "block";
         return;
     }
 
-    contenedor.innerHTML = modelos.map(m =>
-        `<div class="opcion-modelo" onclick="elegirModelo('${idCampoModelo}', '${escaparComillas(m)}')">${escapar(m)}</div>`
-    ).join("");
-    contenedor.style.display = "block";
+    campoOtroModelo.style.display = "none";
+    campoOtroModelo.value = "";
 
 };
 
-window.ocultarDesplegableModelos = function (idCampoModelo) {
-    const contenedor = document.getElementById(idCampoModelo + "Resultados");
-    if (contenedor) contenedor.style.display = "none";
+window.cambioModeloSelect = function (prefijo) {
+    const modelo = document.getElementById(prefijo + "Modelo").value;
+    const campoOtroModelo = document.getElementById(prefijo + "ModeloOtro");
+    if (modelo === "__otro__") {
+        campoOtroModelo.style.display = "block";
+        campoOtroModelo.focus();
+    } else {
+        campoOtroModelo.style.display = "none";
+        campoOtroModelo.value = "";
+    }
 };
 
-window.elegirModelo = function (idCampoModelo, modelo) {
-    document.getElementById(idCampoModelo).value = modelo;
-    window.ocultarDesplegableModelos(idCampoModelo);
-};
+// Devuelve el valor final de marca/modelo ya resuelto (sea de la lista o
+// escrito a mano en "Otra marca / Otro modelo"), para guardar en Firestore.
+function valorFinalMarca(prefijo) {
+    const sel = document.getElementById(prefijo + "Marca").value;
+    if (sel === "__otra__") return document.getElementById(prefijo + "MarcaOtra").value.trim();
+    return sel;
+}
 
-// Cierra cualquier desplegable de modelos si se hace clic afuera
-document.addEventListener("click", function (e) {
-    ["ivModelo", "vModelo", "evModelo"].forEach(idCampo => {
-        const campo = document.getElementById(idCampo);
-        const resultados = document.getElementById(idCampo + "Resultados");
-        if (campo && resultados && !campo.contains(e.target) && !resultados.contains(e.target)) {
-            resultados.style.display = "none";
-        }
-    });
-});
-
-document.getElementById("vMarca").addEventListener("input", function () {
-    actualizarModelos(this.value, "vModelo");
-});
-
-document.getElementById("evMarca").addEventListener("input", function () {
-    actualizarModelos(this.value, "evModelo");
-});
+function valorFinalModelo(prefijo) {
+    const sel = document.getElementById(prefijo + "Modelo").value;
+    if (sel === "__otro__") return document.getElementById(prefijo + "ModeloOtro").value.trim();
+    return sel;
+}
 
 let clientesCache = [];
 let vehiculosCache = [];
@@ -7801,7 +7788,11 @@ window.abrirFicha = function (clienteId, nombreCompleto) {
     document.getElementById("fichaClienteId").value = clienteId;
     document.getElementById("vPatente").value = "";
     document.getElementById("vMarca").value = "";
-    document.getElementById("vModelo").value = "";
+    document.getElementById("vMarcaOtra").value = "";
+    document.getElementById("vMarcaOtra").style.display = "none";
+    document.getElementById("vModelo").innerHTML = "";
+    document.getElementById("vModeloOtro").value = "";
+    document.getElementById("vModeloOtro").style.display = "none";
     document.getElementById("vAnio").value = "";
 
     window.cambiarFichaTab("vehiculos");
@@ -7900,8 +7891,11 @@ window.abrirModalIngresarVehiculo = function () {
     document.getElementById("ivClienteResultados").style.display = "none";
     document.getElementById("ivPatente").value = "";
     document.getElementById("ivMarca").value = "";
-    document.getElementById("ivModelo").value = "";
-    document.getElementById("ivModeloResultados").style.display = "none";
+    document.getElementById("ivMarcaOtra").value = "";
+    document.getElementById("ivMarcaOtra").style.display = "none";
+    document.getElementById("ivModelo").innerHTML = "";
+    document.getElementById("ivModeloOtro").value = "";
+    document.getElementById("ivModeloOtro").style.display = "none";
     document.getElementById("ivAnio").value = "";
     document.getElementById("ivEstadoTaller").value = "";
     document.getElementById("mensajeEstadoIngresarVehiculo").textContent = "";
@@ -7971,8 +7965,8 @@ window.guardarIngresarVehiculo = async function () {
 
     const clienteId = document.getElementById("ivClienteId").value;
     const patente = document.getElementById("ivPatente").value.trim().toUpperCase();
-    const marca = document.getElementById("ivMarca").value.trim();
-    const modelo = document.getElementById("ivModelo").value.trim();
+    const marca = valorFinalMarca("iv");
+    const modelo = valorFinalModelo("iv");
     const anio = document.getElementById("ivAnio").value.trim();
     const estadoTaller = document.getElementById("ivEstadoTaller").value;
     const estado = document.getElementById("mensajeEstadoIngresarVehiculo");
@@ -8017,8 +8011,8 @@ window.agregarVehiculo = async function () {
 
     const clienteId = document.getElementById("fichaClienteId").value;
     const patente = document.getElementById("vPatente").value.trim().toUpperCase();
-    const marca = document.getElementById("vMarca").value.trim();
-    const modelo = document.getElementById("vModelo").value.trim();
+    const marca = valorFinalMarca("v");
+    const modelo = valorFinalModelo("v");
     const anio = document.getElementById("vAnio").value.trim();
 
     if (!patente) {
@@ -8033,19 +8027,68 @@ window.agregarVehiculo = async function () {
 
     document.getElementById("vPatente").value = "";
     document.getElementById("vMarca").value = "";
-    document.getElementById("vModelo").value = "";
+    document.getElementById("vMarcaOtra").value = "";
+    document.getElementById("vMarcaOtra").style.display = "none";
+    document.getElementById("vModelo").innerHTML = "";
+    document.getElementById("vModeloOtro").value = "";
+    document.getElementById("vModeloOtro").style.display = "none";
     document.getElementById("vAnio").value = "";
 
 };
+
+// Precarga marca/modelo al abrir "Editar vehículo": si el valor guardado
+// coincide con una marca/modelo conocido, lo selecciona en la lista; si no
+// coincide con nada (por ejemplo, se cargó a mano hace tiempo), lo pone en
+// "Otra marca / Otro modelo" con el texto tal cual estaba, sin perder el dato.
+function precargarMarcaModelo(prefijo, marca, modelo) {
+
+    const selectMarca = document.getElementById(prefijo + "Marca");
+    const campoOtraMarca = document.getElementById(prefijo + "MarcaOtra");
+    const selectModelo = document.getElementById(prefijo + "Modelo");
+    const campoOtroModelo = document.getElementById(prefijo + "ModeloOtro");
+
+    const coincideMarca = LISTA_MARCAS.includes(marca);
+
+    if (coincideMarca) {
+        selectMarca.value = marca;
+        campoOtraMarca.style.display = "none";
+        campoOtraMarca.value = "";
+    } else {
+        selectMarca.value = "__otra__";
+        campoOtraMarca.style.display = marca ? "block" : "none";
+        campoOtraMarca.value = marca || "";
+    }
+
+    const clave = (marca || "").trim().toLowerCase();
+    const modelosDeLaMarca = MODELOS_POR_MARCA[clave] || [];
+    const coincideModelo = modelosDeLaMarca.includes(modelo);
+
+    if (modelosDeLaMarca.length > 0) {
+        selectModelo.innerHTML = '<option value="">Elegí un modelo...</option>' +
+            modelosDeLaMarca.map(m => `<option value="${m}">${m}</option>`).join("") +
+            '<option value="__otro__">Otro modelo (escribir)</option>';
+    } else {
+        selectModelo.innerHTML = '<option value="__otro__">Escribir el modelo</option>';
+    }
+
+    if (coincideModelo) {
+        selectModelo.value = modelo;
+        campoOtroModelo.style.display = "none";
+        campoOtroModelo.value = "";
+    } else {
+        selectModelo.value = "__otro__";
+        campoOtroModelo.style.display = modelo ? "block" : "none";
+        campoOtroModelo.value = modelo || "";
+    }
+
+}
 
 window.abrirEdicionVehiculo = function (id, patente, marca, modelo, anio) {
 
     document.getElementById("evId").value = id;
     document.getElementById("evPatente").value = patente;
-    document.getElementById("evMarca").value = marca;
-    document.getElementById("evModelo").value = modelo;
     document.getElementById("evAnio").value = anio;
-    actualizarModelos(marca, "evModelo", false);
+    precargarMarcaModelo("ev", marca || "", modelo || "");
 
     document.getElementById("mensajeEstadoVehiculo").textContent = "";
     document.getElementById("modalEditarVehiculo").classList.add("abierto");
@@ -8056,8 +8099,8 @@ window.guardarEdicionVehiculo = async function () {
 
     const id = document.getElementById("evId").value;
     const patente = document.getElementById("evPatente").value.trim().toUpperCase();
-    const marca = document.getElementById("evMarca").value.trim();
-    const modelo = document.getElementById("evModelo").value.trim();
+    const marca = valorFinalMarca("ev");
+    const modelo = valorFinalModelo("ev");
     const anio = document.getElementById("evAnio").value.trim();
     const estado = document.getElementById("mensajeEstadoVehiculo");
 
