@@ -3247,6 +3247,9 @@ header{
 .badge-estado-tabla.Aprobado{ background:#0d2418; color:#5fd98a; }
 .badge-estado-tabla.Convertido{ background:#0a1e33; color:#6ab6ff; }
 .badge-estado-tabla.Vencido{ background:#3a1416; color:#ff6b6b; }
+.badge-estado-tabla.StockOK{ background:#0d2418; color:#5fd98a; }
+.badge-estado-tabla.StockBajo{ background:#2a2408; color:#f5a623; }
+.badge-estado-tabla.SinStock{ background:#3a1416; color:#ff6b6b; }
 .badge-estado-tabla.Rechazado{ background:#2a2a2e; color:#999; }
 
 .presu-valido-cell{
@@ -3388,6 +3391,76 @@ header{
 .caja-acceso-icono.ambar{ background:#c99a3f; }
 .caja-acceso-icono.violeta{ background:#7c5cf0; }
 .caja-acceso-icono.gris{ background:#555; }
+
+/* ======================================================================
+   STOCK — nuevo diseño (calcado del mockup)
+   ====================================================================== */
+
+.stock-filtros-fila{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:14px;
+}
+
+.stock-producto-cell{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.stock-producto-icono{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:#242428;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    flex-shrink:0;
+}
+
+.stock-producto-nombre{
+    font-weight:700;
+    color:#fff;
+    font-size:13px;
+}
+
+.stock-producto-sub{
+    font-size:11px;
+    color:#888;
+}
+
+.stock-codigo-chip{
+    background:#242428;
+    padding:3px 8px;
+    border-radius:6px;
+    font-size:11px;
+    color:#ccc;
+    font-family:monospace;
+}
+
+.mov-stock-fila{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px dashed #262626;
+    font-size:12.5px;
+}
+
+.mov-stock-fila:last-child{ border-bottom:none; }
+
+.mov-stock-cambio{
+    font-weight:800;
+    font-family:'Montserrat',sans-serif;
+    min-width:44px;
+    text-align:center;
+    border-radius:6px;
+    padding:4px 0;
+}
 
 </style>
 </head>
@@ -3757,6 +3830,7 @@ header{
             <input type="date" id="presuFiltroDesde" class="turno-estado-select" onchange="renderPresupuestos()">
             <span style="color:#666;">–</span>
             <input type="date" id="presuFiltroHasta" class="turno-estado-select" onchange="renderPresupuestos()">
+            <button class="btn-red" style="padding:8px 18px;font-size:12.5px;" onclick="presuPaginaActual=1; renderPresupuestos();">🔍 Buscar</button>
             <button class="btn-chico" onclick="document.getElementById('presuFiltroDesde').value='';document.getElementById('presuFiltroHasta').value='';renderPresupuestos();">Limpiar fechas</button>
         </div>
 
@@ -3928,6 +4002,7 @@ header{
             <input type="date" id="cajaFiltroDesde" class="turno-estado-select" onchange="renderCaja()">
             <span style="color:#666;">–</span>
             <input type="date" id="cajaFiltroHasta" class="turno-estado-select" onchange="renderCaja()">
+            <button class="btn-red" style="padding:8px 18px;font-size:12.5px;" onclick="cajaPaginaActual=1; renderCaja();">🔍 Buscar</button>
             <button class="btn-chico" onclick="document.getElementById('cajaFiltroDesde').value='';document.getElementById('cajaFiltroHasta').value='';renderCaja();">Limpiar fechas</button>
         </div>
 
@@ -4033,10 +4108,93 @@ header{
             <h2>Stock</h2>
             <div style="display:flex;gap:8px;">
                 <button class="btn-chico" onclick="modoEscaner='venta'; abrirEscaner()">📷 Escanear</button>
-                <button class="btn-chico" onclick="abrirModalProducto()">+ Nuevo producto</button>
+                <button class="btn-chico" onclick="document.getElementById('inputImportarStock').click()">⬇️ Importar</button>
+                <input type="file" id="inputImportarStock" accept=".xlsx,.xls" style="display:none;" onchange="importarStockDesdeExcel(this.files[0])">
+                <button class="btn-chico" onclick="exportarStockFiltrado()">⬇️ Exportar</button>
+                <button class="btn-red" onclick="abrirModalProducto()">+ Nuevo producto</button>
             </div>
         </div>
-        <div id="tablaStock"></div>
+
+        <div class="turnos-chips-fila">
+            <button class="cv-chip-toggle activo" id="chipStockInventario" onclick="cambiarSubtabStock('inventario')">Inventario</button>
+            <button class="cv-chip-toggle" id="chipStockMinimo" onclick="cambiarSubtabStock('minimo')">Stock mínimo</button>
+            <button class="cv-chip-toggle" id="chipStockMovimientos" onclick="cambiarSubtabStock('movimientos')">Movimientos</button>
+        </div>
+
+        <div class="turnos-stats-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="turnos-stat-card">
+                <div class="turnos-stat-icono" style="background:#0a1e33;">📦</div>
+                <div><div class="turnos-stat-numero" id="stockStatTotal">0</div><div class="turnos-stat-label">Total productos · en inventario</div></div>
+            </div>
+            <div class="turnos-stat-card verde">
+                <div class="turnos-stat-icono">🧊</div>
+                <div><div class="turnos-stat-numero" id="stockStatUnidades">0</div><div class="turnos-stat-label">Stock total · unidades</div></div>
+            </div>
+            <div class="turnos-stat-card ambar">
+                <div class="turnos-stat-icono">⚠️</div>
+                <div><div class="turnos-stat-numero" id="stockStatBajo">0</div><div class="turnos-stat-label">Stock bajo · productos</div></div>
+            </div>
+            <div class="turnos-stat-card" style="border-left:3px solid #ff6b6b;">
+                <div class="turnos-stat-icono" style="background:#3a1416;">🚫</div>
+                <div><div class="turnos-stat-numero" id="stockStatSinStock">0</div><div class="turnos-stat-label">Sin stock · productos</div></div>
+            </div>
+        </div>
+        <div class="turnos-stat-card violeta" style="max-width:280px;margin-bottom:16px;">
+            <div class="turnos-stat-icono">💲</div>
+            <div><div class="turnos-stat-numero" id="stockStatValorTotal">$0</div><div class="turnos-stat-label">Valor total · inventario</div></div>
+        </div>
+
+        <div id="vistaStockInventario">
+
+            <div class="stock-filtros-fila">
+                <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;min-width:180px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="buscadorStock" placeholder="Buscar producto, código o marca..." oninput="renderStock()">
+                </div>
+                <select id="stockFiltroCategoria" class="turno-estado-select" onchange="renderStock()"><option value="">Todas las categorías</option></select>
+                <select id="stockFiltroProveedor" class="turno-estado-select" onchange="renderStock()"><option value="">Todos los proveedores</option></select>
+                <select id="stockFiltroEstado" class="turno-estado-select" onchange="renderStock()">
+                    <option value="">Todos los estados</option>
+                    <option value="ok">OK</option>
+                    <option value="bajo">Bajo stock</option>
+                    <option value="sin">Sin stock</option>
+                </select>
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;white-space:nowrap;">
+                    <input type="checkbox" id="stockSoloBajo" onchange="renderStock()"> Solo stock bajo
+                </label>
+            </div>
+
+            <div class="presu-tabla-wrap">
+                <table class="presu-tabla">
+                    <thead>
+                        <tr><th>Producto</th><th>Categoría</th><th>Código</th><th>Stock</th><th>Stock mínimo</th><th>Estado</th><th>Valor unitario</th><th>Valor total</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="stockTablaBody"></tbody>
+                </table>
+            </div>
+
+            <div class="presu-paginacion">
+                <span id="stockPaginacionTexto">-</span>
+                <div class="presu-paginacion-botones" id="stockPaginacionBotones"></div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:12px;color:#999;">Ver</span>
+                    <select id="stockPorPagina" class="turno-estado-select" onchange="cambiarPorPaginaStock()">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                    <span style="font-size:12px;color:#999;">por página</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="vistaStockMovimientos" style="display:none;">
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Historial de movimientos de stock</div>
+                <div id="listaMovimientosStock"></div>
+            </div>
+        </div>
 
     </section>
 
@@ -4782,6 +4940,9 @@ header{
         <label style="color:#fff;font-size:13px;">Nombre</label>
         <input type="text" id="pNombre" placeholder="Perfume Glade">
 
+        <label style="color:#fff;font-size:13px;">Código (opcional)</label>
+        <input type="text" id="pCodigo" placeholder="SEL-001">
+
         <label style="color:#fff;font-size:13px;">Cantidad inicial</label>
         <input type="number" id="pCantidad" placeholder="10">
 
@@ -4796,6 +4957,9 @@ header{
 
         <label style="color:#fff;font-size:13px;">Categoría (opcional)</label>
         <select id="pCategoria"><option value="">Sin categoría</option></select>
+
+        <label style="color:#fff;font-size:13px;">Proveedor (opcional)</label>
+        <select id="pProveedor"><option value="">Sin proveedor</option></select>
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
@@ -4816,6 +4980,9 @@ header{
         <label style="color:#fff;font-size:13px;">Nombre</label>
         <input type="text" id="epNombre">
 
+        <label style="color:#fff;font-size:13px;">Código (opcional)</label>
+        <input type="text" id="epCodigo">
+
         <label style="color:#fff;font-size:13px;">Cantidad</label>
         <input type="number" id="epCantidad">
 
@@ -4831,10 +4998,15 @@ header{
         <label style="color:#fff;font-size:13px;">Categoría (opcional)</label>
         <select id="epCategoria"><option value="">Sin categoría</option></select>
 
+        <label style="color:#fff;font-size:13px;">Proveedor (opcional)</label>
+        <select id="epProveedor"><option value="">Sin proveedor</option></select>
+
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
             <button class="btn-red" onclick="guardarEdicionProducto()">Guardar</button>
         </div>
+
+        <div class="modal-botones" id="accionesEdicionProducto" style="display:none;"></div>
 
         <p id="mensajeEstadoEdicionProducto"></p>
     </div>
@@ -5241,6 +5413,7 @@ onAuthStateChanged(auth, (user) => {
         escucharUsuarios();
         escucharProveedores();
         escucharCategorias();
+        escucharStockMovimientos();
         escucharServicios();
         escucharConfiguracion();
     } else {
@@ -7548,42 +7721,213 @@ function escucharStock() {
 
 }
 
+let subtabStockActual = "inventario";
+let stockPaginaActual = 1;
+let stockPorPagina = 10;
+let stockMovimientosCache = [];
+
+window.cambiarSubtabStock = function (sub) {
+
+    subtabStockActual = sub;
+    stockPaginaActual = 1;
+
+    document.getElementById("chipStockInventario").classList.toggle("activo", sub === "inventario");
+    document.getElementById("chipStockMinimo").classList.toggle("activo", sub === "minimo");
+    document.getElementById("chipStockMovimientos").classList.toggle("activo", sub === "movimientos");
+
+    document.getElementById("vistaStockInventario").style.display = sub === "movimientos" ? "none" : "block";
+    document.getElementById("vistaStockMovimientos").style.display = sub === "movimientos" ? "block" : "none";
+
+    document.getElementById("stockSoloBajo").checked = sub === "minimo";
+
+    renderStock();
+
+};
+
+function estadoDelProducto(p) {
+    const stockMinimo = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
+    if ((Number(p.cantidad) || 0) <= 0) return "sin";
+    if (Number(p.cantidad) <= stockMinimo) return "bajo";
+    return "ok";
+}
+
+function actualizarFiltrosStock() {
+
+    const selCat = document.getElementById("stockFiltroCategoria");
+    const selProv = document.getElementById("stockFiltroProveedor");
+    if (!selCat) return;
+
+    const valorCat = selCat.value;
+    selCat.innerHTML = '<option value="">Todas las categorías</option>' + categoriasCache.map(c => `<option value="${c.id}">${escapar(c.nombre)}</option>`).join("");
+    selCat.value = valorCat;
+
+    const valorProv = selProv.value;
+    selProv.innerHTML = '<option value="">Todos los proveedores</option>' + proveedoresCache.map(p => `<option value="${p.id}">${escapar(p.nombre)}</option>`).join("");
+    selProv.value = valorProv;
+
+}
+
+window.cambiarPorPaginaStock = function () {
+    stockPorPagina = parseInt(document.getElementById("stockPorPagina").value, 10);
+    stockPaginaActual = 1;
+    renderStock();
+};
+
+window.irAPaginaStock = function (pagina) {
+    stockPaginaActual = pagina;
+    renderStock();
+};
+
 function renderStock() {
 
-    const el = document.getElementById("tablaStock");
+    const el = document.getElementById("stockTablaBody");
+    if (!el) return;
 
-    if (stockCache.length === 0) {
-        el.innerHTML = '<div class="vacio">Todavía no hay productos cargados.</div>';
+    actualizarFiltrosStock();
+
+    // ---- Tarjetas de resumen (sobre TODO el inventario, sin filtrar) ----
+    const bajo = stockCache.filter(p => estadoDelProducto(p) === "bajo");
+    const sinStock = stockCache.filter(p => estadoDelProducto(p) === "sin");
+    const unidadesTotales = stockCache.reduce((s, p) => s + (Number(p.cantidad) || 0), 0);
+    const valorTotal = stockCache.reduce((s, p) => s + (Number(p.cantidad) || 0) * (Number(p.precio) || 0), 0);
+
+    document.getElementById("stockStatTotal").textContent = stockCache.length;
+    document.getElementById("stockStatUnidades").textContent = unidadesTotales.toLocaleString("es-AR");
+    document.getElementById("stockStatBajo").textContent = bajo.length;
+    document.getElementById("stockStatSinStock").textContent = sinStock.length;
+    document.getElementById("stockStatValorTotal").textContent = formatoPlata(valorTotal);
+
+    if (subtabStockActual === "movimientos") {
+        renderMovimientosStock();
         return;
     }
 
-    el.innerHTML = "";
+    // ---- Filtros ----
+    const texto = (document.getElementById("buscadorStock").value || "").trim().toLowerCase();
+    const filtroCategoria = document.getElementById("stockFiltroCategoria").value;
+    const filtroProveedor = document.getElementById("stockFiltroProveedor").value;
+    const filtroEstado = document.getElementById("stockFiltroEstado").value;
+    const soloBajo = document.getElementById("stockSoloBajo").checked;
 
-    stockCache.forEach(p => {
-
-        const stockMinimo = p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3;
-        const bajo = p.cantidad <= stockMinimo;
-        const categoria = categoriasCache.find(c => c.id === p.categoriaId);
-
-        const fila = document.createElement("div");
-        fila.className = "fila-stock" + (bajo ? " stock-bajo" : "");
-        fila.innerHTML = `
-            <div>
-                <div class="fila-stock-nombre">${escapar(p.nombre)} ${bajo ? "⚠️" : ""}</div>
-                <div class="fila-stock-cantidad">Quedan <span id="cantidad-${p.id}">${p.cantidad}</span> unidades ${bajo ? "· stock bajo" : ""}${categoria ? " · " + escapar(categoria.nombre) : ""}</div>
-            </div>
-            <div class="fila-stock-botones">
-                <button class="btn-redondo" onclick="ajustarCantidad('${p.id}', -1)">-</button>
-                <span class="cantidad-numero" id="numero-${p.id}">${p.cantidad}</span>
-                <button class="btn-redondo" onclick="ajustarCantidad('${p.id}', 1)">+</button>
-                <button class="btn-chico" onclick="abrirEdicionProducto('${p.id}', '${escaparComillas(p.nombre)}', ${p.cantidad}, ${stockMinimo}, ${p.precio || 0}, '${p.categoriaId || ""}', ${p.precioCosto || 0})">Editar</button>
-                <button class="btn-chico" onclick="abrirEtiqueta('${p.id}', '${escaparComillas(p.nombre)}')">🏷️ Etiqueta</button>
-            </div>
-        `;
-        el.appendChild(fila);
-
+    let lista = stockCache.filter(p => {
+        if (texto && !(`${p.nombre} ${p.codigo || ""}`.toLowerCase().includes(texto))) return false;
+        if (filtroCategoria && p.categoriaId !== filtroCategoria) return false;
+        if (filtroProveedor && p.proveedorId !== filtroProveedor) return false;
+        const est = estadoDelProducto(p);
+        if (filtroEstado && est !== filtroEstado) return false;
+        if (soloBajo && est === "ok") return false;
+        return true;
     });
 
+    const totalPaginas = Math.max(1, Math.ceil(lista.length / stockPorPagina));
+    if (stockPaginaActual > totalPaginas) stockPaginaActual = totalPaginas;
+    const inicio = (stockPaginaActual - 1) * stockPorPagina;
+    const listaPagina = lista.slice(inicio, inicio + stockPorPagina);
+
+    if (lista.length === 0) {
+        el.innerHTML = '<tr><td colspan="9" class="vacio">No hay productos con estos filtros.</td></tr>';
+        document.getElementById("stockPaginacionTexto").textContent = "Sin resultados";
+        document.getElementById("stockPaginacionBotones").innerHTML = "";
+        return;
+    }
+
+    const estadoInfo = { ok: { clase: "StockOK", texto: "✓ OK" }, bajo: { clase: "StockBajo", texto: "⚠ Bajo stock" }, sin: { clase: "SinStock", texto: "⊘ Sin stock" } };
+
+    el.innerHTML = listaPagina.map(p => {
+
+        const categoria = categoriasCache.find(c => c.id === p.categoriaId);
+        const est = estadoDelProducto(p);
+        const info = estadoInfo[est];
+        const valorTotalProducto = (Number(p.cantidad) || 0) * (Number(p.precio) || 0);
+
+        return `<tr>
+            <td>
+                <div class="stock-producto-cell">
+                    <div class="stock-producto-icono">📦</div>
+                    <div>
+                        <div class="stock-producto-nombre">${escapar(p.nombre)}</div>
+                        ${categoria ? `<div class="stock-producto-sub">${escapar(categoria.nombre)}</div>` : ""}
+                    </div>
+                </div>
+            </td>
+            <td style="color:#999;">${categoria ? escapar(categoria.nombre) : "-"}</td>
+            <td>${p.codigo ? `<span class="stock-codigo-chip">${escapar(p.codigo)}</span>` : "-"}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <button class="btn-redondo" style="width:22px;height:22px;font-size:13px;" onclick="ajustarCantidad('${p.id}', -1)">-</button>
+                    <strong style="min-width:24px;text-align:center;display:inline-block;">${p.cantidad}</strong>
+                    <button class="btn-redondo" style="width:22px;height:22px;font-size:13px;" onclick="ajustarCantidad('${p.id}', 1)">+</button>
+                </div>
+            </td>
+            <td style="color:#999;">${p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3}</td>
+            <td><span class="badge-estado-tabla ${info.clase}">${info.texto}</span></td>
+            <td>${formatoPlata(p.precio)}</td>
+            <td class="presu-importe-cell">${formatoPlata(valorTotalProducto)}</td>
+            <td>
+                <div class="presu-acciones-cell">
+                    <div class="icono-accion-turno" onclick="abrirEtiqueta('${p.id}', '${escaparComillas(p.nombre)}')" title="Ver / Etiqueta">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div class="icono-accion-turno" onclick="abrirEdicionProducto('${p.id}', '${escaparComillas(p.nombre)}', ${p.cantidad}, ${p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3}, ${p.precio || 0}, '${p.categoriaId || ""}', ${p.precioCosto || 0}, '${escaparComillas(p.codigo || "")}', '${p.proveedorId || ""}')" title="Editar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                    </div>
+                    <div class="icono-accion-turno borrar" onclick="borrarProducto('${p.id}', '${escaparComillas(p.nombre)}')" title="Eliminar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/></svg>
+                    </div>
+                </div>
+            </td>
+        </tr>`;
+
+    }).join("");
+
+    const desdeN = inicio + 1;
+    const hastaN = Math.min(inicio + stockPorPagina, lista.length);
+    document.getElementById("stockPaginacionTexto").textContent = `Mostrando ${desdeN} a ${hastaN} de ${lista.length} productos`;
+
+    let htmlPaginas = `<button class="presu-pagina-btn" onclick="irAPaginaStock(${Math.max(1, stockPaginaActual - 1)})" ${stockPaginaActual === 1 ? "disabled" : ""}>‹</button>`;
+    for (let i = 1; i <= totalPaginas; i++) {
+        if (i > 6 && i < totalPaginas - 1 && Math.abs(i - stockPaginaActual) > 1) continue;
+        htmlPaginas += `<button class="presu-pagina-btn ${i === stockPaginaActual ? "activo" : ""}" onclick="irAPaginaStock(${i})">${i}</button>`;
+    }
+    htmlPaginas += `<button class="presu-pagina-btn" onclick="irAPaginaStock(${Math.min(totalPaginas, stockPaginaActual + 1)})" ${stockPaginaActual === totalPaginas ? "disabled" : ""}>›</button>`;
+
+    document.getElementById("stockPaginacionBotones").innerHTML = htmlPaginas;
+
+}
+
+function renderMovimientosStock() {
+
+    const el = document.getElementById("listaMovimientosStock");
+    if (!el) return;
+
+    if (stockMovimientosCache.length === 0) {
+        el.innerHTML = '<div class="vacio">Todavía no hay movimientos de stock registrados. Se van guardando solos cada vez que sumás/restás cantidad o editás un producto.</div>';
+        return;
+    }
+
+    el.innerHTML = stockMovimientosCache.slice(0, 100).map(m => {
+        const fecha = toDateSegura(m.fecha);
+        const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") + " " + fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "-";
+        const positivo = m.delta > 0;
+        return `<div class="mov-stock-fila">
+            <div class="mov-stock-cambio" style="background:${positivo ? "#0d2418" : "#3a1416"};color:${positivo ? "#5fd98a" : "#ff6b6b"};">${positivo ? "+" : ""}${m.delta}</div>
+            <div style="flex:1;">
+                <div style="color:#fff;font-weight:600;">${escapar(m.productoNombre)}</div>
+                <div style="color:#888;font-size:11px;">${escapar(m.motivo || "Ajuste manual")} · quedaron ${m.cantidadResultante}</div>
+            </div>
+            <div style="color:#777;font-size:11px;white-space:nowrap;">${fechaTexto}</div>
+        </div>`;
+    }).join("");
+
+}
+
+async function registrarMovimientoStock(productoId, productoNombre, delta, cantidadResultante, motivo) {
+    try {
+        await addDoc(collection(db, "stockMovimientos"), {
+            productoId, productoNombre, delta, cantidadResultante, motivo,
+            fecha: serverTimestamp()
+        });
+    } catch (e) { /* si falla el log no debe romper la operación principal */ }
 }
 
 window.ajustarCantidad = async function (id, delta) {
@@ -7594,25 +7938,37 @@ window.ajustarCantidad = async function (id, delta) {
     const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) + delta);
 
     await updateDoc(doc(db, "stock", id), { cantidad: nuevaCantidad });
+    await registrarMovimientoStock(id, producto.nombre, nuevaCantidad - (Number(producto.cantidad) || 0), nuevaCantidad, "Ajuste rápido +/-");
 
+};
+
+window.borrarProducto = async function (id, nombre) {
+    const confirmado = confirm(`¿Eliminar "${nombre}" del inventario? No se puede deshacer.`);
+    if (!confirmado) return;
+    await deleteDoc(doc(db, "stock", id));
 };
 
 window.abrirModalProducto = function () {
     document.getElementById("modalProducto").classList.add("abierto");
     document.getElementById("mensajeEstadoProducto").textContent = "";
     actualizarSelectCategoriasEnStock();
+    actualizarSelectProveedoresEnStock();
     document.getElementById("pCategoria").value = "";
+    document.getElementById("pProveedor").value = "";
+    document.getElementById("pCodigo").value = "";
     document.getElementById("pStockMinimo").value = configuracionActual.stockMinimoDefecto || "";
 };
 
 window.guardarProducto = async function () {
 
     const nombre = document.getElementById("pNombre").value.trim();
+    const codigo = document.getElementById("pCodigo").value.trim();
     const cantidad = parseInt(document.getElementById("pCantidad").value, 10) || 0;
     const precio = parseFloat(document.getElementById("pPrecio").value) || 0;
     const precioCosto = parseFloat(document.getElementById("pPrecioCosto").value) || 0;
     const stockMinimo = parseInt(document.getElementById("pStockMinimo").value, 10) || configuracionActual.stockMinimoDefecto || 3;
     const categoriaId = document.getElementById("pCategoria").value || null;
+    const proveedorId = document.getElementById("pProveedor").value || null;
     const estado = document.getElementById("mensajeEstadoProducto");
 
     if (!nombre) {
@@ -7626,20 +7982,26 @@ window.guardarProducto = async function () {
 
     try {
 
-        await addDoc(collection(db, "stock"), {
-            nombre, cantidad, precio, precioCosto, stockMinimo, categoriaId,
+        const nuevo = await addDoc(collection(db, "stock"), {
+            nombre, codigo, cantidad, precio, precioCosto, stockMinimo, categoriaId, proveedorId,
             creado: serverTimestamp()
         });
+
+        if (cantidad > 0) {
+            await registrarMovimientoStock(nuevo.id, nombre, cantidad, cantidad, "Alta de producto");
+        }
 
         estado.textContent = "¡Producto guardado!";
         estado.style.color = "#5fd98a";
 
         document.getElementById("pNombre").value = "";
+        document.getElementById("pCodigo").value = "";
         document.getElementById("pCantidad").value = "";
         document.getElementById("pPrecioCosto").value = "";
         document.getElementById("pPrecio").value = "";
         document.getElementById("pStockMinimo").value = "";
         document.getElementById("pCategoria").value = "";
+        document.getElementById("pProveedor").value = "";
 
         setTimeout(() => window.cerrarModales(), 600);
 
@@ -7650,17 +8012,24 @@ window.guardarProducto = async function () {
 
 };
 
-window.abrirEdicionProducto = function (id, nombre, cantidad, stockMinimo, precio, categoriaId, precioCosto) {
+window.abrirEdicionProducto = function (id, nombre, cantidad, stockMinimo, precio, categoriaId, precioCosto, codigo, proveedorId) {
 
     document.getElementById("epId").value = id;
     document.getElementById("epNombre").value = nombre;
+    document.getElementById("epCodigo").value = codigo || "";
     document.getElementById("epCantidad").value = cantidad;
     document.getElementById("epStockMinimo").value = stockMinimo;
     document.getElementById("epPrecio").value = precio || "";
     document.getElementById("epPrecioCosto").value = precioCosto || "";
 
     actualizarSelectCategoriasEnStock();
+    actualizarSelectProveedoresEnStock();
     document.getElementById("epCategoria").value = categoriaId || "";
+    document.getElementById("epProveedor").value = proveedorId || "";
+
+    document.getElementById("accionesEdicionProducto").innerHTML =
+        `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="cerrarModales(); borrarProducto('${id}', '${escaparComillas(nombre)}')">🗑️ Eliminar producto</button>`;
+    document.getElementById("accionesEdicionProducto").style.display = "flex";
 
     document.getElementById("mensajeEstadoEdicionProducto").textContent = "";
     document.getElementById("modalEditarProducto").classList.add("abierto");
@@ -7671,11 +8040,13 @@ window.guardarEdicionProducto = async function () {
 
     const id = document.getElementById("epId").value;
     const nombre = document.getElementById("epNombre").value.trim();
+    const codigo = document.getElementById("epCodigo").value.trim();
     const cantidad = parseInt(document.getElementById("epCantidad").value, 10) || 0;
     const precio = parseFloat(document.getElementById("epPrecio").value) || 0;
     const precioCosto = parseFloat(document.getElementById("epPrecioCosto").value) || 0;
     const stockMinimo = parseInt(document.getElementById("epStockMinimo").value, 10) || 3;
     const categoriaId = document.getElementById("epCategoria").value || null;
+    const proveedorId = document.getElementById("epProveedor").value || null;
     const estado = document.getElementById("mensajeEstadoEdicionProducto");
 
     if (!nombre) {
@@ -7689,7 +8060,14 @@ window.guardarEdicionProducto = async function () {
 
     try {
 
-        await updateDoc(doc(db, "stock", id), { nombre, cantidad, precio, precioCosto, stockMinimo, categoriaId });
+        const productoAnterior = stockCache.find(p => p.id === id);
+        const cantidadAnterior = productoAnterior ? Number(productoAnterior.cantidad) || 0 : cantidad;
+
+        await updateDoc(doc(db, "stock", id), { nombre, codigo, cantidad, precio, precioCosto, stockMinimo, categoriaId, proveedorId });
+
+        if (cantidad !== cantidadAnterior) {
+            await registrarMovimientoStock(id, nombre, cantidad - cantidadAnterior, cantidad, "Edición manual");
+        }
 
         estado.textContent = "¡Listo!";
         estado.style.color = "#5fd98a";
@@ -7997,6 +8375,115 @@ function actualizarSelectCategoriasEnStock() {
     if (selEditar) { const actual = selEditar.value; selEditar.innerHTML = opciones; selEditar.value = actual; }
 
 }
+
+function actualizarSelectProveedoresEnStock() {
+
+    const opciones = '<option value="">Sin proveedor</option>' +
+        proveedoresCache.map(p => `<option value="${p.id}">${escapar(p.nombre)}</option>`).join("");
+
+    const selNuevo = document.getElementById("pProveedor");
+    const selEditar = document.getElementById("epProveedor");
+    if (selNuevo) { const actual = selNuevo.value; selNuevo.innerHTML = opciones; selNuevo.value = actual; }
+    if (selEditar) { const actual = selEditar.value; selEditar.innerHTML = opciones; selEditar.value = actual; }
+
+}
+
+function escucharStockMovimientos() {
+    const q = query(collection(db, "stockMovimientos"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        stockMovimientosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (subtabStockActual === "movimientos") renderMovimientosStock();
+    }, () => {});
+}
+
+window.exportarStockFiltrado = function () {
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    const lista = stockCache.map(p => {
+        const categoria = categoriasCache.find(c => c.id === p.categoriaId);
+        const proveedor = proveedoresCache.find(pr => pr.id === p.proveedorId);
+        return {
+            Nombre: p.nombre || "",
+            Codigo: p.codigo || "",
+            Categoria: categoria ? categoria.nombre : "",
+            Proveedor: proveedor ? proveedor.nombre : "",
+            Stock: p.cantidad || 0,
+            StockMinimo: p.stockMinimo !== undefined && p.stockMinimo !== null ? p.stockMinimo : 3,
+            PrecioCosto: p.precioCosto || 0,
+            PrecioVenta: p.precio || 0,
+            Estado: estadoDelProducto(p)
+        };
+    });
+
+    const hoja = XLSX.utils.json_to_sheet(lista.length ? lista : [{ info: "Sin datos" }]);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Stock");
+    XLSX.writeFile(libro, `KM26_Stock_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+};
+
+// Importa productos desde un Excel con columnas: Nombre, Codigo, Stock, StockMinimo,
+// PrecioCosto, PrecioVenta (todas menos Nombre son opcionales). No borra ni pisa
+// productos existentes — siempre crea productos nuevos, para no arriesgar datos.
+window.importarStockDesdeExcel = async function (archivo) {
+
+    if (!archivo) return;
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    try {
+
+        const buffer = await archivo.arrayBuffer();
+        const libro = XLSX.read(buffer, { type: "array" });
+        const hoja = libro.Sheets[libro.SheetNames[0]];
+        const filas = XLSX.utils.sheet_to_json(hoja);
+
+        if (filas.length === 0) {
+            alert("El archivo no tiene filas para importar.");
+            return;
+        }
+
+        const confirmado = confirm(`¿Importar ${filas.length} producto(s) nuevos al inventario?`);
+        if (!confirmado) return;
+
+        let importados = 0;
+
+        for (const fila of filas) {
+
+            const nombre = String(fila.Nombre || fila.nombre || "").trim();
+            if (!nombre) continue;
+
+            await addDoc(collection(db, "stock"), {
+                nombre,
+                codigo: String(fila.Codigo || fila.codigo || "").trim(),
+                cantidad: parseInt(fila.Stock || fila.stock || fila.Cantidad || 0, 10) || 0,
+                stockMinimo: parseInt(fila.StockMinimo || fila.stockMinimo || 3, 10) || 3,
+                precioCosto: parseFloat(fila.PrecioCosto || fila.precioCosto || 0) || 0,
+                precio: parseFloat(fila.PrecioVenta || fila.precioVenta || fila.Precio || 0) || 0,
+                categoriaId: null,
+                proveedorId: null,
+                creado: serverTimestamp()
+            });
+
+            importados++;
+
+        }
+
+        document.getElementById("inputImportarStock").value = "";
+        alert(`¡Listo! Se importaron ${importados} producto(s).`);
+
+    } catch (err) {
+        alert("No se pudo importar el archivo: " + err.message);
+    }
+
+};
 
 // ---------- Servicios (catálogo de trabajos habituales con precio de referencia) ----------
 
