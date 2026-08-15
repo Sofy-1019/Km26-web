@@ -3801,6 +3801,35 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     font-size:13px;
 }
 
+.desplegable-modelos{
+    background:#1a1a1a;
+    border:1px solid #333;
+    border-radius:8px;
+    margin-top:-8px;
+    margin-bottom:14px;
+    max-height:220px;
+    overflow-y:auto;
+    position:relative;
+    z-index:60;
+}
+
+.desplegable-modelos .opcion-modelo{
+    padding:10px 14px;
+    font-size:13px;
+    color:#eee;
+    cursor:pointer;
+    border-bottom:1px solid #262626;
+}
+
+.desplegable-modelos .opcion-modelo:last-child{
+    border-bottom:none;
+}
+
+.desplegable-modelos .opcion-modelo:hover{
+    background:#242428;
+    color:#fff;
+}
+
 .cc-resultado-item:hover{ background:#242428; }
 
 </style>
@@ -5651,9 +5680,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <label>Patente</label>
         <input type="text" id="ivPatente" placeholder="AB123CD">
         <label>Marca</label>
-        <input type="text" id="ivMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off" oninput="actualizarModelos(this.value, 'ivModelo')">
+        <input type="text" id="ivMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off" oninput="actualizarModelos(this.value, 'ivModelo')" onfocus="actualizarModelos(this.value, 'ivModelo')">
         <label>Modelo</label>
-        <input type="text" id="ivModelo" placeholder="Vento" list="listaModelos" autocomplete="off">
+        <input type="text" id="ivModelo" placeholder="Vento" list="listaModelos" autocomplete="off" onfocus="mostrarDesplegableModelos('ivModelo')">
+        <div id="ivModeloResultados" class="desplegable-modelos" style="display:none;"></div>
         <label>Año</label>
         <input type="text" id="ivAnio" placeholder="2020">
 
@@ -5757,9 +5787,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <label>Patente</label>
                 <input type="text" id="vPatente" placeholder="AB123CD">
                 <label>Marca</label>
-                <input type="text" id="vMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off">
+                <input type="text" id="vMarca" placeholder="Volkswagen" list="listaMarcas" autocomplete="off" onfocus="actualizarModelos(this.value, 'vModelo')">
                 <label>Modelo</label>
-                <input type="text" id="vModelo" placeholder="Vento" list="listaModelos" autocomplete="off">
+                <input type="text" id="vModelo" placeholder="Vento" list="listaModelos" autocomplete="off" onfocus="mostrarDesplegableModelos('vModelo')">
+                <div id="vModeloResultados" class="desplegable-modelos" style="display:none;"></div>
                 <label>Año</label>
                 <input type="text" id="vAnio" placeholder="2020">
                 <div class="modal-botones">
@@ -5789,9 +5820,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <label>Patente</label>
         <input type="text" id="evPatente">
         <label>Marca</label>
-        <input type="text" id="evMarca" list="listaMarcas" autocomplete="off">
+        <input type="text" id="evMarca" list="listaMarcas" autocomplete="off" onfocus="actualizarModelos(this.value, 'evModelo')">
         <label>Modelo</label>
-        <input type="text" id="evModelo" list="listaModelos" autocomplete="off">
+        <input type="text" id="evModelo" list="listaModelos" autocomplete="off" onfocus="mostrarDesplegableModelos('evModelo')">
+        <div id="evModeloResultados" class="desplegable-modelos" style="display:none;"></div>
         <label>Año</label>
         <input type="text" id="evAnio">
 
@@ -6688,7 +6720,11 @@ const MODELOS_POR_MARCA = {
 // Al elegir/escribir la marca, se arma la lista de modelos de esa marca y se
 // abre sola (en los navegadores que lo permiten, como Chrome/Edge) para elegir
 // directo — sin dejar de poder escribir un modelo que no esté en la lista.
-function actualizarModelos(marcaTexto, idCampoModelo) {
+// Guarda, por cada campo de modelo, cuáles son sus modelos disponibles ahora
+// (según la marca escrita), para poder mostrarlos en el desplegable propio.
+let modelosDisponiblesPorCampo = {};
+
+function actualizarModelos(marcaTexto, idCampoModelo, autoAbrir) {
 
     const clave = marcaTexto.trim().toLowerCase();
     const datalist = document.getElementById("listaModelos");
@@ -6696,14 +6732,58 @@ function actualizarModelos(marcaTexto, idCampoModelo) {
 
     datalist.innerHTML = modelos.map(m => `<option value="${m}">`).join("");
 
-    if (idCampoModelo && modelos.length > 0) {
-        const campoModelo = document.getElementById(idCampoModelo);
-        if (campoModelo && typeof campoModelo.showPicker === "function") {
-            try { campoModelo.focus(); campoModelo.showPicker(); } catch (e) { /* el navegador no lo permite acá, no pasa nada */ }
-        }
+    if (idCampoModelo) {
+        modelosDisponiblesPorCampo[idCampoModelo] = modelos;
+        // Si ya hay una marca con modelos conocidos, se muestra el desplegable
+        // directo (no hace falta ni tocar el campo Modelo) — salvo que se pida
+        // explícitamente no abrirlo (por ejemplo, al abrir "Editar vehículo").
+        if (autoAbrir !== false && modelos.length > 0) mostrarDesplegableModelos(idCampoModelo);
+        else if (autoAbrir !== false) ocultarDesplegableModelos(idCampoModelo);
     }
 
 }
+
+// Desplegable propio de modelos: mismo patrón que ya usamos (y sabemos que
+// funciona bien) en los buscadores de cliente y de producto — no depende de
+// que el navegador soporte abrir un <datalist> con JS, que es poco confiable.
+window.mostrarDesplegableModelos = function (idCampoModelo) {
+
+    const modelos = modelosDisponiblesPorCampo[idCampoModelo] || [];
+    const contenedor = document.getElementById(idCampoModelo + "Resultados");
+    if (!contenedor) return;
+
+    if (modelos.length === 0) {
+        contenedor.style.display = "none";
+        return;
+    }
+
+    contenedor.innerHTML = modelos.map(m =>
+        `<div class="opcion-modelo" onclick="elegirModelo('${idCampoModelo}', '${escaparComillas(m)}')">${escapar(m)}</div>`
+    ).join("");
+    contenedor.style.display = "block";
+
+};
+
+window.ocultarDesplegableModelos = function (idCampoModelo) {
+    const contenedor = document.getElementById(idCampoModelo + "Resultados");
+    if (contenedor) contenedor.style.display = "none";
+};
+
+window.elegirModelo = function (idCampoModelo, modelo) {
+    document.getElementById(idCampoModelo).value = modelo;
+    window.ocultarDesplegableModelos(idCampoModelo);
+};
+
+// Cierra cualquier desplegable de modelos si se hace clic afuera
+document.addEventListener("click", function (e) {
+    ["ivModelo", "vModelo", "evModelo"].forEach(idCampo => {
+        const campo = document.getElementById(idCampo);
+        const resultados = document.getElementById(idCampo + "Resultados");
+        if (campo && resultados && !campo.contains(e.target) && !resultados.contains(e.target)) {
+            resultados.style.display = "none";
+        }
+    });
+});
 
 document.getElementById("vMarca").addEventListener("input", function () {
     actualizarModelos(this.value, "vModelo");
@@ -7821,6 +7901,7 @@ window.abrirModalIngresarVehiculo = function () {
     document.getElementById("ivPatente").value = "";
     document.getElementById("ivMarca").value = "";
     document.getElementById("ivModelo").value = "";
+    document.getElementById("ivModeloResultados").style.display = "none";
     document.getElementById("ivAnio").value = "";
     document.getElementById("ivEstadoTaller").value = "";
     document.getElementById("mensajeEstadoIngresarVehiculo").textContent = "";
@@ -7964,7 +8045,7 @@ window.abrirEdicionVehiculo = function (id, patente, marca, modelo, anio) {
     document.getElementById("evMarca").value = marca;
     document.getElementById("evModelo").value = modelo;
     document.getElementById("evAnio").value = anio;
-    actualizarModelos(marca);
+    actualizarModelos(marca, "evModelo", false);
 
     document.getElementById("mensajeEstadoVehiculo").textContent = "";
     document.getElementById("modalEditarVehiculo").classList.add("abierto");
