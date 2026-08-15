@@ -3250,6 +3250,9 @@ header{
 .badge-estado-tabla.StockOK{ background:#0d2418; color:#5fd98a; }
 .badge-estado-tabla.StockBajo{ background:#2a2408; color:#f5a623; }
 .badge-estado-tabla.SinStock{ background:#3a1416; color:#ff6b6b; }
+.badge-estado-tabla.CCPendiente{ background:#2a2408; color:#f5a623; }
+.badge-estado-tabla.CCVencida{ background:#3a1416; color:#ff6b6b; }
+.badge-estado-tabla.CCPagada{ background:#0d2418; color:#5fd98a; }
 .badge-estado-tabla.Rechazado{ background:#2a2a2e; color:#999; }
 
 .presu-valido-cell{
@@ -3462,6 +3465,134 @@ header{
     padding:4px 0;
 }
 
+/* ======================================================================
+   CUENTAS / COBROS — nuevo diseño (calcado del mockup)
+   ====================================================================== */
+
+.cc-2col{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:16px;
+}
+
+@media (min-width:1200px){
+    .cc-2col{ grid-template-columns:1fr 300px; }
+}
+
+.cc-fila-2col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    position:relative;
+}
+
+.cc-totales-fila{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid #262626;
+}
+
+@media (min-width:640px){
+    .cc-totales-fila{ grid-template-columns:repeat(4,1fr); }
+}
+
+.cc-total-chip{
+    background:#1a1a1a;
+    border:1px solid #333;
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:14px;
+    font-weight:700;
+    color:#fff;
+}
+
+.cc-total-final{
+    font-size:22px;
+    font-weight:800;
+    color:#ff6b6b;
+    font-family:'Montserrat',sans-serif;
+}
+
+.cc-accion-rapida{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 6px;
+    cursor:pointer;
+    border-radius:10px;
+}
+
+.cc-accion-rapida:hover{
+    background:#1e1e1e;
+}
+
+.cc-accion-rapida strong{
+    font-size:12.5px;
+    color:#fff;
+}
+
+.cc-medio-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:12.5px;
+    color:#ccc;
+    padding:7px 0;
+}
+
+.cc-medio-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    flex-shrink:0;
+}
+
+.cc-vencimiento-item{
+    padding:10px 0;
+    border-bottom:1px dashed #262626;
+    font-size:12.5px;
+}
+
+.cc-vencimiento-item:last-child{ border-bottom:none; }
+
+.cc-vencimiento-cliente{
+    font-weight:700;
+    color:#fff;
+}
+
+.cc-vencimiento-sub{
+    color:#888;
+    font-size:11px;
+    margin:2px 0;
+}
+
+.cc-vencimiento-fila-abajo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.cc-dias-badge{
+    font-size:10.5px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:12px;
+    background:#2a2408;
+    color:#f5a623;
+}
+
+.cc-resultado-item{
+    padding:10px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.cc-resultado-item:hover{ background:#242428; }
+
 </style>
 </head>
 
@@ -3530,7 +3661,7 @@ header{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
             Stock
         </button>
-        <button class="sidebar-nav-btn" data-roles="admin,recepcion" onclick="abrirModalCuenta()">
+        <button class="sidebar-nav-btn" data-nav="cuentas" data-roles="admin,recepcion" onclick="cambiarTab('cuentas')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             Cuentas / Cobros
         </button>
@@ -3643,6 +3774,7 @@ header{
         <button data-tab="presupuestos" data-roles="admin,recepcion" onclick="cambiarTab('presupuestos')">Presupuestos</button>
         <button data-tab="caja" data-roles="admin,recepcion" onclick="cambiarTab('caja')">Caja</button>
         <button data-tab="stock" data-roles="admin,recepcion" onclick="cambiarTab('stock')">Stock</button>
+        <button data-tab="cuentas" data-roles="admin,recepcion" onclick="cambiarTab('cuentas')">Cuentas / Cobros</button>
         <button data-tab="usuarios" data-roles="admin" onclick="cambiarTab('usuarios')">👤 Usuarios</button>
         <button data-tab="reportes" data-roles="admin" onclick="cambiarTab('reportes')">📊 Reportes</button>
     </nav>
@@ -4091,7 +4223,7 @@ header{
                         <div class="caja-acceso-item" onclick="abrirModalCajaConTipo('Egreso')"><div class="caja-acceso-icono rojo">↑</div>Nuevo egreso</div>
                         <div class="caja-acceso-item" onclick="abrirModalCajaConTipo('Transferencia')"><div class="caja-acceso-icono azul">⇄</div>Transferencia</div>
                         <div class="caja-acceso-item" onclick="abrirModalArqueoCaja()"><div class="caja-acceso-icono ambar">🧮</div>Arqueo de caja</div>
-                        <div class="caja-acceso-item" onclick="cambiarTab('clientes')"><div class="caja-acceso-icono violeta">👤</div>Cuentas/Cobros</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('cuentas')"><div class="caja-acceso-icono violeta">👤</div>Cuentas/Cobros</div>
                         <div class="caja-acceso-item" onclick="cambiarTab('reportes')"><div class="caja-acceso-icono gris">📊</div>Reportes</div>
                     </div>
                 </div>
@@ -4194,6 +4326,241 @@ header{
                 <div class="dash-panel-nuevo-titulo">Historial de movimientos de stock</div>
                 <div id="listaMovimientosStock"></div>
             </div>
+        </div>
+
+    </section>
+
+    <section class="seccion" id="tab-cuentas">
+
+        <div class="fila-titulo">
+            <div>
+                <h2>Cuentas / Cobros</h2>
+                <p style="font-size:12.5px;color:#999;margin-top:2px;">Gestioná las cuentas de tus clientes y registrá cobros de forma rápida.</p>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-chico" onclick="abrirHistorialCobrosCompleto()">🕐 Historial de cobros</button>
+                <button class="btn-chico" onclick="alert('Elegí primero una cuenta de la lista y tocá el ícono de impresora en Acciones.')">🖨️ Imprimir cuenta</button>
+            </div>
+        </div>
+
+        <div class="turnos-stats-grid">
+            <div class="turnos-stat-card rojo">
+                <div class="turnos-stat-icono">👤</div>
+                <div><div class="turnos-stat-numero" id="ccStatTotalCuentas">$0</div><div class="turnos-stat-label" id="ccStatTotalCuentasCant">Total cuentas</div></div>
+            </div>
+            <div class="turnos-stat-card ambar">
+                <div class="turnos-stat-icono">⏰</div>
+                <div><div class="turnos-stat-numero" id="ccStatSaldoVencido">$0</div><div class="turnos-stat-label" id="ccStatSaldoVencidoCant">Saldo vencido</div></div>
+            </div>
+            <div class="turnos-stat-card verde">
+                <div class="turnos-stat-icono">🔄</div>
+                <div><div class="turnos-stat-numero" id="ccStatCobrosMes">$0</div><div class="turnos-stat-label" id="ccStatCobrosMesCant">Cobros del mes</div></div>
+            </div>
+            <div class="turnos-stat-card violeta">
+                <div class="turnos-stat-icono">📊</div>
+                <div><div class="turnos-stat-numero" id="ccStatPromedio">$0</div><div class="turnos-stat-label">Cuenta promedio · Por cuenta abierta</div></div>
+            </div>
+        </div>
+
+        <div class="cc-2col">
+
+            <div class="cc-col-izq">
+
+                <div class="dash-panel-nuevo">
+
+                    <div class="dash-panel-nuevo-titulo" style="font-size:15px;color:#fff;">Nueva cuenta</div>
+
+                    <div class="cc-fila-2col">
+                        <div>
+                            <label>Cliente *</label>
+                            <input type="text" id="ccClienteBuscar" placeholder="Buscar por nombre o patente..." autocomplete="off" oninput="buscarClienteCC()" onfocus="buscarClienteCC()">
+                            <input type="hidden" id="ccClienteId">
+                            <div id="ccClienteResultados" style="display:none;background:#1a1a1a;border:1px solid #333;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto;position:absolute;z-index:50;width:calc(50% - 34px);"></div>
+                        </div>
+                        <div>
+                            <button class="btn-chico" style="margin-top:22px;width:100%;" onclick="cerrarModales(); abrirModalCliente();">+ Nuevo cliente</button>
+                        </div>
+                    </div>
+
+                    <label>Vehículo</label>
+                    <select id="ccVehiculo"><option value="">Elegí un vehículo</option></select>
+
+                    <div class="cc-fila-2col">
+                        <div>
+                            <label>Fecha</label>
+                            <input type="date" id="ccFecha">
+                        </div>
+                        <div>
+                            <label>Vencimiento</label>
+                            <input type="date" id="ccVencimiento">
+                        </div>
+                    </div>
+
+                    <label>Observaciones</label>
+                    <input type="text" id="ccObservaciones" placeholder="Ej: trabajo adicional, detalle importante, etc.">
+
+                    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #262626;">
+
+                        <label style="margin-bottom:8px;">Agregar ítems</label>
+                        <div class="turnos-chips-fila" style="margin-bottom:12px;">
+                            <button class="cv-chip-toggle" id="ccTabReparacion" onclick="cambiarTipoItemCC('reparacion')">Reparación</button>
+                            <button class="cv-chip-toggle activo" id="ccTabProducto" onclick="cambiarTipoItemCC('producto')">Producto</button>
+                            <button class="cv-chip-toggle" id="ccTabServicio" onclick="cambiarTipoItemCC('servicio')">Servicio</button>
+                        </div>
+
+                        <div id="ccFormReparacion" style="display:none;">
+                            <div class="ficha-historial-form">
+                                <input type="text" id="ccRepDescripcion" placeholder="Descripción de la reparación">
+                                <input type="number" id="ccRepMonto" placeholder="$ Precio">
+                                <button class="btn-chico" onclick="agregarItemCC('reparacion')">+ Agregar</button>
+                            </div>
+                        </div>
+
+                        <div id="ccFormProducto">
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" id="ccBuscarProducto" placeholder="Escanear o buscar producto..." oninput="buscarProductoCC()" style="flex:1;">
+                                <button class="btn-chico" onclick="modoEscaner='cc'; abrirEscanerDesdeCC()" title="Escanear">📷</button>
+                            </div>
+                            <div id="ccProductoResultados" style="display:none;background:#1a1a1a;border:1px solid #333;border-radius:8px;margin-top:4px;max-height:160px;overflow-y:auto;"></div>
+                        </div>
+
+                        <div id="ccFormServicio" style="display:none;">
+                            <div class="ficha-historial-form">
+                                <select id="ccServicioSelect" style="flex:1;"></select>
+                                <button class="btn-chico" onclick="agregarItemCC('servicio')">+ Agregar</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <table class="presu-tabla" style="min-width:0;">
+                            <thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr></thead>
+                            <tbody id="ccItemsBody"></tbody>
+                        </table>
+                        <div id="ccSinItems" class="vacio" style="display:none;">Todavía no agregaste ningún ítem.</div>
+                    </div>
+
+                    <div class="cc-totales-fila">
+                        <div>
+                            <label style="margin-bottom:4px;">Subtotal</label>
+                            <div class="cc-total-chip" id="ccSubtotalTexto">$0</div>
+                        </div>
+                        <div>
+                            <label style="margin-bottom:4px;">Descuento %</label>
+                            <input type="number" id="ccDescuentoPorc" placeholder="0" min="0" max="100" oninput="recalcularTotalesCC()">
+                        </div>
+                        <div>
+                            <label style="margin-bottom:4px;">Impuestos (%)</label>
+                            <input type="number" id="ccImpuestoPorc" placeholder="21" value="21" min="0" max="100" oninput="recalcularTotalesCC()">
+                        </div>
+                        <div style="text-align:right;">
+                            <label style="margin-bottom:4px;">Total de la cuenta</label>
+                            <div class="cc-total-final" id="ccTotalFinal">$0</div>
+                        </div>
+                    </div>
+
+                    <div class="modal-botones" style="margin-top:16px;">
+                        <button class="btn-cancelar" onclick="limpiarFormularioCC()">Cancelar</button>
+                        <button class="btn-red" style="flex:1;" onclick="guardarCuentaCC()">Guardar cuenta</button>
+                    </div>
+                    <p id="mensajeEstadoCC"></p>
+
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:16px;">
+
+                    <div class="dash-panel-nuevo-titulo" style="font-size:15px;color:#fff;">Cuentas abiertas</div>
+
+                    <div class="turnos-chips-fila">
+                        <button class="cv-chip-toggle activo" id="chipCCTodas" onclick="filtrarCuentasCC('todas')">Todas</button>
+                        <button class="cv-chip-toggle" id="chipCCPendientes" onclick="filtrarCuentasCC('pendientes')">Pendientes</button>
+                        <button class="cv-chip-toggle" id="chipCCVencidas" onclick="filtrarCuentasCC('vencidas')">Vencidas</button>
+                        <button class="cv-chip-toggle" id="chipCCPagadas" onclick="filtrarCuentasCC('pagadas')">Pagadas</button>
+                    </div>
+
+                    <div class="stock-filtros-fila">
+                        <select id="ccFiltroCliente" class="turno-estado-select" onchange="renderCuentasCC()"><option value="">Todos los clientes</option></select>
+                    </div>
+
+                    <div class="presu-tabla-wrap" style="background:none;">
+                        <table class="presu-tabla">
+                            <thead><tr><th>Cliente / Vehículo</th><th>Fecha</th><th>Vencimiento</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th>Acciones</th></tr></thead>
+                            <tbody id="ccCuentasBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="presu-paginacion">
+                        <span id="ccPaginacionTexto">-</span>
+                        <div class="presu-paginacion-botones" id="ccPaginacionBotones"></div>
+                    </div>
+
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:16px;">
+                    <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;font-size:15px;color:#fff;">
+                        <span>Historial de cobros recientes</span>
+                        <a class="dash-panel-nuevo-link" onclick="abrirHistorialCobrosCompleto()">Ver todos ›</a>
+                    </div>
+                    <div class="presu-tabla-wrap" style="background:none;">
+                        <table class="presu-tabla">
+                            <thead><tr><th>Fecha</th><th>Cliente</th><th>Cuenta</th><th>Monto</th><th>Medio de pago</th><th>Recibido por</th></tr></thead>
+                            <tbody id="ccHistorialBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="cc-col-der">
+
+                <div class="dash-panel-nuevo">
+                    <div class="dash-panel-nuevo-titulo">Resumen de cuentas</div>
+                    <div style="display:flex;align-items:center;gap:16px;">
+                        <canvas id="ccDonut" width="90" height="90"></canvas>
+                        <div style="flex:1;" id="ccDonutLeyenda"></div>
+                    </div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Próximos vencimientos</span>
+                        <a class="dash-panel-nuevo-link" onclick="filtrarCuentasCC('pendientes')">Ver todos ›</a>
+                    </div>
+                    <div id="ccProximosVencimientos"></div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Acciones rápidas</div>
+                    <div class="cc-accion-rapida" onclick="abrirModalRegistrarCobroRapido()">
+                        <div class="caja-acceso-icono verde">$</div>
+                        <div><strong>Registrar cobro</strong><div style="font-size:11px;color:#999;">Registrar un pago recibido</div></div>
+                    </div>
+                    <div class="cc-accion-rapida" onclick="abrirCuentaCorrienteCliente()">
+                        <div class="caja-acceso-icono azul">👤</div>
+                        <div><strong>Cuenta corriente del cliente</strong><div style="font-size:11px;color:#999;">Ver historial de cuentas</div></div>
+                    </div>
+                    <div class="cc-accion-rapida" onclick="enviarCuentaPorWhatsAppGenerico()">
+                        <div class="caja-acceso-icono" style="background:#25D366;"><svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#fff;"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.4 5L2 22l5.1-1.3c1.5.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.4.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.1.2-.1.3-.3.5-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.6-.1.2-.2.7-.8.9-1 .2-.2.4-.2.6-.1l1.7.8c.2.1.4.2.4.3.1.2.1.7-.1 1.3z"/></svg></div>
+                        <div><strong>Envío por WhatsApp</strong><div style="font-size:11px;color:#999;">Enviar cuenta al cliente</div></div>
+                    </div>
+                    <div class="cc-accion-rapida" onclick="imprimirCuentaGenerico()">
+                        <div class="caja-acceso-icono gris">🖨️</div>
+                        <div><strong>Imprimir cuenta</strong><div style="font-size:11px;color:#999;">Imprimir cuenta actual</div></div>
+                    </div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Medios de pago aceptados</div>
+                    <div class="cc-medio-item"><span class="cc-medio-dot" style="background:#25D366;"></span>Efectivo</div>
+                    <div class="cc-medio-item"><span class="cc-medio-dot" style="background:#3f9cff;"></span>Transferencia</div>
+                    <div class="cc-medio-item"><span class="cc-medio-dot" style="background:#a855f7;"></span>Tarjeta de Débito</div>
+                    <div class="cc-medio-item"><span class="cc-medio-dot" style="background:#f5a623;"></span>Tarjeta de Crédito</div>
+                    <div class="cc-medio-item"><span class="cc-medio-dot" style="background:#3f9cff;"></span>Mercado Pago</div>
+                </div>
+
+            </div>
+
         </div>
 
     </section>
@@ -4835,6 +5202,73 @@ header{
     </div>
 </div>
 
+<!-- ---------- Modal: registrar cobro (pago parcial o total) sobre una cuenta ---------- -->
+<div class="overlay" id="modalCobrarCC">
+    <div class="modal">
+        <h3>💲 Registrar cobro</h3>
+
+        <input type="hidden" id="cobrarCCCuentaId">
+
+        <label>Cuenta (buscá por cliente si no elegiste una desde la tabla)</label>
+        <input type="text" id="cobrarCCBuscar" placeholder="Buscar cuenta por cliente..." autocomplete="off" oninput="buscarCuentaParaCobrar()">
+        <div id="cobrarCCResultados" style="display:none;background:#1a1a1a;border:1px solid #333;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto;"></div>
+
+        <div id="cobrarCCResumen" style="background:#1a1a1a;border-radius:10px;padding:12px 14px;margin-top:12px;display:none;">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#999;"><span>Total de la cuenta</span><strong style="color:#fff;" id="cobrarCCTotal">$0</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#999;margin-top:4px;"><span>Ya pagado</span><strong style="color:#5fd98a;" id="cobrarCCPagado">$0</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-top:6px;padding-top:6px;border-top:1px solid #333;"><span>Saldo pendiente</span><strong style="color:#ff6b6b;" id="cobrarCCSaldo">$0</strong></div>
+        </div>
+
+        <label>Monto a cobrar</label>
+        <input type="number" id="cobrarCCMonto" placeholder="0">
+
+        <label>Medio de pago</label>
+        <select id="cobrarCCMedioPago">
+            <option>Efectivo</option>
+            <option>Transferencia</option>
+            <option>Tarjeta de Débito</option>
+            <option>Tarjeta de Crédito</option>
+            <option>Mercado Pago</option>
+        </select>
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="confirmarCobroCC()">Registrar cobro</button>
+        </div>
+
+        <p id="mensajeEstadoCobrarCC"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: ver detalle de una cuenta ---------- -->
+<div class="overlay" id="modalVerCuentaCC">
+    <div class="modal" style="max-width:480px;">
+        <h3 id="verCCTitulo">Cuenta</h3>
+        <div style="font-size:12px;color:#888;margin-bottom:10px;" id="verCCSub"></div>
+
+        <div id="verCCItems" style="background:#1a1a1a;border-radius:10px;padding:12px 14px;margin-bottom:12px;"></div>
+
+        <div style="background:#1a1a1a;border-radius:10px;padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#999;padding:3px 0;"><span>Subtotal</span><span id="verCCSubtotal">$0</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#999;padding:3px 0;"><span>Descuento</span><span id="verCCDescuento">$0</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#999;padding:3px 0;"><span>Impuestos</span><span id="verCCImpuestos">$0</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:800;padding:8px 0 0;border-top:1px solid #333;margin-top:6px;"><span>Total</span><span id="verCCTotal">$0</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#5fd98a;padding:6px 0 0;"><span>Pagado</span><span id="verCCPagado">$0</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:#ff6b6b;font-weight:700;"><span>Saldo</span><span id="verCCSaldo">$0</span></div>
+        </div>
+
+        <div id="verCCPagos" style="margin-top:12px;"></div>
+
+        <div class="modal-botones" style="margin-top:16px;">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+            <button class="btn-carpeta" style="color:#fff;width:auto;padding:0 16px;" onclick="imprimirCuentaCC(document.getElementById('cobrarCCCuentaId').value)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            </button>
+        </div>
+        <div class="modal-botones" style="margin-top:8px;" id="verCCAccionesExtra"></div>
+    </div>
+</div>
+
 <!-- ---------- Modal: nuevo/editar proveedor ---------- -->
 <div class="overlay" id="modalProveedor">
     <div class="modal">
@@ -5414,6 +5848,8 @@ onAuthStateChanged(auth, (user) => {
         escucharProveedores();
         escucharCategorias();
         escucharStockMovimientos();
+        escucharCuentasCC();
+        escucharPagosCuentaCC();
         escucharServicios();
         escucharConfiguracion();
     } else {
@@ -5643,6 +6079,8 @@ window.cerrarModales = function () {
     document.getElementById("modalIngresarVehiculo").classList.remove("abierto");
     document.getElementById("modalVerPresupuesto").classList.remove("abierto");
     document.getElementById("modalArqueoCaja").classList.remove("abierto");
+    document.getElementById("modalCobrarCC").classList.remove("abierto");
+    document.getElementById("modalVerCuentaCC").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -5741,6 +6179,10 @@ window.cambiarTab = function (tab) {
 
     if (tab === "configuracion" && typeof renderFormConfiguracion === "function") {
         setTimeout(renderFormConfiguracion, 30);
+    }
+
+    if (tab === "cuentas" && typeof limpiarFormularioCC === "function" && !document.getElementById("ccFecha").value) {
+        setTimeout(() => { window.limpiarFormularioCC(); if (typeof renderCuentasCC === "function") renderCuentasCC(); }, 30);
     }
 
 };
@@ -7134,6 +7576,717 @@ window.guardarArqueoCaja = async function () {
         estado.style.color = "#ff6b6b";
     }
 
+};
+
+// ======================================================================
+// CUENTAS / COBROS — cuentas corrientes con saldo y pagos parciales
+// ======================================================================
+// Colecciones reales:
+//   cuentas { numero, clienteId, vehiculoId, fecha, vencimiento, items[],
+//     subtotal, descuentoPorc, impuestoPorc, impuestoMonto, total,
+//     pagado, saldo, estado, observaciones, creado }
+//   pagosCuenta { cuentaId, clienteId, monto, medioPago, fecha, recibidoPor }
+// Cada cobro registrado acá también genera un Ingreso real en Caja, para que
+// el saldo de Caja/Movimientos siempre refleje la plata que efectivamente entró.
+
+let cuentasCache = [];
+let pagosCuentaCache = [];
+let ccItemsTemp = [];
+let ccTipoItemActivo = "producto";
+let filtroCCActivo = "todas";
+
+function escucharCuentasCC() {
+    const q = query(collection(db, "cuentas"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        cuentasCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (typeof renderCuentasCC === "function") renderCuentasCC();
+    }, () => {});
+}
+
+function escucharPagosCuentaCC() {
+    const q = query(collection(db, "pagosCuenta"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        pagosCuentaCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (typeof renderCuentasCC === "function") renderCuentasCC();
+    }, () => {});
+}
+
+// Una cuenta queda "Vencida" automáticamente (en la vista) si tiene saldo
+// pendiente y ya pasó la fecha de vencimiento — sin tener que tocarla a mano.
+function estadoRealCuenta(c) {
+    if ((Number(c.saldo) || 0) <= 0.5) return "Pagada";
+    const venc = toDateSegura(c.vencimiento);
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    if (venc && venc < hoy) return "Vencida";
+    return "Pendiente";
+}
+
+// ---------- Cliente / vehículo en "Nueva cuenta" ----------
+
+window.buscarClienteCC = function () {
+
+    const texto = document.getElementById("ccClienteBuscar").value.trim().toLowerCase();
+    const elResultados = document.getElementById("ccClienteResultados");
+
+    if (!texto) { elResultados.style.display = "none"; elResultados.innerHTML = ""; return; }
+
+    const textoSinEspacios = texto.replace(/\s/g, "");
+    const coincidencias = clientesCache.filter(c => {
+        const nombreCompleto = `${c.nombre} ${c.apellido}`.toLowerCase();
+        const tieneVehiculo = vehiculosCache.some(v => v.clienteId === c.id && String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(textoSinEspacios));
+        return nombreCompleto.includes(texto) || tieneVehiculo;
+    }).slice(0, 8);
+
+    elResultados.innerHTML = coincidencias.length === 0
+        ? '<div class="cc-resultado-item" style="color:#777;">Sin resultados.</div>'
+        : coincidencias.map(c => `<div class="cc-resultado-item" onclick="seleccionarClienteCC('${c.id}')">${escapar(c.apellido)}, ${escapar(c.nombre)}</div>`).join("");
+    elResultados.style.display = "block";
+
+};
+
+window.seleccionarClienteCC = function (clienteId) {
+    const cliente = clientesCache.find(c => c.id === clienteId);
+    if (!cliente) return;
+    document.getElementById("ccClienteId").value = clienteId;
+    document.getElementById("ccClienteBuscar").value = `${cliente.apellido}, ${cliente.nombre}`;
+    document.getElementById("ccClienteResultados").style.display = "none";
+    const vehiculos = vehiculosCache.filter(v => v.clienteId === clienteId);
+    document.getElementById("ccVehiculo").innerHTML = '<option value="">Sin especificar</option>' +
+        vehiculos.map(v => `<option value="${v.id}">${escapar(v.patente)} - ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</option>`).join("");
+};
+
+document.addEventListener("click", function (e) {
+    const buscador = document.getElementById("ccClienteBuscar");
+    const resultados = document.getElementById("ccClienteResultados");
+    if (buscador && resultados && !buscador.contains(e.target) && !resultados.contains(e.target)) resultados.style.display = "none";
+    const buscadorProd = document.getElementById("ccBuscarProducto");
+    const resultadosProd = document.getElementById("ccProductoResultados");
+    if (buscadorProd && resultadosProd && !buscadorProd.contains(e.target) && !resultadosProd.contains(e.target)) resultadosProd.style.display = "none";
+});
+
+// ---------- Ítems de la nueva cuenta (Reparación / Producto / Servicio) ----------
+
+window.cambiarTipoItemCC = function (tipo) {
+    ccTipoItemActivo = tipo;
+    document.getElementById("ccTabReparacion").classList.toggle("activo", tipo === "reparacion");
+    document.getElementById("ccTabProducto").classList.toggle("activo", tipo === "producto");
+    document.getElementById("ccTabServicio").classList.toggle("activo", tipo === "servicio");
+    document.getElementById("ccFormReparacion").style.display = tipo === "reparacion" ? "block" : "none";
+    document.getElementById("ccFormProducto").style.display = tipo === "producto" ? "block" : "none";
+    document.getElementById("ccFormServicio").style.display = tipo === "servicio" ? "block" : "none";
+    if (tipo === "servicio") {
+        document.getElementById("ccServicioSelect").innerHTML = serviciosCache.map(s => `<option value="${s.id}">${escapar(s.nombre)} — ${formatoPlata(s.precio || 0)}</option>`).join("") || '<option value="">Sin servicios cargados</option>';
+    }
+};
+
+window.buscarProductoCC = function () {
+
+    const texto = document.getElementById("ccBuscarProducto").value.trim().toLowerCase();
+    const el = document.getElementById("ccProductoResultados");
+
+    if (!texto) { el.style.display = "none"; el.innerHTML = ""; return; }
+
+    const coincidencias = stockCache.filter(p =>
+        p.nombre.toLowerCase().includes(texto) || (p.codigo || "").toLowerCase().includes(texto)
+    ).slice(0, 8);
+
+    el.innerHTML = coincidencias.length === 0
+        ? '<div class="cc-resultado-item" style="color:#777;">Sin resultados.</div>'
+        : coincidencias.map(p => `<div class="cc-resultado-item" onclick="agregarProductoCC('${p.id}')">${escapar(p.nombre)} — ${formatoPlata(p.precio || 0)} <span style="color:#777;">(quedan ${p.cantidad})</span></div>`).join("");
+    el.style.display = "block";
+
+};
+
+window.agregarProductoCC = function (stockId) {
+    const producto = stockCache.find(p => p.id === stockId);
+    if (!producto) return;
+    ccItemsTemp.push({ descripcion: producto.nombre, precioUnitario: Number(producto.precio) || 0, cantidad: 1, monto: Number(producto.precio) || 0, stockId: producto.id });
+    document.getElementById("ccBuscarProducto").value = "";
+    document.getElementById("ccProductoResultados").style.display = "none";
+    renderItemsCC();
+};
+
+window.agregarItemCC = function (tipo) {
+
+    if (tipo === "reparacion") {
+        const desc = document.getElementById("ccRepDescripcion").value.trim();
+        const monto = parseFloat(document.getElementById("ccRepMonto").value) || 0;
+        if (!desc || monto <= 0) { alert("Completá la descripción y el precio de la reparación."); return; }
+        ccItemsTemp.push({ descripcion: desc, precioUnitario: monto, cantidad: 1, monto });
+        document.getElementById("ccRepDescripcion").value = "";
+        document.getElementById("ccRepMonto").value = "";
+    }
+
+    if (tipo === "servicio") {
+        const servicioId = document.getElementById("ccServicioSelect").value;
+        const servicio = serviciosCache.find(s => s.id === servicioId);
+        if (!servicio) { alert("Elegí un servicio del catálogo."); return; }
+        ccItemsTemp.push({ descripcion: servicio.nombre, precioUnitario: Number(servicio.precio) || 0, cantidad: 1, monto: Number(servicio.precio) || 0 });
+    }
+
+    renderItemsCC();
+
+};
+
+window.cambiarCantidadItemCC = function (index, delta) {
+    const item = ccItemsTemp[index];
+    if (!item) return;
+    item.cantidad = Math.max(1, (item.cantidad || 1) + delta);
+    item.monto = item.cantidad * item.precioUnitario;
+    renderItemsCC();
+};
+
+window.quitarItemCC = function (index) {
+    ccItemsTemp.splice(index, 1);
+    renderItemsCC();
+};
+
+function renderItemsCC() {
+
+    const body = document.getElementById("ccItemsBody");
+    const vacio = document.getElementById("ccSinItems");
+    if (!body) return;
+
+    if (ccItemsTemp.length === 0) {
+        body.innerHTML = "";
+        vacio.style.display = "block";
+    } else {
+        vacio.style.display = "none";
+        body.innerHTML = ccItemsTemp.map((item, i) => `
+            <tr>
+                <td>${escapar(item.descripcion)}</td>
+                <td>${formatoPlata(item.precioUnitario)}</td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <button class="btn-redondo" style="width:22px;height:22px;font-size:13px;" onclick="cambiarCantidadItemCC(${i}, -1)">-</button>
+                        <span style="min-width:20px;text-align:center;display:inline-block;">${item.cantidad}</span>
+                        <button class="btn-redondo" style="width:22px;height:22px;font-size:13px;" onclick="cambiarCantidadItemCC(${i}, 1)">+</button>
+                    </div>
+                </td>
+                <td>${formatoPlata(item.monto)}</td>
+                <td><span class="icono-accion-turno borrar" style="width:26px;height:26px;" onclick="quitarItemCC(${i})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                </span></td>
+            </tr>
+        `).join("");
+    }
+
+    recalcularTotalesCC();
+
+}
+
+window.recalcularTotalesCC = function () {
+
+    const subtotal = ccItemsTemp.reduce((s, i) => s + (i.monto || 0), 0);
+    const descPorc = Math.min(100, Math.max(0, Number(document.getElementById("ccDescuentoPorc").value) || 0));
+    const impPorc = Math.min(100, Math.max(0, Number(document.getElementById("ccImpuestoPorc").value) || 0));
+
+    const descuentoMonto = subtotal * descPorc / 100;
+    const baseImponible = subtotal - descuentoMonto;
+    const impuestoMonto = baseImponible * impPorc / 100;
+    const total = baseImponible + impuestoMonto;
+
+    document.getElementById("ccSubtotalTexto").textContent = formatoPlata(subtotal);
+    document.getElementById("ccTotalFinal").textContent = formatoPlata(total);
+
+};
+
+window.limpiarFormularioCC = function () {
+
+    ccItemsTemp = [];
+    document.getElementById("ccClienteBuscar").value = "";
+    document.getElementById("ccClienteId").value = "";
+    document.getElementById("ccVehiculo").innerHTML = '<option value="">Elegí un vehículo</option>';
+    document.getElementById("ccFecha").value = new Date().toISOString().split("T")[0];
+    const venc = new Date(); venc.setDate(venc.getDate() + 14);
+    document.getElementById("ccVencimiento").value = venc.toISOString().split("T")[0];
+    document.getElementById("ccObservaciones").value = "";
+    document.getElementById("ccDescuentoPorc").value = "";
+    document.getElementById("ccImpuestoPorc").value = "21";
+    document.getElementById("mensajeEstadoCC").textContent = "";
+    renderItemsCC();
+
+};
+
+window.guardarCuentaCC = async function () {
+
+    const clienteId = document.getElementById("ccClienteId").value;
+    const estado = document.getElementById("mensajeEstadoCC");
+
+    if (!clienteId) { estado.textContent = "Elegí un cliente."; estado.style.color = "#ff6b6b"; return; }
+    if (ccItemsTemp.length === 0) { estado.textContent = "Agregá al menos un ítem."; estado.style.color = "#ff6b6b"; return; }
+
+    const vehiculoId = document.getElementById("ccVehiculo").value || null;
+    const fecha = document.getElementById("ccFecha").value || new Date().toISOString().split("T")[0];
+    const vencimiento = document.getElementById("ccVencimiento").value;
+    const observaciones = document.getElementById("ccObservaciones").value.trim();
+
+    const subtotal = ccItemsTemp.reduce((s, i) => s + (i.monto || 0), 0);
+    const descuentoPorc = Math.min(100, Math.max(0, Number(document.getElementById("ccDescuentoPorc").value) || 0));
+    const impuestoPorc = Math.min(100, Math.max(0, Number(document.getElementById("ccImpuestoPorc").value) || 0));
+    const descuentoMonto = subtotal * descuentoPorc / 100;
+    const baseImponible = subtotal - descuentoMonto;
+    const impuestoMonto = baseImponible * impuestoPorc / 100;
+    const total = baseImponible + impuestoMonto;
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        const numeroMax = cuentasCache.reduce((max, c) => Math.max(max, Number(c.numero) || 0), 0);
+
+        await addDoc(collection(db, "cuentas"), {
+            numero: numeroMax + 1,
+            clienteId, vehiculoId,
+            fecha: new Date(fecha + "T00:00:00"),
+            vencimiento: vencimiento ? new Date(vencimiento + "T00:00:00") : null,
+            items: ccItemsTemp,
+            subtotal, descuentoPorc, impuestoPorc, impuestoMonto, total,
+            pagado: 0, saldo: total,
+            estado: "Pendiente",
+            observaciones,
+            creado: serverTimestamp()
+        });
+
+        estado.textContent = "✅ ¡Cuenta guardada!";
+        estado.style.color = "#5fd98a";
+
+        setTimeout(() => window.limpiarFormularioCC(), 800);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+// ---------- Listado de cuentas abiertas ----------
+
+window.filtrarCuentasCC = function (filtro) {
+    filtroCCActivo = filtro;
+    ["Todas", "Pendientes", "Vencidas", "Pagadas"].forEach(n => {
+        const el = document.getElementById("chipCC" + n);
+        if (el) el.classList.toggle("activo", filtro === n.toLowerCase());
+    });
+    renderCuentasCC();
+};
+
+function renderCuentasCC() {
+
+    const body = document.getElementById("ccCuentasBody");
+    if (!body) return;
+
+    // ---- Filtro de cliente (dropdown) ----
+    const selCliente = document.getElementById("ccFiltroCliente");
+    const valorClienteFiltro = selCliente.value;
+    selCliente.innerHTML = '<option value="">Todos los clientes</option>' +
+        clientesCache.map(c => `<option value="${c.id}">${escapar(c.apellido)}, ${escapar(c.nombre)}</option>`).join("");
+    selCliente.value = valorClienteFiltro;
+
+    let lista = cuentasCache.slice();
+
+    if (filtroCCActivo === "pendientes") lista = lista.filter(c => estadoRealCuenta(c) === "Pendiente");
+    else if (filtroCCActivo === "vencidas") lista = lista.filter(c => estadoRealCuenta(c) === "Vencida");
+    else if (filtroCCActivo === "pagadas") lista = lista.filter(c => estadoRealCuenta(c) === "Pagada");
+
+    if (valorClienteFiltro) lista = lista.filter(c => c.clienteId === valorClienteFiltro);
+
+    // ---- Tarjetas de resumen (sobre TODAS las cuentas, sin filtrar) ----
+    const abiertas = cuentasCache.filter(c => (Number(c.saldo) || 0) > 0.5);
+    const vencidas = cuentasCache.filter(c => estadoRealCuenta(c) === "Vencida");
+    const totalSaldoAbierto = abiertas.reduce((s, c) => s + (Number(c.saldo) || 0), 0);
+    const totalSaldoVencido = vencidas.reduce((s, c) => s + (Number(c.saldo) || 0), 0);
+
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const cobrosMes = pagosCuentaCache.filter(p => { const f = toDateSegura(p.fecha); return f && f >= inicioMes; });
+    const totalCobrosMes = cobrosMes.reduce((s, p) => s + (Number(p.monto) || 0), 0);
+
+    const promedio = abiertas.length > 0 ? totalSaldoAbierto / abiertas.length : 0;
+
+    document.getElementById("ccStatTotalCuentas").textContent = formatoPlata(totalSaldoAbierto);
+    document.getElementById("ccStatTotalCuentasCant").textContent = `Total cuentas · ${abiertas.length} abiertas`;
+    document.getElementById("ccStatSaldoVencido").textContent = formatoPlata(totalSaldoVencido);
+    document.getElementById("ccStatSaldoVencidoCant").textContent = `Saldo vencido · ${vencidas.length} cuentas`;
+    document.getElementById("ccStatCobrosMes").textContent = formatoPlata(totalCobrosMes);
+    document.getElementById("ccStatCobrosMesCant").textContent = `Cobros del mes · ${cobrosMes.length} cobros`;
+    document.getElementById("ccStatPromedio").textContent = formatoPlata(promedio);
+
+    // ---- Donut Pendientes/Vencidas/Pagadas ----
+    const pendientes = cuentasCache.filter(c => estadoRealCuenta(c) === "Pendiente");
+    const pagadas = cuentasCache.filter(c => estadoRealCuenta(c) === "Pagada");
+    const totalMontoPend = pendientes.reduce((s, c) => s + (Number(c.total) || 0), 0);
+    const totalMontoVenc = vencidas.reduce((s, c) => s + (Number(c.total) || 0), 0);
+    const totalMontoPag = pagadas.reduce((s, c) => s + (Number(c.total) || 0), 0);
+    dibujarDonutCC([
+        { valor: totalMontoPend, color: "#f5a623" },
+        { valor: totalMontoVenc, color: "#ff6b6b" },
+        { valor: totalMontoPag, color: "#5fd98a" }
+    ]);
+    const totalDonut = totalMontoPend + totalMontoVenc + totalMontoPag;
+    document.getElementById("ccDonutLeyenda").innerHTML = `
+        <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#f5a623;"></span>Pendientes <strong>${formatoPlata(totalMontoPend)}</strong> <span style="color:#777;">${totalDonut ? Math.round(totalMontoPend / totalDonut * 100) : 0}%</span></div>
+        <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#ff6b6b;"></span>Vencidas <strong>${formatoPlata(totalMontoVenc)}</strong> <span style="color:#777;">${totalDonut ? Math.round(totalMontoVenc / totalDonut * 100) : 0}%</span></div>
+        <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#5fd98a;"></span>Pagadas <strong>${formatoPlata(totalMontoPag)}</strong> <span style="color:#777;">${totalDonut ? Math.round(totalMontoPag / totalDonut * 100) : 0}%</span></div>
+    `;
+
+    // ---- Próximos vencimientos (top 3, con saldo pendiente) ----
+    const proximos = cuentasCache.filter(c => (Number(c.saldo) || 0) > 0.5 && toDateSegura(c.vencimiento))
+        .sort((a, b) => toDateSegura(a.vencimiento) - toDateSegura(b.vencimiento))
+        .slice(0, 3);
+
+    document.getElementById("ccProximosVencimientos").innerHTML = proximos.length === 0
+        ? '<div class="vacio">Sin vencimientos pendientes.</div>'
+        : proximos.map(c => {
+            const cliente = clientesCache.find(cl => cl.id === c.clienteId);
+            const vehiculo = vehiculosCache.find(v => v.id === c.vehiculoId);
+            const venc = toDateSegura(c.vencimiento);
+            const dias = Math.round((venc - hoy) / 86400000);
+            return `<div class="cc-vencimiento-item">
+                <div class="cc-vencimiento-cliente">${cliente ? escapar(cliente.apellido) + ", " + escapar(cliente.nombre) : "-"}</div>
+                <div class="cc-vencimiento-sub">${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") + " - " + escapar(vehiculo.patente) : ""}</div>
+                <div class="cc-vencimiento-fila-abajo">
+                    <span style="color:#888;">${venc.toLocaleDateString("es-AR")} · ${formatoPlata(c.saldo)}</span>
+                    <span class="cc-dias-badge" style="${dias < 0 ? "background:#3a1416;color:#ff6b6b;" : ""}">${dias < 0 ? "Vencida" : dias === 0 ? "Hoy" : dias + " día" + (dias > 1 ? "s" : "")}</span>
+                </div>
+            </div>`;
+        }).join("");
+
+    // ---- Tabla de cuentas abiertas ----
+    if (lista.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" class="vacio">No hay cuentas con estos filtros.</td></tr>';
+        document.getElementById("ccPaginacionTexto").textContent = "Sin resultados";
+        document.getElementById("ccPaginacionBotones").innerHTML = "";
+        return;
+    }
+
+    const estadoClase = { "Pendiente": "CCPendiente", "Vencida": "CCVencida", "Pagada": "CCPagada" };
+
+    body.innerHTML = lista.slice(0, 20).map(c => {
+
+        const cliente = clientesCache.find(cl => cl.id === c.clienteId);
+        const vehiculo = vehiculosCache.find(v => v.id === c.vehiculoId);
+        const venc = toDateSegura(c.vencimiento);
+        const est = estadoRealCuenta(c);
+
+        return `<tr>
+            <td>
+                <div class="presu-cv-nombre">${cliente ? escapar(cliente.apellido) + ", " + escapar(cliente.nombre) : "-"}</div>
+                <div class="presu-cv-sub">${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") + " - " + escapar(vehiculo.patente) : "Sin vehículo"}</div>
+            </td>
+            <td class="presu-fecha-cell">${toDateSegura(c.fecha) ? toDateSegura(c.fecha).toLocaleDateString("es-AR") : "-"}</td>
+            <td class="presu-fecha-cell">${venc ? venc.toLocaleDateString("es-AR") : "-"}</td>
+            <td class="presu-importe-cell">${formatoPlata(c.total)}</td>
+            <td style="color:#5fd98a;">${formatoPlata(c.pagado)}</td>
+            <td style="color:${c.saldo > 0.5 ? "#ff6b6b" : "#888"};font-weight:700;">${formatoPlata(c.saldo)}</td>
+            <td><span class="badge-estado-tabla ${estadoClase[est]}">${est}</span></td>
+            <td>
+                <div class="presu-acciones-cell">
+                    <div class="icono-accion-turno" onclick="verCuentaCC('${c.id}')" title="Ver">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    ${c.saldo > 0.5 ? `<button class="btn-chico" style="color:#5fd98a;padding:5px 10px;font-size:11px;" onclick="cobrarCuentaDesdeTabla('${c.id}')">💲 Cobrar</button>` : `<span style="color:#555;font-size:11px;">Pagada</span>`}
+                </div>
+            </td>
+        </tr>`;
+
+    }).join("");
+
+    document.getElementById("ccPaginacionTexto").textContent = `Mostrando ${Math.min(20, lista.length)} de ${lista.length} cuentas`;
+    document.getElementById("ccPaginacionBotones").innerHTML = "";
+
+    // ---- Historial de cobros recientes ----
+    const elHist = document.getElementById("ccHistorialBody");
+    if (elHist) {
+        const recientes = pagosCuentaCache.slice(0, 6);
+        elHist.innerHTML = recientes.length === 0
+            ? '<tr><td colspan="6" class="vacio">Todavía no hay cobros registrados.</td></tr>'
+            : recientes.map(p => {
+                const cliente = clientesCache.find(c => c.id === p.clienteId);
+                const cuenta = cuentasCache.find(c => c.id === p.cuentaId);
+                const fecha = toDateSegura(p.fecha);
+                const numeroTexto = cuenta && cuenta.numero ? "#" + String(cuenta.numero).padStart(5, "0") : "-";
+                return `<tr>
+                    <td class="presu-fecha-cell">${fecha ? fecha.toLocaleDateString("es-AR") + " " + fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "-"}</td>
+                    <td>${cliente ? escapar(cliente.apellido) + ", " + escapar(cliente.nombre) : "-"}</td>
+                    <td>${numeroTexto}</td>
+                    <td class="presu-importe-cell">${formatoPlata(p.monto)}</td>
+                    <td style="color:#999;">${escapar(p.medioPago || "-")}</td>
+                    <td style="color:#999;">${escapar(p.recibidoPor || "-")}</td>
+                </tr>`;
+            }).join("");
+    }
+
+}
+
+function dibujarDonutCC(segmentos) {
+
+    const canvas = document.getElementById("ccDonut");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const cx = w / 2, cy = h / 2, radio = Math.min(w, h) / 2 - 7, grosor = 12;
+    const total = segmentos.reduce((s, seg) => s + seg.valor, 0);
+
+    if (total <= 0) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+        ctx.strokeStyle = "#2a2a2a";
+        ctx.lineWidth = grosor;
+        ctx.stroke();
+        return;
+    }
+
+    let anguloActual = -Math.PI / 2;
+
+    segmentos.forEach(seg => {
+        if (seg.valor <= 0) return;
+        const angulo = (seg.valor / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radio, anguloActual, anguloActual + angulo);
+        ctx.strokeStyle = seg.color;
+        ctx.lineWidth = grosor;
+        ctx.stroke();
+        anguloActual += angulo;
+    });
+
+}
+
+// ---------- Registrar cobro (pago parcial o total sobre una cuenta) ----------
+
+window.abrirModalRegistrarCobroRapido = function () {
+    document.getElementById("cobrarCCCuentaId").value = "";
+    document.getElementById("cobrarCCBuscar").value = "";
+    document.getElementById("cobrarCCBuscar").disabled = false;
+    document.getElementById("cobrarCCResultados").style.display = "none";
+    document.getElementById("cobrarCCResumen").style.display = "none";
+    document.getElementById("cobrarCCMonto").value = "";
+    document.getElementById("mensajeEstadoCobrarCC").textContent = "";
+    document.getElementById("modalCobrarCC").classList.add("abierto");
+};
+
+window.cobrarCuentaDesdeTabla = function (cuentaId) {
+    window.abrirModalRegistrarCobroRapido();
+    document.getElementById("cobrarCCBuscar").disabled = true;
+    window.seleccionarCuentaParaCobrar(cuentaId);
+};
+
+window.buscarCuentaParaCobrar = function () {
+
+    const texto = document.getElementById("cobrarCCBuscar").value.trim().toLowerCase();
+    const el = document.getElementById("cobrarCCResultados");
+
+    if (!texto) { el.style.display = "none"; el.innerHTML = ""; return; }
+
+    const coincidencias = cuentasCache.filter(c => {
+        if ((Number(c.saldo) || 0) <= 0.5) return false;
+        const cliente = clientesCache.find(cl => cl.id === c.clienteId);
+        return cliente && `${cliente.nombre} ${cliente.apellido}`.toLowerCase().includes(texto);
+    }).slice(0, 8);
+
+    el.innerHTML = coincidencias.length === 0
+        ? '<div class="cc-resultado-item" style="color:#777;">Sin cuentas pendientes con ese cliente.</div>'
+        : coincidencias.map(c => {
+            const cliente = clientesCache.find(cl => cl.id === c.clienteId);
+            return `<div class="cc-resultado-item" onclick="seleccionarCuentaParaCobrar('${c.id}')">${escapar(cliente.apellido)}, ${escapar(cliente.nombre)} — Saldo ${formatoPlata(c.saldo)}</div>`;
+        }).join("");
+    el.style.display = "block";
+
+};
+
+window.seleccionarCuentaParaCobrar = function (cuentaId) {
+
+    const c = cuentasCache.find(x => x.id === cuentaId);
+    if (!c) return;
+
+    document.getElementById("cobrarCCCuentaId").value = cuentaId;
+    const cliente = clientesCache.find(cl => cl.id === c.clienteId);
+    document.getElementById("cobrarCCBuscar").value = cliente ? `${cliente.apellido}, ${cliente.nombre}` : "";
+    document.getElementById("cobrarCCResultados").style.display = "none";
+
+    document.getElementById("cobrarCCResumen").style.display = "block";
+    document.getElementById("cobrarCCTotal").textContent = formatoPlata(c.total);
+    document.getElementById("cobrarCCPagado").textContent = formatoPlata(c.pagado);
+    document.getElementById("cobrarCCSaldo").textContent = formatoPlata(c.saldo);
+    document.getElementById("cobrarCCMonto").value = c.saldo;
+
+};
+
+window.confirmarCobroCC = async function () {
+
+    const cuentaId = document.getElementById("cobrarCCCuentaId").value;
+    const monto = parseFloat(document.getElementById("cobrarCCMonto").value);
+    const medioPago = document.getElementById("cobrarCCMedioPago").value;
+    const estado = document.getElementById("mensajeEstadoCobrarCC");
+
+    if (!cuentaId) { estado.textContent = "Elegí una cuenta."; estado.style.color = "#ff6b6b"; return; }
+    if (!monto || monto <= 0) { estado.textContent = "Ingresá un monto válido."; estado.style.color = "#ff6b6b"; return; }
+
+    const cuenta = cuentasCache.find(c => c.id === cuentaId);
+    if (!cuenta) return;
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        const cliente = clientesCache.find(c => c.id === cuenta.clienteId);
+        const nuevoPagado = (Number(cuenta.pagado) || 0) + monto;
+        const nuevoSaldo = Math.max(0, (Number(cuenta.total) || 0) - nuevoPagado);
+        const nuevoEstado = nuevoSaldo <= 0.5 ? "Pagada" : "Pendiente";
+
+        await updateDoc(doc(db, "cuentas", cuentaId), { pagado: nuevoPagado, saldo: nuevoSaldo, estado: nuevoEstado });
+
+        await addDoc(collection(db, "pagosCuenta"), {
+            cuentaId, clienteId: cuenta.clienteId,
+            monto, medioPago,
+            recibidoPor: (usuariosCache.find(u => u.id === usuarioActual.email) || {}).nombre || "Administrador",
+            fecha: serverTimestamp()
+        });
+
+        // Este cobro también entra a Caja como un Ingreso real, para que el
+        // saldo de Caja/Movimientos quede siempre consistente.
+        await addDoc(collection(db, "caja"), {
+            tipo: "Ingreso",
+            descripcion: `Cobro cuenta #${String(cuenta.numero || "").padStart(5, "0")}${cliente ? " - " + cliente.nombre + " " + cliente.apellido : ""}`,
+            contraparte: cliente ? `${cliente.nombre} ${cliente.apellido}` : "",
+            categoria: "Cuentas/Cobros",
+            monto, medioPago,
+            fecha: serverTimestamp()
+        });
+
+        estado.textContent = "✅ ¡Cobro registrado!";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 900);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+// ---------- Ver / Imprimir / WhatsApp de una cuenta ---------
+
+window.verCuentaCC = function (id) {
+
+    const c = cuentasCache.find(x => x.id === id);
+    if (!c) return;
+
+    const cliente = clientesCache.find(cl => cl.id === c.clienteId);
+    const vehiculo = vehiculosCache.find(v => v.id === c.vehiculoId);
+    const numeroTexto = "#" + String(c.numero || "").padStart(5, "0");
+
+    document.getElementById("verCCTitulo").textContent = `Cuenta ${numeroTexto}`;
+    document.getElementById("verCCSub").textContent = `${cliente ? cliente.apellido + ", " + cliente.nombre : "-"}${vehiculo ? " · " + vehiculo.marca + " " + vehiculo.modelo + " - " + vehiculo.patente : ""}`;
+
+    document.getElementById("verCCItems").innerHTML = (c.items || []).map(i =>
+        `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;"><span>${escapar(i.descripcion)} ${i.cantidad > 1 ? "x" + i.cantidad : ""}</span><span>${formatoPlata(i.monto)}</span></div>`
+    ).join("") || '<div style="color:#777;font-size:12px;">Sin ítems.</div>';
+
+    document.getElementById("verCCSubtotal").textContent = formatoPlata(c.subtotal);
+    document.getElementById("verCCDescuento").textContent = c.descuentoPorc ? `-${c.descuentoPorc}%` : "$0";
+    document.getElementById("verCCImpuestos").textContent = formatoPlata(c.impuestoMonto) + (c.impuestoPorc ? ` (${c.impuestoPorc}%)` : "");
+    document.getElementById("verCCTotal").textContent = formatoPlata(c.total);
+    document.getElementById("verCCPagado").textContent = formatoPlata(c.pagado);
+    document.getElementById("verCCSaldo").textContent = formatoPlata(c.saldo);
+
+    const pagosDeEstaCuenta = pagosCuentaCache.filter(p => p.cuentaId === id);
+    document.getElementById("verCCPagos").innerHTML = pagosDeEstaCuenta.length === 0 ? "" : `
+        <div style="font-size:11px;color:#999;margin-bottom:6px;">Pagos registrados</div>
+        ${pagosDeEstaCuenta.map(p => {
+            const f = toDateSegura(p.fecha);
+            return `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:#ccc;"><span>${f ? f.toLocaleDateString("es-AR") : "-"} · ${escapar(p.medioPago || "")}</span><span style="color:#5fd98a;">+${formatoPlata(p.monto)}</span></div>`;
+        }).join("")}
+    `;
+
+    document.getElementById("cobrarCCCuentaId").value = id;
+
+    const extra = document.getElementById("verCCAccionesExtra");
+    let htmlExtra = "";
+    if (cliente && cliente.telefono) {
+        htmlExtra += `<a class="icono-whatsapp-btn" style="width:auto;border-radius:20px;padding:9px 16px;gap:6px;display:inline-flex;align-items:center;flex:1;justify-content:center;" href="https://wa.me/549${String(cliente.telefono).replace(/\D/g, "")}?text=${encodeURIComponent(`Hola ${cliente.nombre}! Te paso el resumen de tu cuenta ${numeroTexto}: total ${formatoPlata(c.total)}, saldo pendiente ${formatoPlata(c.saldo)}. ${configuracionActual.nombreNegocio || "KM26 Performance"}`)}" target="_blank" rel="noopener">${ICONO_WHATSAPP_SVG} WhatsApp</a>`;
+    }
+    if (c.saldo > 0.5) {
+        htmlExtra += `<button class="btn-confirmar-gasto" style="flex:1;" onclick="cerrarModales(); cobrarCuentaDesdeTabla('${c.id}')">💲 Cobrar</button>`;
+    }
+    extra.innerHTML = htmlExtra;
+
+    document.getElementById("modalVerCuentaCC").classList.add("abierto");
+
+};
+
+window.imprimirCuentaCC = function (id) {
+
+    const c = cuentasCache.find(x => x.id === id);
+    if (!c) return;
+
+    const cliente = clientesCache.find(cl => cl.id === c.clienteId);
+    const vehiculo = vehiculosCache.find(v => v.id === c.vehiculoId);
+    const nombreNegocio = configuracionActual.nombreNegocio || "KM26 PERFORMANCE";
+    const numeroTexto = "#" + String(c.numero || "").padStart(5, "0");
+
+    const filasItems = (c.items || []).map(i => `<tr><td>${escapar(i.descripcion)}${i.cantidad > 1 ? " x" + i.cantidad : ""}</td><td style="text-align:right;">${formatoPlata(i.monto)}</td></tr>`).join("");
+
+    const html = `
+        <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Cuenta ${numeroTexto}</title>
+        <style>
+            *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
+            body{padding:32px;color:#111;}
+            h1{font-size:20px;margin-bottom:2px;color:#c1141b;}
+            .sub{color:#666;font-size:12px;margin-bottom:20px;}
+            table{width:100%;border-collapse:collapse;margin-top:10px;}
+            td,th{padding:8px 6px;border-bottom:1px solid #ddd;font-size:13px;text-align:left;}
+            .total{font-size:18px;font-weight:bold;text-align:right;margin-top:14px;}
+            .datos{font-size:13px;margin-bottom:6px;}
+        </style></head>
+        <body>
+            <h1>${escapar(nombreNegocio)}</h1>
+            <div class="sub">Cuenta ${numeroTexto} · ${toDateSegura(c.fecha) ? toDateSegura(c.fecha).toLocaleDateString("es-AR") : ""}</div>
+            <div class="datos"><strong>Cliente:</strong> ${cliente ? escapar(cliente.apellido) + ", " + escapar(cliente.nombre) : "-"}</div>
+            <div class="datos"><strong>Vehículo:</strong> ${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") + " - " + escapar(vehiculo.patente) : "-"}</div>
+            <table><thead><tr><th>Detalle</th><th style="text-align:right;">Importe</th></tr></thead><tbody>${filasItems}</tbody></table>
+            <div class="total">Total: ${formatoPlata(c.total)}</div>
+            <div class="datos" style="margin-top:6px;">Pagado: ${formatoPlata(c.pagado)} · Saldo: ${formatoPlata(c.saldo)}</div>
+        </body></html>
+    `;
+
+    const ventana = window.open("", "_blank");
+    ventana.document.write(html);
+    ventana.document.close();
+    setTimeout(() => ventana.print(), 300);
+
+};
+
+window.imprimirCuentaGenerico = function () {
+    const id = document.getElementById("cobrarCCCuentaId").value;
+    if (id) { window.imprimirCuentaCC(id); return; }
+    alert("Elegí una cuenta de la lista (ícono 👁) y tocá Imprimir desde ahí.");
+};
+
+window.enviarCuentaPorWhatsAppGenerico = function () {
+    const id = document.getElementById("cobrarCCCuentaId").value;
+    if (id) { window.verCuentaCC(id); return; }
+    alert("Elegí una cuenta de la lista (ícono 👁) para enviarla por WhatsApp desde ahí.");
+};
+
+window.abrirCuentaCorrienteCliente = function () {
+    const nombre = prompt("Escribí el nombre del cliente para ver su cuenta corriente:");
+    if (!nombre) return;
+    const encontrado = clientesCache.find(c => `${c.nombre} ${c.apellido}`.toLowerCase().includes(nombre.trim().toLowerCase()));
+    if (!encontrado) { alert("No encontré ningún cliente con ese nombre."); return; }
+    document.getElementById("ccFiltroCliente").value = encontrado.id;
+    window.filtrarCuentasCC("todas");
+    document.getElementById("ccCuentasBody").scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
+window.abrirHistorialCobrosCompleto = function () {
+    const el = document.getElementById("ccHistorialBody");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
 };
 
 // Dibuja una barra con las puntas de arriba redondeadas
@@ -8717,6 +9870,16 @@ function procesarCodigoEscaneado(texto) {
         return;
     }
 
+    // Modo "cc": se agrega como ítem a la cuenta que se está armando en Cuentas/Cobros
+    if (modoEscaner === "cc") {
+
+        window.agregarProductoCC(producto.id);
+        window.cerrarEscaner();
+
+        return;
+
+    }
+
     // Modo "cuenta": en vez de vender directo, se agrega como ítem a la cuenta actual
     if (modoEscaner === "cuenta") {
 
@@ -9685,6 +10848,11 @@ function renderListaCuentaItems() {
 window.abrirEscanerParaCuenta = function () {
     modoEscaner = "cuenta";
     document.getElementById("modalCuenta").classList.remove("abierto");
+    window.abrirEscaner();
+};
+
+window.abrirEscanerDesdeCC = function () {
+    modoEscaner = "cc";
     window.abrirEscaner();
 };
 
