@@ -4007,6 +4007,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                     </div>
                 </div>
 
+                <button id="btnInstalarApp" class="btn-chico" style="display:none;align-items:center;gap:6px;border-color:#2fdb6e;color:#5fd98a;" onclick="instalarAppPWA()" title="Instalar KM26 como app">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Instalar app
+                </button>
+
                 <div class="header-rol-badge" onclick="toggleMenuUsuario()">
                     <span class="header-rol-avatar" id="rolAvatar">KM</span>
                     <span id="rolTexto">Administrador</span>
@@ -5644,6 +5649,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82"/></svg>
                 Configuración
             </button>
+            <button class="mas-item" id="btnInstalarAppMovil" style="display:none;color:#5fd98a;" onclick="cerrarOverlayMas(); instalarAppPWA()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Instalar app
+            </button>
             <button class="mas-item salir" onclick="cerrarOverlayMas(); cerrarSesion()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Cerrar sesión
@@ -6820,6 +6829,45 @@ window.iniciarSesion = function () {
 window.cerrarSesion = function () {
     signOut(auth);
 };
+
+// ---------- PWA: se puede "instalar" en el celular o la compu ----------
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
+}
+
+let eventoInstalarPWA = null;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    eventoInstalarPWA = e;
+    const btn = document.getElementById("btnInstalarApp");
+    const btnMovil = document.getElementById("btnInstalarAppMovil");
+    if (btn) btn.style.display = "flex";
+    if (btnMovil) btnMovil.style.display = "flex";
+});
+
+window.instalarAppPWA = async function () {
+    if (!eventoInstalarPWA) return;
+    eventoInstalarPWA.prompt();
+    await eventoInstalarPWA.userChoice;
+    eventoInstalarPWA = null;
+    const btn = document.getElementById("btnInstalarApp");
+    const btnMovil = document.getElementById("btnInstalarAppMovil");
+    if (btn) btn.style.display = "none";
+    if (btnMovil) btnMovil.style.display = "none";
+};
+
+// Si ya está instalada (abierta como app, no como pestaña del navegador),
+// nunca mostramos el botón de instalar.
+window.addEventListener("appinstalled", () => {
+    const btn = document.getElementById("btnInstalarApp");
+    const btnMovil = document.getElementById("btnInstalarAppMovil");
+    if (btn) btn.style.display = "none";
+    if (btnMovil) btnMovil.style.display = "none";
+});
 
 onAuthStateChanged(auth, (user) => {
 
