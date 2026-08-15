@@ -536,6 +536,7 @@ td.mono{
     margin-bottom:18px;
 }
 
+label,
 .modal label{
     display:block;
     font-size:12px;
@@ -545,16 +546,41 @@ td.mono{
     font-family:'Montserrat',sans-serif;
 }
 
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="search"],
+input:not([type]),
+select,
+textarea,
 .modal input{
-    width:100%;
-    padding:12px;
-    border-radius:8px;
-    border:1px solid #333;
-    background:#1a1a1a;
-    color:#fff;
-    font-size:14px;
+    width:100% !important;
+    padding:12px !important;
+    border-radius:8px !important;
+    border:1px solid #333 !important;
+    background:#1a1a1a !important;
+    color:#fff !important;
+    font-size:14px !important;
+    font-family:'Montserrat',sans-serif !important;
+    -webkit-appearance:none;
+    color-scheme:dark;
 }
 
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input:not([type]):focus,
+select:focus,
+textarea:focus,
 .modal input:focus{
     outline:none;
     border-color:#d71920;
