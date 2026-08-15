@@ -4773,11 +4773,106 @@ header{
     <section class="seccion" id="tab-categorias">
 
         <div class="fila-titulo">
-            <h2>Categorías</h2>
+            <div>
+                <h2>Categorías</h2>
+                <p style="font-size:12.5px;color:#999;margin-top:2px;">Organizá y controlá tu stock por rubros. Cada categoría puede tener productos y servicios asociados.</p>
+            </div>
             <button class="btn-red" onclick="abrirModalCategoria()">+ Nueva categoría</button>
         </div>
-        <p style="font-size:12.5px;color:#888;margin-bottom:16px;">Se usan para ordenar el Stock por rubro (Frenos, Motor, Filtros, etc.).</p>
-        <div id="listaCategorias"></div>
+
+        <div class="turnos-stats-grid">
+            <div class="turnos-stat-card">
+                <div class="turnos-stat-icono" style="background:#0a1e33;">🏷️</div>
+                <div><div class="turnos-stat-numero" id="catStatTotal">0</div><div class="turnos-stat-label">Total categorías · activas</div></div>
+            </div>
+            <div class="turnos-stat-card verde">
+                <div class="turnos-stat-icono">📦</div>
+                <div><div class="turnos-stat-numero" id="catStatProductos">0</div><div class="turnos-stat-label">Productos totales · en categorías</div></div>
+            </div>
+            <div class="turnos-stat-card ambar">
+                <div class="turnos-stat-icono">🔧</div>
+                <div><div class="turnos-stat-numero" id="catStatServicios">0</div><div class="turnos-stat-label">Servicios totales · en categorías</div></div>
+            </div>
+            <div class="turnos-stat-card" style="border-left:3px solid #ff6b6b;">
+                <div class="turnos-stat-icono" style="background:#3a1416;">⚠️</div>
+                <div><div class="turnos-stat-numero" id="catStatSinProductos">0</div><div class="turnos-stat-label">Categorías sin productos · revisar</div></div>
+            </div>
+            <div class="turnos-stat-card violeta">
+                <div class="turnos-stat-icono">💲</div>
+                <div><div class="turnos-stat-numero" id="catStatValorTotal">$0</div><div class="turnos-stat-label">Valor total en stock · todas las categorías</div></div>
+            </div>
+        </div>
+
+        <div class="cc-2col">
+
+            <div class="cc-col-izq">
+
+                <div class="stock-filtros-fila">
+                    <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;min-width:180px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="buscadorCategorias" placeholder="Buscar categoría..." oninput="renderCategorias()">
+                    </div>
+                    <select id="catFiltroEstado" class="turno-estado-select" onchange="renderCategorias()">
+                        <option value="">Estado: Todas</option>
+                        <option value="Activa">Activa</option>
+                        <option value="Inactiva">Inactiva</option>
+                    </select>
+                </div>
+
+                <div class="presu-tabla-wrap">
+                    <table class="presu-tabla">
+                        <thead><tr><th>Categoría</th><th>Productos</th><th>Servicios</th><th>Valor en stock</th><th>Ventas (este mes)</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="catTablaBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="presu-paginacion">
+                    <span id="catPaginacionTexto">-</span>
+                    <div class="presu-paginacion-botones" id="catPaginacionBotones"></div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:12px;color:#999;">Ver</span>
+                        <select id="catPorPagina" class="turno-estado-select" onchange="cambiarPorPaginaCat()">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span style="font-size:12px;color:#999;">por página</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="cc-col-der">
+
+                <div class="dash-panel-nuevo">
+                    <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Categorías más rentables</span>
+                        <span style="font-size:11px;color:#777;">Este mes</span>
+                    </div>
+                    <div id="catMasRentables"></div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Distribución del stock</div>
+                    <div style="display:flex;align-items:center;gap:14px;">
+                        <canvas id="catDonutDistribucion" width="90" height="90"></canvas>
+                        <div id="catDonutLeyenda" style="flex:1;font-size:11.5px;"></div>
+                    </div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Acciones rápidas</div>
+                    <div class="caja-accesos-grid">
+                        <div class="caja-acceso-item" onclick="abrirModalCategoria()"><div class="caja-acceso-icono verde">➕</div>Nueva categoría</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('stock')"><div class="caja-acceso-icono azul">📦</div>Listar productos</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('servicios')"><div class="caja-acceso-icono ambar">🔧</div>Listar servicios</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('reportes')"><div class="caja-acceso-icono violeta">📊</div>Reporte de stock</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
 
     </section>
 
@@ -5608,6 +5703,15 @@ header{
         <label>Nombre</label>
         <input type="text" id="catNombre" placeholder="Ej: Frenos">
 
+        <label>Descripción (opcional)</label>
+        <input type="text" id="catDescripcion" placeholder="Ej: Pastillas, discos, líquido y más">
+
+        <label>Estado</label>
+        <select id="catEstado">
+            <option value="Activa">Activa</option>
+            <option value="Inactiva">Inactiva</option>
+        </select>
+
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
             <button class="btn-red" onclick="guardarCategoria()">Guardar</button>
@@ -5631,6 +5735,9 @@ header{
 
         <label>Precio de referencia</label>
         <input type="number" id="servPrecio" placeholder="15000">
+
+        <label>Categoría (opcional)</label>
+        <select id="servCategoria"><option value="">Sin categoría</option></select>
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
@@ -9149,6 +9256,7 @@ function escucharStock() {
         stockCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderStock();
         if (typeof renderDashboard === "function") renderDashboard();
+        if (typeof renderCategorias === "function") renderCategorias();
 
     });
 
@@ -10287,6 +10395,15 @@ window.importarProveedoresDesdeExcel = async function (archivo) {
 // ---------- Categorías (para ordenar Stock por rubro) ----------
 
 let categoriasCache = [];
+let catPaginaActual = 1;
+let catPorPagina = 10;
+
+const COLORES_CATEGORIA = ["#3f9cff", "#d71920", "#f5a623", "#2fdb6e", "#a855f7", "#14b8a6", "#e879f9", "#fb923c"];
+function colorParaCategoria(id) {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    return COLORES_CATEGORIA[Math.abs(hash) % COLORES_CATEGORIA.length];
+}
 
 function escucharCategorias() {
     const q = query(collection(db, "categorias"), orderBy("nombre"));
@@ -10294,34 +10411,185 @@ function escucharCategorias() {
         categoriasCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderCategorias();
         actualizarSelectCategoriasEnStock();
+        if (typeof actualizarSelectCategoriaServicio === "function") actualizarSelectCategoriaServicio();
     });
 }
 
+// "Ventas del mes" de una categoría: se calcula sumando las bajas de stock
+// (movimientos negativos) registradas este mes para los productos de esa
+// categoría, multiplicadas por su precio de venta — usa datos reales del
+// historial de Movimientos de Stock, no un número inventado.
+function ventasDelMesCategoria(categoriaId) {
+
+    const hoy = new Date();
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    const productosDeLaCategoria = stockCache.filter(p => p.categoriaId === categoriaId);
+    const idsProductos = new Set(productosDeLaCategoria.map(p => p.id));
+
+    let total = 0;
+
+    stockMovimientosCache.forEach(m => {
+        if (!idsProductos.has(m.productoId) || m.delta >= 0) return;
+        const f = toDateSegura(m.fecha);
+        if (!f || f < inicioMes) return;
+        const producto = productosDeLaCategoria.find(p => p.id === m.productoId);
+        total += Math.abs(m.delta) * (producto ? (Number(producto.precio) || 0) : 0);
+    });
+
+    return total;
+
+}
+
+window.cambiarPorPaginaCat = function () {
+    catPorPagina = parseInt(document.getElementById("catPorPagina").value, 10);
+    catPaginaActual = 1;
+    renderCategorias();
+};
+
+window.irAPaginaCat = function (pagina) {
+    catPaginaActual = pagina;
+    renderCategorias();
+};
+
 function renderCategorias() {
 
-    const el = document.getElementById("listaCategorias");
-    if (!el) return;
+    const body = document.getElementById("catTablaBody");
+    if (!body) return;
 
-    if (categoriasCache.length === 0) {
-        el.innerHTML = '<div class="vacio">Todavía no hay categorías cargadas.</div>';
-        return;
+    const activas = categoriasCache.filter(c => (c.estado || "Activa") === "Activa");
+    const totalProductos = stockCache.filter(p => p.categoriaId).length;
+    const totalServicios = serviciosCache.filter(s => s.categoriaId).length;
+    const sinProductos = categoriasCache.filter(c => stockCache.filter(p => p.categoriaId === c.id).length === 0).length;
+    const valorTotalStock = stockCache.reduce((s, p) => s + (Number(p.cantidad) || 0) * (Number(p.precio) || 0), 0);
+
+    document.getElementById("catStatTotal").textContent = activas.length;
+    document.getElementById("catStatProductos").textContent = totalProductos;
+    document.getElementById("catStatServicios").textContent = totalServicios;
+    document.getElementById("catStatSinProductos").textContent = sinProductos;
+    document.getElementById("catStatValorTotal").textContent = formatoPlata(valorTotalStock);
+
+    const texto = (document.getElementById("buscadorCategorias").value || "").trim().toLowerCase();
+    const filtroEstado = document.getElementById("catFiltroEstado").value;
+
+    let lista = categoriasCache.filter(c => {
+        if (texto && !c.nombre.toLowerCase().includes(texto)) return false;
+        if (filtroEstado && (c.estado || "Activa") !== filtroEstado) return false;
+        return true;
+    });
+
+    const totalPaginas = Math.max(1, Math.ceil(lista.length / catPorPagina));
+    if (catPaginaActual > totalPaginas) catPaginaActual = totalPaginas;
+    const inicio = (catPaginaActual - 1) * catPorPagina;
+    const listaPagina = lista.slice(inicio, inicio + catPorPagina);
+
+    if (lista.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" class="vacio">No hay categorías con estos filtros.</td></tr>';
+        document.getElementById("catPaginacionTexto").textContent = "Sin resultados";
+        document.getElementById("catPaginacionBotones").innerHTML = "";
+    } else {
+
+        body.innerHTML = listaPagina.map(c => {
+
+            const productos = stockCache.filter(p => p.categoriaId === c.id);
+            const servicios = serviciosCache.filter(s => s.categoriaId === c.id);
+            const valorStock = productos.reduce((s, p) => s + (Number(p.cantidad) || 0) * (Number(p.precio) || 0), 0);
+            const ventasMes = ventasDelMesCategoria(c.id);
+            const estado = c.estado || "Activa";
+            const color = colorParaCategoria(c.id);
+
+            return `<tr>
+                <td>
+                    <div class="stock-producto-cell">
+                        <div class="stock-producto-icono" style="background:${color}33;color:${color};font-weight:800;">${c.nombre.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div class="stock-producto-nombre">${escapar(c.nombre)}</div>
+                            <div class="stock-producto-sub">${escapar(c.descripcion || "")}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>${productos.length}</td>
+                <td>${servicios.length}</td>
+                <td>${formatoPlata(valorStock)}</td>
+                <td style="color:${ventasMes > 0 ? "#5fd98a" : "#888"};">${formatoPlata(ventasMes)}</td>
+                <td><span class="badge-estado-tabla ${estado === "Activa" ? "StockOK" : "SinStock"}">● ${estado}</span></td>
+                <td>
+                    <div class="presu-acciones-cell">
+                        <div class="icono-accion-turno" onclick="cambiarTab('stock'); document.getElementById('stockFiltroCategoria').value='${c.id}'; renderStock();" title="Ver productos">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </div>
+                        <div class="icono-accion-turno" title="Ventas del mes">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        </div>
+                        <div class="icono-accion-turno" onclick="editarCategoria('${c.id}')" title="Editar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                        </div>
+                        <div class="icono-accion-turno borrar" onclick="borrarCategoria('${c.id}', '${escaparComillas(c.nombre)}')" title="Eliminar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                        </div>
+                    </div>
+                </td>
+            </tr>`;
+
+        }).join("");
+
+        const desdeN = inicio + 1;
+        const hastaN = Math.min(inicio + catPorPagina, lista.length);
+        document.getElementById("catPaginacionTexto").textContent = `Mostrando ${desdeN} a ${hastaN} de ${lista.length} categorías`;
+
+        let htmlPaginas = `<button class="presu-pagina-btn" onclick="irAPaginaCat(${Math.max(1, catPaginaActual - 1)})" ${catPaginaActual === 1 ? "disabled" : ""}>‹</button>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+            if (i > 6 && i < totalPaginas - 1 && Math.abs(i - catPaginaActual) > 1) continue;
+            htmlPaginas += `<button class="presu-pagina-btn ${i === catPaginaActual ? "activo" : ""}" onclick="irAPaginaCat(${i})">${i}</button>`;
+        }
+        htmlPaginas += `<button class="presu-pagina-btn" onclick="irAPaginaCat(${Math.min(totalPaginas, catPaginaActual + 1)})" ${catPaginaActual === totalPaginas ? "disabled" : ""}>›</button>`;
+        document.getElementById("catPaginacionBotones").innerHTML = htmlPaginas;
+
     }
 
-    el.innerHTML = '<div class="lista-cards">' + categoriasCache.map(c => {
-        const cantidadProductos = stockCache.filter(p => p.categoriaId === c.id).length;
-        return `
-        <div class="item-card">
-            <div class="item-avatar" style="background:linear-gradient(135deg,#555,#2a2a2a);">${c.nombre.charAt(0).toUpperCase()}</div>
-            <div class="item-info">
-                <div class="item-titulo">${escapar(c.nombre)}</div>
-                <div class="item-sub">${cantidadProductos} producto${cantidadProductos === 1 ? "" : "s"}</div>
-            </div>
-            <div class="item-acciones">
-                <button class="btn-chico" onclick="editarCategoria('${c.id}')">Editar</button>
-                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarCategoria('${c.id}', '${escaparComillas(c.nombre)}')">✕</button>
-            </div>
-        </div>`;
-    }).join("") + '</div>';
+    const elRent = document.getElementById("catMasRentables");
+    if (elRent) {
+        const ranking = categoriasCache.map(c => ({ cat: c, ventas: ventasDelMesCategoria(c.id) }))
+            .filter(x => x.ventas > 0).sort((a, b) => b.ventas - a.ventas).slice(0, 5);
+        elRent.innerHTML = ranking.length === 0
+            ? '<div class="vacio">Sin ventas registradas este mes todavía.</div>'
+            : ranking.map((x, i) => `<div class="dash-mov-fila"><span>${i + 1}. ${escapar(x.cat.nombre)}</span><strong style="margin-left:auto;color:#5fd98a;">${formatoPlata(x.ventas)}</strong></div>`).join("");
+    }
+
+    const elDonut = document.getElementById("catDonutDistribucion");
+    if (elDonut) {
+
+        const segmentos = categoriasCache.map(c => ({
+            nombre: c.nombre,
+            color: colorParaCategoria(c.id),
+            valor: stockCache.filter(p => p.categoriaId === c.id).reduce((s, p) => s + (Number(p.cantidad) || 0) * (Number(p.precio) || 0), 0)
+        })).filter(s => s.valor > 0).sort((a, b) => b.valor - a.valor).slice(0, 4);
+
+        const sinCategoria = stockCache.filter(p => !p.categoriaId).reduce((s, p) => s + (Number(p.cantidad) || 0) * (Number(p.precio) || 0), 0);
+        if (sinCategoria > 0) segmentos.push({ nombre: "Otros", color: "#666", valor: sinCategoria });
+
+        const total = segmentos.reduce((s, x) => s + x.valor, 0);
+        const ctx = elDonut.getContext("2d");
+        const w = elDonut.width, h = elDonut.height;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2, radio = Math.min(w, h) / 2 - 6, grosor = 13;
+
+        if (total <= 0) {
+            ctx.beginPath(); ctx.arc(cx, cy, radio, 0, Math.PI * 2); ctx.strokeStyle = "#2a2a2a"; ctx.lineWidth = grosor; ctx.stroke();
+        } else {
+            let ang = -Math.PI / 2;
+            segmentos.forEach(s => {
+                const a = (s.valor / total) * Math.PI * 2;
+                ctx.beginPath(); ctx.arc(cx, cy, radio, ang, ang + a); ctx.strokeStyle = s.color; ctx.lineWidth = grosor; ctx.stroke();
+                ang += a;
+            });
+        }
+
+        document.getElementById("catDonutLeyenda").innerHTML = segmentos.map(s =>
+            `<div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:${s.color};"></span>${escapar(s.nombre)} <span style="color:#777;margin-left:auto;">${total ? Math.round(s.valor / total * 100) : 0}%</span></div>`
+        ).join("");
+
+    }
 
 }
 
@@ -10329,6 +10597,8 @@ window.abrirModalCategoria = function () {
     document.getElementById("modalCategoriaTitulo").textContent = "Nueva categoría";
     document.getElementById("catId").value = "";
     document.getElementById("catNombre").value = "";
+    document.getElementById("catDescripcion").value = "";
+    document.getElementById("catEstado").value = "Activa";
     document.getElementById("mensajeEstadoCategoria").textContent = "";
     document.getElementById("accionesCategoria").style.display = "none";
     document.getElementById("modalCategoria").classList.add("abierto");
@@ -10340,6 +10610,8 @@ window.editarCategoria = function (id) {
     document.getElementById("modalCategoriaTitulo").textContent = "Editar categoría";
     document.getElementById("catId").value = c.id;
     document.getElementById("catNombre").value = c.nombre || "";
+    document.getElementById("catDescripcion").value = c.descripcion || "";
+    document.getElementById("catEstado").value = c.estado || "Activa";
     document.getElementById("mensajeEstadoCategoria").textContent = "";
     document.getElementById("accionesCategoria").innerHTML =
         `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="borrarCategoria('${c.id}', '${escaparComillas(c.nombre)}')">🗑️ Eliminar</button>`;
@@ -10351,6 +10623,8 @@ window.guardarCategoria = async function () {
 
     const id = document.getElementById("catId").value;
     const nombre = document.getElementById("catNombre").value.trim();
+    const descripcion = document.getElementById("catDescripcion").value.trim();
+    const catEstado = document.getElementById("catEstado").value;
     const estado = document.getElementById("mensajeEstadoCategoria");
 
     if (!nombre) {
@@ -10365,9 +10639,9 @@ window.guardarCategoria = async function () {
     try {
 
         if (id) {
-            await updateDoc(doc(db, "categorias", id), { nombre });
+            await updateDoc(doc(db, "categorias", id), { nombre, descripcion, estado: catEstado });
         } else {
-            await addDoc(collection(db, "categorias"), { nombre, creado: serverTimestamp() });
+            await addDoc(collection(db, "categorias"), { nombre, descripcion, estado: catEstado, creado: serverTimestamp() });
         }
 
         estado.textContent = "¡Listo!";
@@ -10382,7 +10656,7 @@ window.guardarCategoria = async function () {
 };
 
 window.borrarCategoria = async function (id, nombre) {
-    const confirmado = confirm(`¿Eliminar la categoría "${nombre}"? Los productos que la tenían asignada quedan sin categoría (no se borra ningún producto).`);
+    const confirmado = confirm(`¿Eliminar la categoría "${nombre}"? Los productos y servicios que la tenían asignada quedan sin categoría (no se borra nada más).`);
     if (!confirmado) return;
     await deleteDoc(doc(db, "categorias", id));
     window.cerrarModales();
@@ -10402,6 +10676,13 @@ function actualizarSelectCategoriasEnStock() {
 
 }
 
+function actualizarSelectCategoriaServicio() {
+    const opciones = '<option value="">Sin categoría</option>' +
+        categoriasCache.map(c => `<option value="${c.id}">${escapar(c.nombre)}</option>`).join("");
+    const sel = document.getElementById("servCategoria");
+    if (sel) { const actual = sel.value; sel.innerHTML = opciones; sel.value = actual; }
+}
+
 function actualizarSelectProveedoresEnStock() {
 
     const opciones = '<option value="">Sin proveedor</option>' +
@@ -10419,6 +10700,7 @@ function escucharStockMovimientos() {
     onSnapshot(q, (snapshot) => {
         stockMovimientosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         if (subtabStockActual === "movimientos") renderMovimientosStock();
+        if (typeof renderCategorias === "function") renderCategorias();
     }, () => {});
 }
 
@@ -10520,6 +10802,7 @@ function escucharServicios() {
     onSnapshot(q, (snapshot) => {
         serviciosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderServicios();
+        if (typeof renderCategorias === "function") renderCategorias();
     });
 }
 
@@ -10554,6 +10837,8 @@ window.abrirModalServicio = function () {
     document.getElementById("servId").value = "";
     document.getElementById("servNombre").value = "";
     document.getElementById("servPrecio").value = "";
+    actualizarSelectCategoriaServicio();
+    document.getElementById("servCategoria").value = "";
     document.getElementById("mensajeEstadoServicio").textContent = "";
     document.getElementById("accionesServicio").style.display = "none";
     document.getElementById("modalServicio").classList.add("abierto");
@@ -10566,6 +10851,8 @@ window.editarServicio = function (id) {
     document.getElementById("servId").value = s.id;
     document.getElementById("servNombre").value = s.nombre || "";
     document.getElementById("servPrecio").value = s.precio || "";
+    actualizarSelectCategoriaServicio();
+    document.getElementById("servCategoria").value = s.categoriaId || "";
     document.getElementById("mensajeEstadoServicio").textContent = "";
     document.getElementById("accionesServicio").innerHTML =
         `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="borrarServicio('${s.id}', '${escaparComillas(s.nombre)}')">🗑️ Eliminar</button>`;
@@ -10578,6 +10865,7 @@ window.guardarServicio = async function () {
     const id = document.getElementById("servId").value;
     const nombre = document.getElementById("servNombre").value.trim();
     const precio = parseFloat(document.getElementById("servPrecio").value) || 0;
+    const categoriaId = document.getElementById("servCategoria").value || null;
     const estado = document.getElementById("mensajeEstadoServicio");
 
     if (!nombre) {
@@ -10592,9 +10880,9 @@ window.guardarServicio = async function () {
     try {
 
         if (id) {
-            await updateDoc(doc(db, "servicios", id), { nombre, precio });
+            await updateDoc(doc(db, "servicios", id), { nombre, precio, categoriaId });
         } else {
-            await addDoc(collection(db, "servicios"), { nombre, precio, creado: serverTimestamp() });
+            await addDoc(collection(db, "servicios"), { nombre, precio, categoriaId, creado: serverTimestamp() });
         }
 
         estado.textContent = "¡Listo!";
