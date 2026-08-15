@@ -3505,6 +3505,27 @@ header{
     .cc-2col{ grid-template-columns:1fr 300px; }
 }
 
+.cc-3col-rep{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-bottom:14px;
+}
+
+@media (min-width:1100px){
+    .cc-3col-rep{ grid-template-columns:repeat(3,1fr); }
+}
+
+.rep-comparacion{
+    font-size:11px;
+    margin-top:4px;
+    font-weight:700;
+}
+
+.rep-comparacion.positivo{ color:#5fd98a; }
+.rep-comparacion.negativo{ color:#ff6b6b; }
+.rep-comparacion.neutro{ color:#888; }
+
 .cc-fila-2col{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -4879,11 +4900,95 @@ header{
     <section class="seccion" id="tab-servicios">
 
         <div class="fila-titulo">
-            <h2>Servicios</h2>
+            <div>
+                <h2>Servicios</h2>
+                <p style="font-size:12.5px;color:#999;margin-top:2px;">Catálogo de trabajos habituales con precio de referencia — se pueden elegir directo al armar un Presupuesto o una Cuenta.</p>
+            </div>
             <button class="btn-red" onclick="abrirModalServicio()">+ Nuevo servicio</button>
         </div>
-        <p style="font-size:12.5px;color:#888;margin-bottom:16px;">Catálogo de trabajos habituales con precio de referencia — se pueden elegir directo al armar un Presupuesto o una Cuenta.</p>
-        <div id="listaServicios"></div>
+
+        <div class="turnos-stats-grid">
+            <div class="turnos-stat-card">
+                <div class="turnos-stat-icono" style="background:#0a1e33;">🔧</div>
+                <div><div class="turnos-stat-numero" id="servStatTotal">0</div><div class="turnos-stat-label">Total servicios · en el catálogo</div></div>
+            </div>
+            <div class="turnos-stat-card verde">
+                <div class="turnos-stat-icono">💲</div>
+                <div><div class="turnos-stat-numero" id="servStatPromedio">$0</div><div class="turnos-stat-label">Precio promedio · de referencia</div></div>
+            </div>
+            <div class="turnos-stat-card ambar">
+                <div class="turnos-stat-icono">⭐</div>
+                <div><div class="turnos-stat-numero" id="servStatMasUsado" style="font-size:15px;">-</div><div class="turnos-stat-label" id="servStatMasUsadoCant">Servicio más usado</div></div>
+            </div>
+            <div class="turnos-stat-card violeta">
+                <div class="turnos-stat-icono">🏷️</div>
+                <div><div class="turnos-stat-numero" id="servStatCategorias">0</div><div class="turnos-stat-label">Categorías con servicios</div></div>
+            </div>
+        </div>
+
+        <div class="cc-2col">
+
+            <div class="cc-col-izq">
+
+                <div class="stock-filtros-fila">
+                    <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;min-width:180px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="buscadorServicios" placeholder="Buscar servicio..." oninput="renderServicios()">
+                    </div>
+                    <select id="servFiltroCategoria" class="turno-estado-select" onchange="renderServicios()"><option value="">Categoría: Todas</option></select>
+                </div>
+
+                <div class="presu-tabla-wrap">
+                    <table class="presu-tabla">
+                        <thead><tr><th>Servicio</th><th>Categoría</th><th>Precio</th><th>Veces usado</th><th>Acciones</th></tr></thead>
+                        <tbody id="servTablaBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="presu-paginacion">
+                    <span id="servPaginacionTexto">-</span>
+                    <div class="presu-paginacion-botones" id="servPaginacionBotones"></div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:12px;color:#999;">Ver</span>
+                        <select id="servPorPagina" class="turno-estado-select" onchange="cambiarPorPaginaServ()">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span style="font-size:12px;color:#999;">por página</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="cc-col-der">
+
+                <div class="dash-panel-nuevo">
+                    <div class="dash-panel-nuevo-titulo">Más usados</div>
+                    <div id="servMasUsados"></div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Distribución por categoría</div>
+                    <div style="display:flex;align-items:center;gap:14px;">
+                        <canvas id="servDonutCategorias" width="90" height="90"></canvas>
+                        <div id="servDonutLeyenda" style="flex:1;font-size:11.5px;"></div>
+                    </div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Acciones rápidas</div>
+                    <div class="caja-accesos-grid">
+                        <div class="caja-acceso-item" onclick="abrirModalServicio()"><div class="caja-acceso-icono verde">➕</div>Nuevo servicio</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('categorias')"><div class="caja-acceso-icono azul">🏷️</div>Categorías</div>
+                        <div class="caja-acceso-item" onclick="abrirModalPresupuesto()"><div class="caja-acceso-icono ambar">📄</div>Nuevo presupuesto</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('reportes')"><div class="caja-acceso-icono violeta">📊</div>Reportes</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
 
     </section>
 
@@ -4904,35 +5009,106 @@ header{
 
     <section class="seccion" id="tab-reportes">
 
-        <div class="fila-titulo"><h2>📊 Reportes</h2></div>
-
-        <div class="subtabs">
-            <button class="activo" data-periodo="hoy" onclick="cambiarPeriodoReporte('hoy')">Hoy</button>
-            <button data-periodo="semana" onclick="cambiarPeriodoReporte('semana')">Semana</button>
-            <button data-periodo="mes" onclick="cambiarPeriodoReporte('mes')">Mes</button>
-            <button data-periodo="anio" onclick="cambiarPeriodoReporte('anio')">Año</button>
+        <div class="fila-titulo">
+            <div>
+                <h2>📊 Reportes</h2>
+                <p style="font-size:12.5px;color:#999;margin-top:2px;">Analizá el rendimiento de tu negocio en tiempo real.</p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-chico" onclick="exportarReporteActual()">⬇️ Exportar</button>
+                <button class="btn-chico" onclick="window.print()">🖨️ Imprimir</button>
+                <button class="btn-red" onclick="cambiarPeriodoReporte('personalizado')">+ Nuevo reporte</button>
+            </div>
         </div>
 
-        <div class="grid-stats" style="margin-top:20px;">
-            <div class="stat-card verde"><div class="stat-label">Facturación</div><div class="stat-valor" id="repFacturacion">-</div></div>
-            <div class="stat-card"><div class="stat-label">Egresos</div><div class="stat-valor" id="repEgresos">-</div></div>
-            <div class="stat-card"><div class="stat-label">Resultado</div><div class="stat-valor" id="repResultado">-</div></div>
-            <div class="stat-card"><div class="stat-label">Ticket promedio</div><div class="stat-valor" id="repTicket">-</div></div>
-            <div class="stat-card"><div class="stat-label">Clientes nuevos</div><div class="stat-valor" id="repClientesNuevos">-</div></div>
-            <div class="stat-card"><div class="stat-label">Vehículos atendidos</div><div class="stat-valor" id="repVehiculos">-</div></div>
-            <div class="stat-card verde"><div class="stat-label">Presupuestos aprobados</div><div class="stat-valor" id="repPresuAprobados">-</div></div>
-            <div class="stat-card"><div class="stat-label">Conversión de presupuestos</div><div class="stat-valor" id="repConversion">-</div></div>
+        <div class="turnos-chips-fila" style="flex-wrap:wrap;">
+            <button class="cv-chip-toggle activo" data-periodo="hoy" onclick="cambiarPeriodoReporte('hoy')">Hoy</button>
+            <button class="cv-chip-toggle" data-periodo="semana" onclick="cambiarPeriodoReporte('semana')">Semana</button>
+            <button class="cv-chip-toggle" data-periodo="mes" onclick="cambiarPeriodoReporte('mes')">Mes</button>
+            <button class="cv-chip-toggle" data-periodo="anio" onclick="cambiarPeriodoReporte('anio')">Año</button>
+            <button class="cv-chip-toggle" data-periodo="personalizado" onclick="cambiarPeriodoReporte('personalizado')">📅 Personalizado</button>
+            <input type="date" id="repFiltroDesde" class="turno-estado-select" style="display:none;" onchange="cambiarPeriodoReporte('personalizado')">
+            <input type="date" id="repFiltroHasta" class="turno-estado-select" style="display:none;" onchange="cambiarPeriodoReporte('personalizado')">
         </div>
 
-        <div class="fila-titulo" style="margin-top:28px;"><h2 style="font-size:19px;">🏆 Más vendidos en el período</h2></div>
-        <div id="repMasVendidos"></div>
+        <div class="turnos-stats-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="turnos-stat-card verde">
+                <div class="turnos-stat-icono">💲</div>
+                <div><div class="turnos-stat-numero" id="repFacturacion">$0</div><div class="turnos-stat-label">Facturación</div><div class="rep-comparacion" id="repFacturacionComp"></div></div>
+            </div>
+            <div class="turnos-stat-card" style="border-left:3px solid #ff6b6b;">
+                <div class="turnos-stat-icono" style="background:#3a1416;">↓</div>
+                <div><div class="turnos-stat-numero" id="repEgresos">$0</div><div class="turnos-stat-label">Egresos</div><div class="rep-comparacion" id="repEgresosComp"></div></div>
+            </div>
+            <div class="turnos-stat-card">
+                <div class="turnos-stat-icono" style="background:#0a1e33;">📈</div>
+                <div><div class="turnos-stat-numero" id="repResultado">$0</div><div class="turnos-stat-label">Resultado</div><div class="rep-comparacion" id="repResultadoComp"></div></div>
+            </div>
+            <div class="turnos-stat-card violeta">
+                <div class="turnos-stat-icono">👤</div>
+                <div><div class="turnos-stat-numero" id="repClientesNuevos">0</div><div class="turnos-stat-label">Clientes nuevos</div><div class="rep-comparacion" id="repClientesNuevosComp"></div></div>
+            </div>
+            <div class="turnos-stat-card ambar">
+                <div class="turnos-stat-icono">🚗</div>
+                <div><div class="turnos-stat-numero" id="repVehiculos">0</div><div class="turnos-stat-label">Vehículos atendidos</div><div class="rep-comparacion" id="repVehiculosComp"></div></div>
+            </div>
+        </div>
 
-        <div class="fila-titulo" style="margin-top:28px;"><h2 style="font-size:19px;">🚗 Vehículos atendidos en el período</h2></div>
+        <div class="cc-3col-rep">
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                    <span>Evolución de ventas</span>
+                </div>
+                <canvas id="repEvolucionVentas" height="150" style="width:100%;"></canvas>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Ventas por categoría</div>
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <canvas id="repDonutCategorias" width="100" height="100"></canvas>
+                    <div id="repDonutLeyenda" style="flex:1;font-size:11.5px;"></div>
+                </div>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Top 5 servicios</div>
+                <div id="repTopServicios"></div>
+            </div>
+
+        </div>
+
+        <div class="cc-3col-rep">
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                    <span>Presupuestos</span>
+                    <a class="dash-panel-nuevo-link" onclick="cambiarTab('presupuestos')">Ver todos ›</a>
+                </div>
+                <div id="repPresupuestosResumen"></div>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">Facturación por medio de pago</div>
+                <div id="repMedioPago"></div>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                    <span>Actividad reciente</span>
+                </div>
+                <div id="repActividadReciente"></div>
+            </div>
+
+        </div>
+
+        <div class="fila-titulo" style="margin-top:8px;"><h2 style="font-size:16px;">🚗 Vehículos atendidos en el período</h2></div>
         <div id="repListaVehiculos"></div>
 
     </section>
 
     <section class="seccion" id="tab-respaldo">
+
 
         <div class="fila-titulo"><h2>💾 Respaldo de datos</h2></div>
 
@@ -7987,6 +8163,7 @@ function escucharCuentasCC() {
     onSnapshot(q, (snapshot) => {
         cuentasCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         if (typeof renderCuentasCC === "function") renderCuentasCC();
+        if (typeof renderServicios === "function") renderServicios();
     }, () => {});
 }
 
@@ -8108,7 +8285,7 @@ window.agregarItemCC = function (tipo) {
         const servicioId = document.getElementById("ccServicioSelect").value;
         const servicio = serviciosCache.find(s => s.id === servicioId);
         if (!servicio) { alert("Elegí un servicio del catálogo."); return; }
-        ccItemsTemp.push({ descripcion: servicio.nombre, precioUnitario: Number(servicio.precio) || 0, cantidad: 1, monto: Number(servicio.precio) || 0 });
+        ccItemsTemp.push({ descripcion: servicio.nombre, precioUnitario: Number(servicio.precio) || 0, cantidad: 1, monto: Number(servicio.precio) || 0, servicioId: servicio.id });
     }
 
     renderItemsCC();
@@ -8995,6 +9172,9 @@ window.addEventListener("resize", () => {
     if (document.getElementById("tab-caja").classList.contains("activa")) {
         dibujarLineaCaja();
     }
+    if (document.getElementById("tab-reportes").classList.contains("activa") && typeof calcularReportes === "function") {
+        calcularReportes();
+    }
 });
 
 // ---------- Historial del vehículo, en tiempo real ----------
@@ -9240,6 +9420,7 @@ window.enviarQRPorWhatsApp = function () {
 
 let stockCache = [];
 let cuentaItems = [];
+let servicioIdParaProximoItem = null;
 let presupuestoOrigenCuentaId = null;
 let presupuestoItemsTemp = [];
 let presupuestoEditandoId = null;
@@ -10796,6 +10977,8 @@ window.importarStockDesdeExcel = async function (archivo) {
 // ---------- Servicios (catálogo de trabajos habituales con precio de referencia) ----------
 
 let serviciosCache = [];
+let servPaginaActual = 1;
+let servPorPagina = 10;
 
 function escucharServicios() {
     const q = query(collection(db, "servicios"), orderBy("nombre"));
@@ -10806,29 +10989,157 @@ function escucharServicios() {
     });
 }
 
+// Cuenta "veces usado" contando en cuántos presupuestos y cuentas (Nueva cuenta)
+// aparece este servicio por su servicioId real — solo cuenta lo que pasó desde que
+// existe este campo, no inventa historial de antes.
+function vecesUsadoServicio(servicioId) {
+    let veces = 0;
+    presupuestosCache.forEach(p => (p.items || []).forEach(i => { if (i.servicioId === servicioId) veces++; }));
+    cuentasCache.forEach(c => (c.items || []).forEach(i => { if (i.servicioId === servicioId) veces++; }));
+    return veces;
+}
+
+function actualizarFiltroCategoriaServ() {
+    const sel = document.getElementById("servFiltroCategoria");
+    if (!sel) return;
+    const valor = sel.value;
+    sel.innerHTML = '<option value="">Categoría: Todas</option>' + categoriasCache.map(c => `<option value="${c.id}">${escapar(c.nombre)}</option>`).join("");
+    sel.value = valor;
+}
+
+window.cambiarPorPaginaServ = function () {
+    servPorPagina = parseInt(document.getElementById("servPorPagina").value, 10);
+    servPaginaActual = 1;
+    renderServicios();
+};
+
+window.irAPaginaServ = function (pagina) {
+    servPaginaActual = pagina;
+    renderServicios();
+};
+
 function renderServicios() {
 
-    const el = document.getElementById("listaServicios");
-    if (!el) return;
+    const body = document.getElementById("servTablaBody");
+    if (!body) return;
 
-    if (serviciosCache.length === 0) {
-        el.innerHTML = '<div class="vacio">Todavía no hay servicios cargados.</div>';
-        return;
+    actualizarFiltroCategoriaServ();
+
+    // ---- Tarjetas ----
+    const precioPromedio = serviciosCache.length ? serviciosCache.reduce((s, x) => s + (Number(x.precio) || 0), 0) / serviciosCache.length : 0;
+    const categoriasConServicios = new Set(serviciosCache.filter(s => s.categoriaId).map(s => s.categoriaId)).size;
+    const ranking = serviciosCache.map(s => ({ serv: s, veces: vecesUsadoServicio(s.id) })).filter(x => x.veces > 0).sort((a, b) => b.veces - a.veces);
+
+    document.getElementById("servStatTotal").textContent = serviciosCache.length;
+    document.getElementById("servStatPromedio").textContent = formatoPlata(precioPromedio);
+    document.getElementById("servStatMasUsado").textContent = ranking.length ? ranking[0].serv.nombre : "Sin datos aún";
+    document.getElementById("servStatMasUsadoCant").textContent = ranking.length ? `Usado ${ranking[0].veces} ${ranking[0].veces === 1 ? "vez" : "veces"}` : "Servicio más usado";
+    document.getElementById("servStatCategorias").textContent = categoriasConServicios;
+
+    // ---- Filtros ----
+    const texto = (document.getElementById("buscadorServicios").value || "").trim().toLowerCase();
+    const filtroCategoria = document.getElementById("servFiltroCategoria").value;
+
+    let lista = serviciosCache.filter(s => {
+        if (texto && !s.nombre.toLowerCase().includes(texto)) return false;
+        if (filtroCategoria && s.categoriaId !== filtroCategoria) return false;
+        return true;
+    });
+
+    const totalPaginas = Math.max(1, Math.ceil(lista.length / servPorPagina));
+    if (servPaginaActual > totalPaginas) servPaginaActual = totalPaginas;
+    const inicio = (servPaginaActual - 1) * servPorPagina;
+    const listaPagina = lista.slice(inicio, inicio + servPorPagina);
+
+    if (lista.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" class="vacio">No hay servicios con estos filtros.</td></tr>';
+        document.getElementById("servPaginacionTexto").textContent = "Sin resultados";
+        document.getElementById("servPaginacionBotones").innerHTML = "";
+    } else {
+
+        body.innerHTML = listaPagina.map(s => {
+            const categoria = categoriasCache.find(c => c.id === s.categoriaId);
+            const veces = vecesUsadoServicio(s.id);
+            return `<tr>
+                <td>
+                    <div class="stock-producto-cell">
+                        <div class="stock-producto-icono">🔧</div>
+                        <div class="stock-producto-nombre">${escapar(s.nombre)}</div>
+                    </div>
+                </td>
+                <td>${categoria ? `<span class="stock-codigo-chip">${escapar(categoria.nombre)}</span>` : "-"}</td>
+                <td class="presu-importe-cell">${formatoPlata(s.precio)}</td>
+                <td style="color:${veces > 0 ? "#5fd98a" : "#888"};">${veces}</td>
+                <td>
+                    <div class="presu-acciones-cell">
+                        <div class="icono-accion-turno" onclick="editarServicio('${s.id}')" title="Editar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                        </div>
+                        <div class="icono-accion-turno borrar" onclick="borrarServicio('${s.id}', '${escaparComillas(s.nombre)}')" title="Eliminar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                        </div>
+                    </div>
+                </td>
+            </tr>`;
+        }).join("");
+
+        const desdeN = inicio + 1;
+        const hastaN = Math.min(inicio + servPorPagina, lista.length);
+        document.getElementById("servPaginacionTexto").textContent = `Mostrando ${desdeN} a ${hastaN} de ${lista.length} servicios`;
+
+        let htmlPaginas = `<button class="presu-pagina-btn" onclick="irAPaginaServ(${Math.max(1, servPaginaActual - 1)})" ${servPaginaActual === 1 ? "disabled" : ""}>‹</button>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+            if (i > 6 && i < totalPaginas - 1 && Math.abs(i - servPaginaActual) > 1) continue;
+            htmlPaginas += `<button class="presu-pagina-btn ${i === servPaginaActual ? "activo" : ""}" onclick="irAPaginaServ(${i})">${i}</button>`;
+        }
+        htmlPaginas += `<button class="presu-pagina-btn" onclick="irAPaginaServ(${Math.min(totalPaginas, servPaginaActual + 1)})" ${servPaginaActual === totalPaginas ? "disabled" : ""}>›</button>`;
+        document.getElementById("servPaginacionBotones").innerHTML = htmlPaginas;
+
     }
 
-    el.innerHTML = '<div class="lista-cards">' + serviciosCache.map(s => `
-        <div class="item-card">
-            <div class="item-icono-auto">🔧</div>
-            <div class="item-info">
-                <div class="item-titulo">${escapar(s.nombre)}</div>
-                <div class="item-sub">${formatoPlata(s.precio || 0)}</div>
-            </div>
-            <div class="item-acciones">
-                <button class="btn-chico" onclick="editarServicio('${s.id}')">Editar</button>
-                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarServicio('${s.id}', '${escaparComillas(s.nombre)}')">✕</button>
-            </div>
-        </div>
-    `).join("") + '</div>';
+    // ---- Más usados (panel lateral) ----
+    const elMasUsados = document.getElementById("servMasUsados");
+    if (elMasUsados) {
+        elMasUsados.innerHTML = ranking.length === 0
+            ? '<div class="vacio">Todavía no se usó ningún servicio en un presupuesto o cuenta.</div>'
+            : ranking.slice(0, 5).map((x, i) => `<div class="dash-mov-fila"><span>${i + 1}. ${escapar(x.serv.nombre)}</span><strong style="margin-left:auto;">${x.veces} ${x.veces === 1 ? "vez" : "veces"}</strong></div>`).join("");
+    }
+
+    // ---- Distribución por categoría (donut) ----
+    const elDonut = document.getElementById("servDonutCategorias");
+    if (elDonut) {
+
+        const segmentos = categoriasCache.map(c => ({
+            nombre: c.nombre,
+            color: colorParaCategoria(c.id),
+            valor: serviciosCache.filter(s => s.categoriaId === c.id).length
+        })).filter(s => s.valor > 0);
+
+        const sinCategoria = serviciosCache.filter(s => !s.categoriaId).length;
+        if (sinCategoria > 0) segmentos.push({ nombre: "Sin categoría", color: "#666", valor: sinCategoria });
+
+        const total = segmentos.reduce((s, x) => s + x.valor, 0);
+        const ctx = elDonut.getContext("2d");
+        const w = elDonut.width, h = elDonut.height;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2, radio = Math.min(w, h) / 2 - 6, grosor = 13;
+
+        if (total <= 0) {
+            ctx.beginPath(); ctx.arc(cx, cy, radio, 0, Math.PI * 2); ctx.strokeStyle = "#2a2a2a"; ctx.lineWidth = grosor; ctx.stroke();
+        } else {
+            let ang = -Math.PI / 2;
+            segmentos.forEach(s => {
+                const a = (s.valor / total) * Math.PI * 2;
+                ctx.beginPath(); ctx.arc(cx, cy, radio, ang, ang + a); ctx.strokeStyle = s.color; ctx.lineWidth = grosor; ctx.stroke();
+                ang += a;
+            });
+        }
+
+        document.getElementById("servDonutLeyenda").innerHTML = segmentos.map(s =>
+            `<div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:${s.color};"></span>${escapar(s.nombre)} <span style="color:#777;margin-left:auto;">${s.valor}</span></div>`
+        ).join("");
+
+    }
 
 }
 
@@ -10916,6 +11227,7 @@ window.elegirServicioParaCuenta = function () {
     if (isNaN(idx) || !serviciosCache[idx]) return;
     document.getElementById("itemDescripcion").value = serviciosCache[idx].nombre;
     document.getElementById("itemMonto").value = serviciosCache[idx].precio || "";
+    servicioIdParaProximoItem = serviciosCache[idx].id;
 };
 
 window.elegirServicioParaPresupuesto = function () {
@@ -10929,6 +11241,7 @@ window.elegirServicioParaPresupuesto = function () {
     if (isNaN(idx) || !serviciosCache[idx]) return;
     document.getElementById("presuItemDescripcion").value = serviciosCache[idx].nombre;
     document.getElementById("presuItemMonto").value = serviciosCache[idx].precio || "";
+    servicioIdParaProximoItem = serviciosCache[idx].id;
 };
 
 // ---------- Escáner con cámara ----------
@@ -11942,7 +12255,8 @@ window.agregarItemManual = function () {
         return;
     }
 
-    cuentaItems.push({ tipo: "manual", descripcion, monto });
+    cuentaItems.push({ tipo: "manual", descripcion, monto, servicioId: servicioIdParaProximoItem || null });
+    servicioIdParaProximoItem = null;
 
     document.getElementById("itemDescripcion").value = "";
     document.getElementById("itemMonto").value = "";
@@ -12120,6 +12434,7 @@ function escucharPresupuestos() {
         presupuestosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderPresupuestos();
         if (typeof renderDashboard === "function") renderDashboard();
+        if (typeof renderServicios === "function") renderServicios();
 
     });
 
@@ -12491,7 +12806,8 @@ window.agregarItemPresupuesto = function () {
         return;
     }
 
-    presupuestoItemsTemp.push({ tipo: "manual", descripcion, monto });
+    presupuestoItemsTemp.push({ tipo: "manual", descripcion, monto, servicioId: servicioIdParaProximoItem || null });
+    servicioIdParaProximoItem = null;
 
     document.getElementById("presuItemDescripcion").value = "";
     document.getElementById("presuItemMonto").value = "";
@@ -13256,8 +13572,13 @@ window.cambiarPeriodoReporte = function (periodo) {
 
     periodoReporteActual = periodo;
 
-    document.querySelectorAll("#tab-reportes .subtabs button").forEach(b => b.classList.remove("activo"));
-    document.querySelector(`#tab-reportes .subtabs button[data-periodo="${periodo}"]`).classList.add("activo");
+    document.querySelectorAll("#tab-reportes .cv-chip-toggle[data-periodo]").forEach(b => {
+        b.classList.toggle("activo", b.dataset.periodo === periodo);
+    });
+
+    const mostrarFechas = periodo === "personalizado";
+    document.getElementById("repFiltroDesde").style.display = mostrarFechas ? "inline-block" : "none";
+    document.getElementById("repFiltroHasta").style.display = mostrarFechas ? "inline-block" : "none";
 
     calcularReportes();
 
@@ -13268,6 +13589,7 @@ function calcularRangoPeriodo(periodo) {
     const ahora = new Date();
     let desde = new Date();
     desde.setHours(0, 0, 0, 0);
+    let hasta = ahora;
 
     if (periodo === "semana") {
         desde.setDate(desde.getDate() - desde.getDay());
@@ -13275,26 +13597,84 @@ function calcularRangoPeriodo(periodo) {
         desde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
     } else if (periodo === "anio") {
         desde = new Date(ahora.getFullYear(), 0, 1);
+    } else if (periodo === "personalizado") {
+        const desdeTxt = document.getElementById("repFiltroDesde").value;
+        const hastaTxt = document.getElementById("repFiltroHasta").value;
+        if (desdeTxt) desde = new Date(desdeTxt + "T00:00:00");
+        if (hastaTxt) hasta = new Date(hastaTxt + "T23:59:59");
     }
 
-    return { desde, hasta: ahora };
+    return { desde, hasta };
 
 }
 
-function extraerItemsDeDescripcion(descripcion) {
+// El "período anterior" es un tramo de la misma duración, justo antes del
+// período elegido — así se puede comparar de forma justa (ej: esta semana vs
+// la semana pasada, hoy vs ayer, este mes vs el mes pasado).
+function calcularRangoPeriodoAnterior(desde, hasta) {
+    const duracionMs = hasta.getTime() - desde.getTime();
+    const hastaAnterior = new Date(desde.getTime() - 1);
+    const desdeAnterior = new Date(hastaAnterior.getTime() - duracionMs);
+    return { desde: desdeAnterior, hasta: hastaAnterior };
+}
 
-    if (descripcion.startsWith("Venta: ")) {
-        return [descripcion.substring(7).trim()];
-    }
+function calcularVariacionPorcentual(actual, anterior) {
+    if (anterior === 0) return actual > 0 ? 100 : 0;
+    return Math.round(((actual - anterior) / Math.abs(anterior)) * 100);
+}
 
-    const partes = descripcion.split(" - ");
+function pintarComparacion(elId, actual, anterior, invertirColor) {
 
-    if (partes.length > 1) {
-        const itemsTexto = partes.slice(0, -1).join(" - ");
-        return itemsTexto.split(" + ").map(s => s.trim()).filter(Boolean);
-    }
+    const el = document.getElementById(elId);
+    if (!el) return;
 
-    return [descripcion.trim()];
+    const variacion = calcularVariacionPorcentual(actual, anterior);
+    const positivo = invertirColor ? variacion <= 0 : variacion >= 0;
+
+    el.className = "rep-comparacion " + (variacion === 0 ? "neutro" : positivo ? "positivo" : "negativo");
+    el.textContent = `${variacion >= 0 ? "▲" : "▼"} ${Math.abs(variacion)}% vs período anterior`;
+
+}
+
+// Ventas de una categoría dentro de un rango de fechas cualquiera (no solo
+// "este mes"), usando el historial real de Movimientos de Stock.
+function ventasCategoriaEnRango(categoriaId, desde, hasta) {
+
+    const productos = stockCache.filter(p => p.categoriaId === categoriaId);
+    const idsProductos = new Set(productos.map(p => p.id));
+
+    let total = 0;
+
+    stockMovimientosCache.forEach(m => {
+        if (!idsProductos.has(m.productoId) || m.delta >= 0) return;
+        const f = toDateSegura(m.fecha);
+        if (!f || f < desde || f > hasta) return;
+        const producto = productos.find(p => p.id === m.productoId);
+        total += Math.abs(m.delta) * (producto ? (Number(producto.precio) || 0) : 0);
+    });
+
+    return total;
+
+}
+
+// Ingresos por servicio (según servicioId real en los ítems) dentro de un rango.
+function ingresosServicioEnRango(servicioId, desde, hasta) {
+
+    let total = 0;
+
+    presupuestosCache.forEach(p => {
+        const f = toDateSegura(p.fecha);
+        if (!f || f < desde || f > hasta) return;
+        (p.items || []).forEach(i => { if (i.servicioId === servicioId) total += Number(i.monto) || 0; });
+    });
+
+    cuentasCache.forEach(c => {
+        const f = toDateSegura(c.fecha);
+        if (!f || f < desde || f > hasta) return;
+        (c.items || []).forEach(i => { if (i.servicioId === servicioId) total += Number(i.monto) || 0; });
+    });
+
+    return total;
 
 }
 
@@ -13303,41 +13683,41 @@ function calcularReportes() {
     if (!document.getElementById("tab-reportes").classList.contains("activa")) return;
 
     const { desde, hasta } = calcularRangoPeriodo(periodoReporteActual);
+    const { desde: desdeAnt, hasta: hastaAnt } = calcularRangoPeriodoAnterior(desde, hasta);
 
-    const cajaEnRango = cajaCache.filter(m => {
-        if (!m.fecha || !m.fecha.toDate) return false;
-        const f = m.fecha.toDate();
-        return f >= desde && f <= hasta;
-    });
+    const cajaEnRango = cajaCache.filter(m => { const f = toDateSegura(m.fecha); return f && f >= desde && f <= hasta; });
+    const cajaEnRangoAnterior = cajaCache.filter(m => { const f = toDateSegura(m.fecha); return f && f >= desdeAnt && f <= hastaAnt; });
 
     const ingresos = cajaEnRango.filter(m => m.tipo === "Ingreso");
     const egresos = cajaEnRango.filter(m => m.tipo === "Egreso");
+    const ingresosAnt = cajaEnRangoAnterior.filter(m => m.tipo === "Ingreso");
+    const egresosAnt = cajaEnRangoAnterior.filter(m => m.tipo === "Egreso");
 
     const totalIngresos = ingresos.reduce((s, m) => s + (Number(m.monto) || 0), 0);
     const totalEgresos = egresos.reduce((s, m) => s + (Number(m.monto) || 0), 0);
-    const ticketPromedio = ingresos.length > 0 ? totalIngresos / ingresos.length : 0;
+    const totalIngresosAnt = ingresosAnt.reduce((s, m) => s + (Number(m.monto) || 0), 0);
+    const totalEgresosAnt = egresosAnt.reduce((s, m) => s + (Number(m.monto) || 0), 0);
 
     document.getElementById("repFacturacion").textContent = formatoPlata(totalIngresos);
     document.getElementById("repEgresos").textContent = formatoPlata(totalEgresos);
     document.getElementById("repResultado").textContent = formatoPlata(totalIngresos - totalEgresos);
-    document.getElementById("repTicket").textContent = formatoPlata(ticketPromedio);
+    pintarComparacion("repFacturacionComp", totalIngresos, totalIngresosAnt, false);
+    pintarComparacion("repEgresosComp", totalEgresos, totalEgresosAnt, true);
+    pintarComparacion("repResultadoComp", totalIngresos - totalEgresos, totalIngresosAnt - totalEgresosAnt, false);
 
-    // Clientes nuevos
-    const clientesNuevos = clientesCache.filter(c => {
-        if (!c.creado || !c.creado.toDate) return false;
-        const f = c.creado.toDate();
-        return f >= desde && f <= hasta;
-    });
+    // ---- Clientes nuevos ----
+    const clientesNuevos = clientesCache.filter(c => { const f = toDateSegura(c.creado); return f && f >= desde && f <= hasta; });
+    const clientesNuevosAnt = clientesCache.filter(c => { const f = toDateSegura(c.creado); return f && f >= desdeAnt && f <= hastaAnt; });
     document.getElementById("repClientesNuevos").textContent = clientesNuevos.length;
+    pintarComparacion("repClientesNuevosComp", clientesNuevos.length, clientesNuevosAnt.length, false);
 
-    // Vehículos atendidos (con algún trabajo cargado en el período)
-    const trabajosEnRango = historialCache.filter(h => {
-        if (!h.fecha || !h.fecha.toDate) return false;
-        const f = h.fecha.toDate();
-        return f >= desde && f <= hasta;
-    });
+    // ---- Vehículos atendidos (con algún trabajo cargado en el período) ----
+    const trabajosEnRango = historialCache.filter(h => { const f = toDateSegura(h.fecha); return f && f >= desde && f <= hasta; });
+    const trabajosEnRangoAnt = historialCache.filter(h => { const f = toDateSegura(h.fecha); return f && f >= desdeAnt && f <= hastaAnt; });
     const vehiculosIdsAtendidos = [...new Set(trabajosEnRango.map(h => h.vehiculoId))];
+    const vehiculosIdsAtendidosAnt = [...new Set(trabajosEnRangoAnt.map(h => h.vehiculoId))];
     document.getElementById("repVehiculos").textContent = vehiculosIdsAtendidos.length;
+    pintarComparacion("repVehiculosComp", vehiculosIdsAtendidos.length, vehiculosIdsAtendidosAnt.length, false);
 
     const elVehiculos = document.getElementById("repListaVehiculos");
     if (vehiculosIdsAtendidos.length === 0) {
@@ -13352,47 +13732,263 @@ function calcularReportes() {
             }).join("") + "</tbody></table>";
     }
 
-    // Presupuestos
-    const presuEnRango = presupuestosCache.filter(p => {
-        if (!p.fecha || !p.fecha.toDate) return false;
-        const f = p.fecha.toDate();
-        return f >= desde && f <= hasta;
-    });
-    const aprobados = presuEnRango.filter(p => p.estado === "Aprobado").length;
-    const rechazados = presuEnRango.filter(p => p.estado === "Rechazado").length;
-    const decididos = aprobados + rechazados;
-    const conversion = decididos > 0 ? Math.round((aprobados / decididos) * 100) : 0;
+    // ---- Evolución de ventas (línea con relleno, agrupada por día si el rango es corto) ----
+    const canvasEvol = document.getElementById("repEvolucionVentas");
+    if (canvasEvol) {
 
-    document.getElementById("repPresuAprobados").textContent = aprobados;
-    document.getElementById("repConversion").textContent = decididos > 0 ? conversion + "%" : "-";
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvasEvol.getBoundingClientRect();
+        canvasEvol.width = rect.width * dpr;
+        canvasEvol.height = (parseInt(canvasEvol.getAttribute("height"), 10) || 150) * dpr;
+        const ctx = canvasEvol.getContext("2d");
+        ctx.scale(dpr, dpr);
+        const w = rect.width, h = parseInt(canvasEvol.getAttribute("height"), 10) || 150;
+        ctx.clearRect(0, 0, w, h);
 
-    // Más vendidos (a partir de los ingresos de Caja: ventas de Stock + Cuentas combinadas)
-    const conteo = {};
+        const dias = [];
+        const cursor = new Date(desde);
+        cursor.setHours(0, 0, 0, 0);
+        const limite = new Date(hasta);
+        limite.setHours(0, 0, 0, 0);
 
-    ingresos.forEach(m => {
-        extraerItemsDeDescripcion(m.descripcion || "").forEach(item => {
-            if (!item) return;
-            conteo[item] = (conteo[item] || 0) + 1;
+        while (cursor <= limite && dias.length < 60) {
+            dias.push({ fecha: new Date(cursor), total: 0 });
+            cursor.setDate(cursor.getDate() + 1);
+        }
+
+        ingresos.forEach(m => {
+            const f = toDateSegura(m.fecha);
+            if (!f) return;
+            f.setHours(0, 0, 0, 0);
+            const dia = dias.find(d => d.fecha.getTime() === f.getTime());
+            if (dia) dia.total += Number(m.monto) || 0;
         });
-    });
 
-    const topVendidos = Object.entries(conteo)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
+        const maxValor = Math.max(1, ...dias.map(d => d.total));
+        const padding = 30;
+        const pasoX = dias.length > 1 ? (w - padding * 2) / (dias.length - 1) : 0;
 
-    const elVendidos = document.getElementById("repMasVendidos");
+        if (dias.length > 0) {
 
-    if (topVendidos.length === 0) {
-        elVendidos.innerHTML = '<div class="vacio">Sin ventas registradas en este período.</div>';
-    } else {
-        const medallas = ["🥇", "🥈", "🥉", "4°", "5°"];
-        elVendidos.innerHTML = "<table><thead><tr><th></th><th>Ítem</th><th>Veces vendido</th></tr></thead><tbody>" +
-            topVendidos.map(([nombre, cant], i) =>
-                `<tr><td class="mono">${medallas[i]}</td><td>${escapar(nombre)}</td><td class="mono">${cant}</td></tr>`
-            ).join("") + "</tbody></table>";
+            ctx.beginPath();
+            ctx.moveTo(padding, h - 24);
+            dias.forEach((d, i) => {
+                const x = padding + i * pasoX;
+                const y = h - 24 - (d.total / maxValor) * (h - 50);
+                ctx.lineTo(x, y);
+            });
+            ctx.lineTo(padding + (dias.length - 1) * pasoX, h - 24);
+            ctx.closePath();
+            const gradiente = ctx.createLinearGradient(0, 0, 0, h);
+            gradiente.addColorStop(0, "rgba(215,25,32,.35)");
+            gradiente.addColorStop(1, "rgba(215,25,32,0)");
+            ctx.fillStyle = gradiente;
+            ctx.fill();
+
+            ctx.beginPath();
+            dias.forEach((d, i) => {
+                const x = padding + i * pasoX;
+                const y = h - 24 - (d.total / maxValor) * (h - 50);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = "#d71920";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            dias.forEach((d, i) => {
+                const x = padding + i * pasoX;
+                const y = h - 24 - (d.total / maxValor) * (h - 50);
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = "#fff";
+                ctx.fill();
+            });
+
+            ctx.fillStyle = "#888";
+            ctx.font = "10px Montserrat";
+            ctx.textAlign = "center";
+            const saltoEtiquetas = Math.ceil(dias.length / 8);
+            dias.forEach((d, i) => {
+                if (i % saltoEtiquetas !== 0) return;
+                const x = padding + i * pasoX;
+                ctx.fillText(d.fecha.toLocaleDateString("es-AR", { day: "numeric", month: "short" }), x, h - 6);
+            });
+
+        }
+
+    }
+
+    // ---- Ventas por categoría (donut) ----
+    const elDonutCat = document.getElementById("repDonutCategorias");
+    if (elDonutCat) {
+
+        const segmentos = categoriasCache.map(c => ({
+            nombre: c.nombre,
+            color: colorParaCategoria(c.id),
+            valor: ventasCategoriaEnRango(c.id, desde, hasta)
+        })).filter(s => s.valor > 0).sort((a, b) => b.valor - a.valor);
+
+        const principales = segmentos.slice(0, 4);
+        const restoValor = segmentos.slice(4).reduce((s, x) => s + x.valor, 0);
+        if (restoValor > 0) principales.push({ nombre: "Otros", color: "#666", valor: restoValor });
+
+        const total = principales.reduce((s, x) => s + x.valor, 0);
+        const ctx = elDonutCat.getContext("2d");
+        const w = elDonutCat.width, h = elDonutCat.height;
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2, radio = Math.min(w, h) / 2 - 7, grosor = 15;
+
+        if (total <= 0) {
+            ctx.beginPath(); ctx.arc(cx, cy, radio, 0, Math.PI * 2); ctx.strokeStyle = "#2a2a2a"; ctx.lineWidth = grosor; ctx.stroke();
+            document.getElementById("repDonutLeyenda").innerHTML = '<div class="vacio">Sin ventas de productos en este período.</div>';
+        } else {
+            let ang = -Math.PI / 2;
+            principales.forEach(s => {
+                const a = (s.valor / total) * Math.PI * 2;
+                ctx.beginPath(); ctx.arc(cx, cy, radio, ang, ang + a); ctx.strokeStyle = s.color; ctx.lineWidth = grosor; ctx.stroke();
+                ang += a;
+            });
+            document.getElementById("repDonutLeyenda").innerHTML = principales.map(s =>
+                `<div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:${s.color};"></span>${escapar(s.nombre)} <span style="color:#777;">${Math.round(s.valor / total * 100)}%</span> <strong style="margin-left:auto;">${formatoPlata(s.valor)}</strong></div>`
+            ).join("");
+        }
+
+    }
+
+    // ---- Top 5 servicios (por ingresos reales en el período) ----
+    const elTopServ = document.getElementById("repTopServicios");
+    if (elTopServ) {
+        const ranking = serviciosCache.map(s => ({ serv: s, total: ingresosServicioEnRango(s.id, desde, hasta) }))
+            .filter(x => x.total > 0).sort((a, b) => b.total - a.total).slice(0, 5);
+        elTopServ.innerHTML = ranking.length === 0
+            ? '<div class="vacio">Sin servicios facturados en este período.</div>'
+            : ranking.map((x, i) => `<div class="dash-mov-fila"><span>${i + 1}. ${escapar(x.serv.nombre)}</span><strong style="margin-left:auto;">${formatoPlata(x.total)}</strong></div>`).join("");
+    }
+
+    // ---- Presupuestos (resumen del período) ----
+    const elPresu = document.getElementById("repPresupuestosResumen");
+    if (elPresu) {
+
+        const presuEnRango = presupuestosCache.filter(p => { const f = toDateSegura(p.fecha); return f && f >= desde && f <= hasta; });
+        const grupos = [
+            { label: "Aprobados", estados: ["Aprobado"], color: "#5fd98a", icono: "📄" },
+            { label: "Pendientes", estados: ["Borrador", "Enviado"], color: "#f5a623", icono: "📋" },
+            { label: "Rechazados", estados: ["Rechazado"], color: "#ff6b6b", icono: "❌" },
+            { label: "Vencidos", estados: ["Vencido"], color: "#888", icono: "📅" }
+        ];
+
+        elPresu.innerHTML = grupos.map(g => {
+            const lista = presuEnRango.filter(p => g.estados.includes(p.estado));
+            const total = lista.reduce((s, p) => s + (Number(p.total) || 0), 0);
+            return `<div class="dash-mov-fila"><span>${g.icono} ${g.label}</span><span style="margin-left:auto;color:#999;">${lista.length}</span><strong style="margin-left:10px;">${formatoPlata(total)}</strong></div>`;
+        }).join("");
+
+    }
+
+    // ---- Facturación por medio de pago ----
+    const elMedio = document.getElementById("repMedioPago");
+    if (elMedio) {
+
+        const medios = ["Efectivo", "Transferencia", "Tarjeta de Débito", "Tarjeta de Crédito", "Mercado Pago", "Otro"];
+        const totalesPorMedio = {};
+        medios.forEach(m => totalesPorMedio[m] = 0);
+
+        ingresos.forEach(m => {
+            const medio = medios.includes(m.medioPago) ? m.medioPago : "Otro";
+            totalesPorMedio[medio] += Number(m.monto) || 0;
+        });
+
+        const totalGeneral = Object.values(totalesPorMedio).reduce((s, v) => s + v, 0);
+
+        if (totalGeneral <= 0) {
+            elMedio.innerHTML = '<div class="vacio">Sin ingresos registrados en este período.</div>';
+        } else {
+            const colores = { "Efectivo": "#2fdb6e", "Transferencia": "#3f9cff", "Tarjeta de Débito": "#a855f7", "Tarjeta de Crédito": "#f5a623", "Mercado Pago": "#00b1ea", "Otro": "#777" };
+            elMedio.innerHTML = medios.filter(m => totalesPorMedio[m] > 0).map(medio => {
+                const monto = totalesPorMedio[medio];
+                const porc = Math.round((monto / totalGeneral) * 100);
+                return `<div style="margin-bottom:12px;">
+                    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+                        <span>${medio}</span><span style="color:#999;">${porc}% · ${formatoPlata(monto)}</span>
+                    </div>
+                    <div style="background:#242428;border-radius:6px;height:7px;overflow:hidden;">
+                        <div style="width:${porc}%;height:100%;background:${colores[medio]};"></div>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+    }
+
+    // ---- Actividad reciente (combina varias fuentes reales, ordenadas por fecha) ----
+    const elActividad = document.getElementById("repActividadReciente");
+    if (elActividad) {
+
+        const eventos = [];
+
+        presupuestosCache.forEach(p => {
+            const f = toDateSegura(p.fecha);
+            if (f && f >= desde && f <= hasta) {
+                const numero = p.numero ? "#" + String(p.numero).padStart(5, "0") : "";
+                eventos.push({ fecha: f, icono: "📄", texto: `Presupuesto ${numero} ${p.estado === "Aprobado" ? "aprobado" : "creado"}` });
+            }
+        });
+
+        turnosCache.forEach(t => {
+            const f = toDateSegura(t.fechaHora);
+            if (f && f >= desde && f <= hasta && t.estado === "Finalizado") {
+                eventos.push({ fecha: f, icono: "🔧", texto: `Servicio "${t.servicio || "trabajo"}" finalizado` });
+            }
+        });
+
+        pagosCuentaCache.forEach(pg => {
+            const f = toDateSegura(pg.fecha);
+            if (f && f >= desde && f <= hasta) {
+                eventos.push({ fecha: f, icono: "💲", texto: "Cobro registrado" });
+            }
+        });
+
+        eventos.sort((a, b) => b.fecha - a.fecha);
+
+        elActividad.innerHTML = eventos.length === 0 ? '<div class="vacio">Sin actividad registrada en este período.</div>' : eventos.slice(0, 6).map(e => `
+            <div class="dash-mov-fila">
+                <span>${e.icono} ${escapar(e.texto)}</span>
+                <span style="margin-left:auto;color:#777;font-size:11px;white-space:nowrap;">${e.fecha.toLocaleDateString("es-AR")} · ${e.fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
+            </div>
+        `).join("");
+
     }
 
 }
+
+window.exportarReporteActual = function () {
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    const { desde, hasta } = calcularRangoPeriodo(periodoReporteActual);
+    const cajaEnRango = cajaCache.filter(m => { const f = toDateSegura(m.fecha); return f && f >= desde && f <= hasta; });
+
+    const filas = cajaEnRango.map(m => {
+        const f = toDateSegura(m.fecha);
+        return {
+            Fecha: f ? f.toLocaleDateString("es-AR") : "",
+            Tipo: m.tipo || "",
+            Descripcion: m.descripcion || "",
+            Categoria: m.categoria || "",
+            MedioDePago: m.medioPago || "",
+            Importe: m.monto || 0
+        };
+    });
+
+    const hoja = XLSX.utils.json_to_sheet(filas.length ? filas : [{ info: "Sin datos en este período" }]);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Reporte");
+    XLSX.writeFile(libro, `KM26_Reporte_${periodoReporteActual}_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+};
 
 // ======================================================================
 // CONFIGURACIÓN (solo admin)
