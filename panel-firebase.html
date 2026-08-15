@@ -5556,11 +5556,9 @@ window.cambiarTab = function (tab) {
     window.cerrarOverlayMas();
     window.cerrarNotificaciones();
 
-    if (tab === "caja" && typeof dibujarGraficoCaja === "function") {
+    if (tab === "caja" && typeof dibujarLineaCaja === "function") {
         setTimeout(() => {
-            dibujarGraficoCaja();
-            dibujarGraficoMensual();
-            dibujarGraficoAnual();
+            dibujarLineaCaja();
         }, 30);
     }
 
@@ -6489,6 +6487,17 @@ function formatoPlata(n) {
     n = Number(n) || 0;
     const signo = n < 0 ? "-" : "";
     return signo + "$" + Math.abs(Math.round(n)).toLocaleString("es-AR");
+}
+
+// Convierte de forma segura un campo de fecha a un objeto Date de JS, sin importar
+// si viene como Timestamp de Firestore (con .toDate()), como Date ya convertido,
+// o como string. Devuelve null si no hay nada o el dato es inválido.
+function toDateSegura(campo) {
+    if (!campo) return null;
+    if (typeof campo.toDate === "function") return campo.toDate();
+    if (campo instanceof Date) return isNaN(campo.getTime()) ? null : campo;
+    const d = new Date(campo);
+    return isNaN(d.getTime()) ? null : d;
 }
 
 function escucharCaja() {
