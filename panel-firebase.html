@@ -487,6 +487,12 @@ td.mono{
     color:#ff6b6b;
 }
 
+.tipo-toggle button.activo-transferencia{
+    background:#0a1e33;
+    border-color:#3f9cff;
+    color:#6ab6ff;
+}
+
 .aviso-migracion{
     background:#1a1608;
     border:1px solid #4d3d0a;
@@ -3293,6 +3299,96 @@ header{
     background:rgba(215,25,32,.12);
 }
 
+/* ======================================================================
+   CAJA / MOVIMIENTOS — nuevo diseño de 3 columnas (calcado del mockup)
+   ====================================================================== */
+
+.caja-3col{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+}
+
+@media (min-width:1280px){
+    .caja-3col{ grid-template-columns:300px 1fr 280px; }
+}
+
+.caja-leyenda-item{
+    font-size:12.5px;
+    color:#ccc;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.caja-leyenda-item strong{
+    color:#fff;
+    margin-left:4px;
+}
+
+.caja-leyenda-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    display:inline-block;
+    flex-shrink:0;
+}
+
+.caja-icono-grande{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    background:#0d2418;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    margin:0 auto;
+}
+
+.caja-accesos-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.caja-acceso-item{
+    background:#1a1a1a;
+    border-radius:12px;
+    padding:14px 8px;
+    text-align:center;
+    font-size:11px;
+    color:#ccc;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+}
+
+.caja-acceso-item:hover{
+    background:#222;
+}
+
+.caja-acceso-icono{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    color:#fff;
+}
+
+.caja-acceso-icono.verde{ background:#1fa851; }
+.caja-acceso-icono.rojo{ background:#c0392b; }
+.caja-acceso-icono.azul{ background:#2f6fd1; }
+.caja-acceso-icono.ambar{ background:#c99a3f; }
+.caja-acceso-icono.violeta{ background:#7c5cf0; }
+.caja-acceso-icono.gris{ background:#555; }
+
 </style>
 </head>
 
@@ -3800,31 +3896,134 @@ header{
 
     <section class="seccion" id="tab-caja">
 
-        <div class="grid-stats">
-            <div class="stat-card verde"><div class="stat-label">Hoy</div><div class="stat-valor" id="cajaHoy">-</div></div>
-            <div class="stat-card"><div class="stat-label">Esta semana</div><div class="stat-valor" id="cajaSemana">-</div></div>
-            <div class="stat-card"><div class="stat-label">Este mes</div><div class="stat-valor" id="cajaMes">-</div></div>
-        </div>
+        <div class="fila-titulo"><h2>Caja / Movimientos</h2></div>
 
-        <div class="fila-titulo"><h2>Últimos 7 días</h2></div>
-        <canvas id="graficoCaja" height="140" style="width:100%;margin-bottom:28px;"></canvas>
-
-        <div class="grid-graficos">
-            <div>
-                <div class="fila-titulo"><h2>Últimos 6 meses</h2></div>
-                <canvas id="graficoMensual" height="90" style="width:100%;"></canvas>
+        <div class="turnos-stats-grid">
+            <div class="turnos-stat-card verde" style="border-left:3px solid #2fdb6e;">
+                <div class="turnos-stat-icono">👛</div>
+                <div><div class="turnos-stat-numero" id="cajaSaldoActual">$0</div><div class="turnos-stat-label">Saldo actual · Disponible en caja</div></div>
             </div>
-            <div>
-                <div class="fila-titulo"><h2>Últimos años</h2></div>
-                <canvas id="graficoAnual" height="90" style="width:100%;"></canvas>
+            <div class="turnos-stat-card" style="border-left:3px solid #3f9cff;">
+                <div class="turnos-stat-icono" style="background:#0a1e33;">↑</div>
+                <div><div class="turnos-stat-numero" id="cajaIngresosHoy">$0</div><div class="turnos-stat-label" id="cajaIngresosHoyCant">Ingresos hoy</div></div>
+            </div>
+            <div class="turnos-stat-card" style="border-left:3px solid #ff6b6b;">
+                <div class="turnos-stat-icono" style="background:#3a1416;">↓</div>
+                <div><div class="turnos-stat-numero" id="cajaEgresosHoy">$0</div><div class="turnos-stat-label" id="cajaEgresosHoyCant">Egresos hoy</div></div>
+            </div>
+            <div class="turnos-stat-card ambar">
+                <div class="turnos-stat-icono">⚖️</div>
+                <div><div class="turnos-stat-numero" id="cajaBalanceHoy">$0</div><div class="turnos-stat-label">Balance hoy · Resultado del día</div></div>
             </div>
         </div>
 
-        <div class="fila-titulo" style="margin-top:24px;">
-            <h2>Movimientos recientes</h2>
-            <button class="btn-chico" onclick="abrirModalCaja()">+ Registrar movimiento</button>
+        <div class="turnos-chips-fila" style="flex-wrap:wrap;">
+            <button class="cv-chip-toggle activo" id="chipCajaTodos" onclick="filtrarCaja('todos')">Todos</button>
+            <button class="cv-chip-toggle" id="chipCajaIngresos" onclick="filtrarCaja('ingresos')">Ingresos</button>
+            <button class="cv-chip-toggle" id="chipCajaEgresos" onclick="filtrarCaja('egresos')">Egresos</button>
+            <button class="cv-chip-toggle" id="chipCajaTransferencias" onclick="filtrarCaja('transferencias')">Transferencias</button>
         </div>
-        <div id="tablaCaja"></div>
+
+        <div class="presu-filtros-fila">
+            <input type="date" id="cajaFiltroDesde" class="turno-estado-select" onchange="renderCaja()">
+            <span style="color:#666;">–</span>
+            <input type="date" id="cajaFiltroHasta" class="turno-estado-select" onchange="renderCaja()">
+            <button class="btn-chico" onclick="document.getElementById('cajaFiltroDesde').value='';document.getElementById('cajaFiltroHasta').value='';renderCaja();">Limpiar fechas</button>
+        </div>
+
+        <div class="caja-3col">
+
+            <div class="caja-col-izq">
+
+                <div class="dash-panel-nuevo">
+                    <div class="dash-panel-nuevo-titulo">Resumen del período</div>
+                    <p style="font-size:11px;color:#777;margin-bottom:10px;" id="cajaResumenRangoTexto">-</p>
+                    <div style="display:flex;align-items:center;gap:16px;">
+                        <canvas id="cajaDonut" width="110" height="110"></canvas>
+                        <div style="flex:1;">
+                            <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#2fdb6e;"></span>Ingresos <strong id="cajaDonutIngresos">$0</strong> <span id="cajaDonutIngresosPorc" style="color:#777;"></span></div>
+                            <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#ff6b6b;"></span>Egresos <strong id="cajaDonutEgresos">$0</strong> <span id="cajaDonutEgresosPorc" style="color:#777;"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Evolución diaria</div>
+                    <canvas id="cajaLinea" height="130" style="width:100%;"></canvas>
+                    <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:#999;">
+                        <span><span class="caja-leyenda-dot" style="background:#2fdb6e;"></span> Ingresos</span>
+                        <span><span class="caja-leyenda-dot" style="background:#ff6b6b;"></span> Egresos</span>
+                    </div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Medios de pago</div>
+                    <div id="cajaMediosPago"></div>
+                </div>
+
+            </div>
+
+            <div class="caja-col-medio">
+                <div class="dash-panel-nuevo">
+                    <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Movimientos recientes</span>
+                        <button class="btn-chico" onclick="exportarMovimientosFiltrados()">⬇️ Exportar</button>
+                    </div>
+                    <div class="presu-tabla-wrap" style="background:none;">
+                        <table class="presu-tabla">
+                            <thead>
+                                <tr><th>Fecha / Hora</th><th>Tipo</th><th>Descripción</th><th>Cliente / Proveedor</th><th>Categoría</th><th>Importe</th><th>Medio de pago</th><th>Acciones</th></tr>
+                            </thead>
+                            <tbody id="cajaTablaBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="presu-paginacion" style="margin-top:10px;">
+                        <span id="cajaPaginacionTexto">-</span>
+                        <div class="presu-paginacion-botones" id="cajaPaginacionBotones"></div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:12px;color:#999;">Ver</span>
+                            <select id="cajaPorPagina" class="turno-estado-select" onchange="cambiarPorPaginaCaja()">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span style="font-size:12px;color:#999;">por página</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="caja-col-der">
+
+                <div class="dash-panel-nuevo" style="text-align:center;">
+                    <div class="dash-panel-nuevo-titulo" style="text-align:left;">Caja actual</div>
+                    <div class="caja-icono-grande">👛</div>
+                    <div style="font-size:12px;color:#999;margin-top:8px;">Efectivo disponible</div>
+                    <div style="font-size:24px;font-weight:800;color:#fff;font-family:'Montserrat',sans-serif;" id="cajaEfectivoDisponible">$0</div>
+                    <div style="font-size:10.5px;color:#666;margin-bottom:14px;" id="cajaActualizadoTexto">-</div>
+                    <button class="btn-red" style="width:100%;" onclick="abrirModalCaja()">+ Registrar movimiento</button>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Resumen rápido</div>
+                    <div id="cajaResumenRapido"></div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Accesos rápidos</div>
+                    <div class="caja-accesos-grid">
+                        <div class="caja-acceso-item" onclick="abrirModalCajaConTipo('Ingreso')"><div class="caja-acceso-icono verde">↓</div>Nuevo ingreso</div>
+                        <div class="caja-acceso-item" onclick="abrirModalCajaConTipo('Egreso')"><div class="caja-acceso-icono rojo">↑</div>Nuevo egreso</div>
+                        <div class="caja-acceso-item" onclick="abrirModalCajaConTipo('Transferencia')"><div class="caja-acceso-icono azul">⇄</div>Transferencia</div>
+                        <div class="caja-acceso-item" onclick="abrirModalArqueoCaja()"><div class="caja-acceso-icono ambar">🧮</div>Arqueo de caja</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('clientes')"><div class="caja-acceso-icono violeta">👤</div>Cuentas/Cobros</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('reportes')"><div class="caja-acceso-icono gris">📊</div>Reportes</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
 
     </section>
 
@@ -4399,23 +4598,82 @@ header{
     <div class="modal">
         <h3>Registrar movimiento</h3>
 
+        <input type="hidden" id="mMovId">
+
         <div class="tipo-toggle">
             <button id="btnIngreso" class="activo-ingreso" onclick="elegirTipo('Ingreso')">Ingreso</button>
             <button id="btnEgreso" onclick="elegirTipo('Egreso')">Egreso</button>
+            <button id="btnTransferencia" onclick="elegirTipo('Transferencia')">Transferencia</button>
         </div>
 
         <label>Descripción</label>
         <input type="text" id="mDescripcion" placeholder="Cambio de aceite - Gol">
 
-        <label>Monto</label>
-        <input type="number" id="mMonto" placeholder="15000">
+        <label>Cliente / Proveedor (opcional)</label>
+        <input type="text" id="mContraparte" placeholder="Nombre">
+
+        <label>Categoría (opcional)</label>
+        <input type="text" id="mCategoria" placeholder="Reparación, Repuestos, Proveedores, Servicios...">
+
+        <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+                <label>Monto</label>
+                <input type="number" id="mMonto" placeholder="15000">
+            </div>
+            <div>
+                <label>Medio de pago</label>
+                <select id="mMedioPago">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+        </div>
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
             <button class="btn-red" onclick="guardarMovimiento()">Guardar</button>
         </div>
 
+        <div class="modal-botones" id="accionesMovimientoCaja" style="display:none;"></div>
+
         <p id="mensajeEstadoCaja"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: arqueo de caja ---------- -->
+<div class="overlay" id="modalArqueoCaja">
+    <div class="modal">
+        <h3>🧮 Arqueo de caja</h3>
+        <p style="font-size:12px;color:#999;margin-bottom:14px;">Contá el efectivo real que tenés en el cajón y compará contra lo que dice el sistema.</p>
+
+        <div style="background:#1a1a1a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:#999;">
+                <span>Efectivo esperado (según el sistema)</span>
+                <strong style="color:#fff;" id="arqueoEsperado">$0</strong>
+            </div>
+        </div>
+
+        <label>Efectivo contado</label>
+        <input type="number" id="arqueoContado" placeholder="0" oninput="calcularDiferenciaArqueo()">
+
+        <div style="background:#1a1a1a;border-radius:10px;padding:14px 16px;margin-top:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;">
+                <span>Diferencia</span>
+                <strong id="arqueoDiferencia">$0</strong>
+            </div>
+        </div>
+
+        <label style="margin-top:14px;">Notas (opcional)</label>
+        <input type="text" id="arqueoNotas" placeholder="Ej: faltante por vuelto no registrado">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+            <button class="btn-red" onclick="guardarArqueoCaja()">Registrar arqueo</button>
+        </div>
+
+        <p id="mensajeEstadoArqueo"></p>
     </div>
 </div>
 
@@ -5211,6 +5469,7 @@ window.cerrarModales = function () {
     document.getElementById("modalQRVehiculo").classList.remove("abierto");
     document.getElementById("modalIngresarVehiculo").classList.remove("abierto");
     document.getElementById("modalVerPresupuesto").classList.remove("abierto");
+    document.getElementById("modalArqueoCaja").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -6245,76 +6504,455 @@ function escucharCaja() {
 
 }
 
+let filtroCajaActivo = "todos";
+let cajaPaginaActual = 1;
+let cajaPorPagina = 10;
+let ordenCajaColumna = "fecha";
+
+window.filtrarCaja = function (filtro) {
+    filtroCajaActivo = filtro;
+    cajaPaginaActual = 1;
+    ["Todos", "Ingresos", "Egresos", "Transferencias"].forEach(nombre => {
+        const el = document.getElementById("chipCaja" + nombre);
+        if (el) el.classList.toggle("activo", filtro === nombre.toLowerCase());
+    });
+    renderCaja();
+};
+
+window.cambiarPorPaginaCaja = function () {
+    cajaPorPagina = parseInt(document.getElementById("cajaPorPagina").value, 10);
+    cajaPaginaActual = 1;
+    renderCaja();
+};
+
+window.irAPaginaCaja = function (pagina) {
+    cajaPaginaActual = pagina;
+    renderCaja();
+};
+
+function obtenerListaCajaFiltrada() {
+
+    let lista = cajaCache.slice();
+
+    if (filtroCajaActivo === "ingresos") lista = lista.filter(m => m.tipo === "Ingreso");
+    else if (filtroCajaActivo === "egresos") lista = lista.filter(m => m.tipo === "Egreso");
+    else if (filtroCajaActivo === "transferencias") lista = lista.filter(m => m.tipo === "Transferencia");
+
+    const desde = document.getElementById("cajaFiltroDesde") ? document.getElementById("cajaFiltroDesde").value : "";
+    const hasta = document.getElementById("cajaFiltroHasta") ? document.getElementById("cajaFiltroHasta").value : "";
+
+    if (desde) {
+        const fDesde = new Date(desde + "T00:00:00");
+        lista = lista.filter(m => { const f = toDateSegura(m.fecha); return f && f >= fDesde; });
+    }
+    if (hasta) {
+        const fHasta = new Date(hasta + "T23:59:59");
+        lista = lista.filter(m => { const f = toDateSegura(m.fecha); return f && f <= fHasta; });
+    }
+
+    return lista;
+
+}
+
 function renderCaja() {
 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
+    const mananaInicio = new Date(hoy); mananaInicio.setDate(hoy.getDate() + 1);
 
-    const inicioSemana = new Date(hoy);
-    inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+    // ---- Saldo actual (histórico completo: todos los ingresos/egresos, sin filtrar) ----
+    let saldoActual = 0;
+    cajaCache.forEach(m => {
+        if (m.tipo === "Ingreso") saldoActual += Number(m.monto) || 0;
+        else if (m.tipo === "Egreso") saldoActual -= Number(m.monto) || 0;
+        // Transferencia no suma ni resta del total: solo cambia el medio, no el balance real
+    });
+    document.getElementById("cajaSaldoActual").textContent = formatoPlata(saldoActual);
+    document.getElementById("cajaEfectivoDisponible").textContent = formatoPlata(saldoActual);
+    document.getElementById("cajaActualizadoTexto").textContent = "Actualizado hoy " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
 
-    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    // ---- Ingresos / Egresos / Balance de hoy ----
+    const movsHoy = cajaCache.filter(m => { const f = toDateSegura(m.fecha); return f && f >= hoy && f < mananaInicio; });
+    const ingresosHoy = movsHoy.filter(m => m.tipo === "Ingreso");
+    const egresosHoy = movsHoy.filter(m => m.tipo === "Egreso");
+    const totalIngresosHoy = ingresosHoy.reduce((s, m) => s + (Number(m.monto) || 0), 0);
+    const totalEgresosHoy = egresosHoy.reduce((s, m) => s + (Number(m.monto) || 0), 0);
 
-    let totalHoy = 0, totalSemana = 0, totalMes = 0;
+    document.getElementById("cajaIngresosHoy").textContent = formatoPlata(totalIngresosHoy);
+    document.getElementById("cajaIngresosHoyCant").textContent = `${ingresosHoy.length} movimiento${ingresosHoy.length === 1 ? "" : "s"}`;
+    document.getElementById("cajaEgresosHoy").textContent = formatoPlata(totalEgresosHoy);
+    document.getElementById("cajaEgresosHoyCant").textContent = `${egresosHoy.length} movimiento${egresosHoy.length === 1 ? "" : "s"}`;
+    document.getElementById("cajaBalanceHoy").textContent = formatoPlata(totalIngresosHoy - totalEgresosHoy);
+
+    // ---- Resumen rápido (panel derecho) ----
+    const listaEnRango = obtenerListaCajaFiltrada();
+    const ingresosRango = listaEnRango.filter(m => m.tipo === "Ingreso").reduce((s, m) => s + (Number(m.monto) || 0), 0);
+    const egresosRango = listaEnRango.filter(m => m.tipo === "Egreso").reduce((s, m) => s + (Number(m.monto) || 0), 0);
+
+    document.getElementById("cajaResumenRapido").innerHTML = `
+        <div class="dash-mov-fila"><span style="color:#5fd98a;">● Ingresos del día</span><strong style="margin-left:auto;">${formatoPlata(totalIngresosHoy)}</strong></div>
+        <div class="dash-mov-fila"><span style="color:#ff6b6b;">● Egresos del día</span><strong style="margin-left:auto;">${formatoPlata(totalEgresosHoy)}</strong></div>
+        <div class="dash-mov-fila"><span style="color:#f5a623;">● Balance del día</span><strong style="margin-left:auto;">${formatoPlata(totalIngresosHoy - totalEgresosHoy)}</strong></div>
+        <div class="dash-mov-fila" style="margin-top:8px;padding-top:10px;border-top:1px dashed #333;"><span style="color:#5fd98a;">● Ingresos del período</span><strong style="margin-left:auto;">${formatoPlata(ingresosRango)}</strong></div>
+        <div class="dash-mov-fila"><span style="color:#ff6b6b;">● Egresos del período</span><strong style="margin-left:auto;">${formatoPlata(egresosRango)}</strong></div>
+        <div class="dash-mov-fila"><span style="color:#f5a623;">● Balance del período</span><strong style="margin-left:auto;">${formatoPlata(ingresosRango - egresosRango)}</strong></div>
+    `;
+
+    // ---- Resumen del período: donut ----
+    const desdeTxt = document.getElementById("cajaFiltroDesde").value;
+    const hastaTxt = document.getElementById("cajaFiltroHasta").value;
+    document.getElementById("cajaResumenRangoTexto").textContent = (desdeTxt || hastaTxt)
+        ? `${desdeTxt ? new Date(desdeTxt + "T00:00:00").toLocaleDateString("es-AR") : "..."} - ${hastaTxt ? new Date(hastaTxt + "T00:00:00").toLocaleDateString("es-AR") : "hoy"}`
+        : "Todo el historial";
+
+    const totalDonut = ingresosRango + egresosRango;
+    document.getElementById("cajaDonutIngresos").textContent = formatoPlata(ingresosRango);
+    document.getElementById("cajaDonutEgresos").textContent = formatoPlata(egresosRango);
+    document.getElementById("cajaDonutIngresosPorc").textContent = totalDonut > 0 ? Math.round(ingresosRango / totalDonut * 100) + "%" : "";
+    document.getElementById("cajaDonutEgresosPorc").textContent = totalDonut > 0 ? Math.round(egresosRango / totalDonut * 100) + "%" : "";
+    dibujarDonutCaja(ingresosRango, egresosRango);
+
+    // ---- Evolución diaria (línea) ----
+    dibujarLineaCaja();
+
+    // ---- Medios de pago ----
+    renderMediosDePago(listaEnRango);
+
+    // ---- Tabla ----
+    renderTablaCaja();
+
+    if (typeof renderDashboard === "function") renderDashboard();
+
+}
+
+function dibujarDonutCaja(ingresos, egresos) {
+
+    const canvas = document.getElementById("cajaDonut");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const cx = w / 2, cy = h / 2, radio = Math.min(w, h) / 2 - 8, grosor = 14;
+    const total = ingresos + egresos;
+
+    if (total <= 0) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+        ctx.strokeStyle = "#2a2a2a";
+        ctx.lineWidth = grosor;
+        ctx.stroke();
+        return;
+    }
+
+    const anguloIngresos = (ingresos / total) * Math.PI * 2;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radio, -Math.PI / 2, -Math.PI / 2 + anguloIngresos);
+    ctx.strokeStyle = "#2fdb6e";
+    ctx.lineWidth = grosor;
+    ctx.lineCap = "butt";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radio, -Math.PI / 2 + anguloIngresos, -Math.PI / 2 + Math.PI * 2);
+    ctx.strokeStyle = "#ff6b6b";
+    ctx.lineWidth = grosor;
+    ctx.stroke();
+
+}
+
+function dibujarLineaCaja() {
+
+    const canvas = document.getElementById("cajaLinea");
+    if (!canvas) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = (canvas.getAttribute("height") || 130) * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    const w = rect.width, h = parseInt(canvas.getAttribute("height") || 130, 10);
+    ctx.clearRect(0, 0, w, h);
+
+    // Últimos 14 días (o el rango filtrado si es más corto)
+    const dias = [];
+    for (let i = 13; i >= 0; i--) {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() - i);
+        dias.push({ fecha: d, ingresos: 0, egresos: 0 });
+    }
 
     cajaCache.forEach(m => {
-
-        if (!m.fecha || !m.fecha.toDate) return;
-
-        const fecha = m.fecha.toDate();
-        const signo = m.tipo === "Ingreso" ? 1 : -1;
-        const monto = signo * (Number(m.monto) || 0);
-
-        if (fecha >= hoy) totalHoy += monto;
-        if (fecha >= inicioSemana) totalSemana += monto;
-        if (fecha >= inicioMes) totalMes += monto;
-
+        const f = toDateSegura(m.fecha);
+        if (!f) return;
+        f.setHours(0, 0, 0, 0);
+        const dia = dias.find(d => d.fecha.getTime() === f.getTime());
+        if (!dia) return;
+        if (m.tipo === "Ingreso") dia.ingresos += Number(m.monto) || 0;
+        else if (m.tipo === "Egreso") dia.egresos += Number(m.monto) || 0;
     });
 
-    document.getElementById("cajaHoy").textContent = formatoPlata(totalHoy);
-    document.getElementById("cajaSemana").textContent = formatoPlata(totalSemana);
-    document.getElementById("cajaMes").textContent = formatoPlata(totalMes);
+    const maxValor = Math.max(1, ...dias.map(d => Math.max(d.ingresos, d.egresos)));
+    const padding = 24;
+    const pasoX = (w - padding * 2) / (dias.length - 1);
 
-    dibujarGraficoCaja();
-    dibujarGraficoMensual();
-    dibujarGraficoAnual();
-    renderTablaCaja();
-    if (typeof renderDashboard === "function") renderDashboard();
+    function trazarLinea(clave, color) {
+        ctx.beginPath();
+        dias.forEach((d, i) => {
+            const x = padding + i * pasoX;
+            const y = h - 20 - (d[clave] / maxValor) * (h - 40);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        dias.forEach((d, i) => {
+            const x = padding + i * pasoX;
+            const y = h - 20 - (d[clave] / maxValor) * (h - 40);
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        });
+    }
+
+    trazarLinea("egresos", "#ff6b6b");
+    trazarLinea("ingresos", "#2fdb6e");
+
+    ctx.fillStyle = "#777";
+    ctx.font = "10px Montserrat";
+    ctx.textAlign = "center";
+    dias.forEach((d, i) => {
+        if (i % 2 !== 0) return;
+        const x = padding + i * pasoX;
+        ctx.fillText(d.fecha.getDate() + "/" + (d.fecha.getMonth() + 1), x, h - 4);
+    });
+
+}
+
+function renderMediosDePago(lista) {
+
+    const el = document.getElementById("cajaMediosPago");
+    if (!el) return;
+
+    const medios = ["Efectivo", "Transferencia", "Tarjeta", "Otro"];
+    const colores = { "Efectivo": "#2fdb6e", "Transferencia": "#3f9cff", "Tarjeta": "#a855f7", "Otro": "#f5a623" };
+
+    const totalesPorMedio = {};
+    medios.forEach(m => totalesPorMedio[m] = 0);
+
+    lista.forEach(m => {
+        const medio = medios.includes(m.medioPago) ? m.medioPago : "Otro";
+        totalesPorMedio[medio] += Number(m.monto) || 0;
+    });
+
+    const totalGeneral = Object.values(totalesPorMedio).reduce((s, v) => s + v, 0);
+
+    if (totalGeneral === 0) {
+        el.innerHTML = '<div class="vacio">Sin movimientos en este período.</div>';
+        return;
+    }
+
+    el.innerHTML = medios.map(medio => {
+        const monto = totalesPorMedio[medio];
+        const porc = Math.round((monto / totalGeneral) * 100);
+        return `<div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+                <span>${medio}</span>
+                <span style="color:#999;">${formatoPlata(monto)} · ${porc}%</span>
+            </div>
+            <div style="background:#242428;border-radius:6px;height:7px;overflow:hidden;">
+                <div style="width:${porc}%;height:100%;background:${colores[medio]};"></div>
+            </div>
+        </div>`;
+    }).join("");
 
 }
 
 function renderTablaCaja() {
 
-    const el = document.getElementById("tablaCaja");
-    const lista = cajaCache.slice(0, 15);
+    const el = document.getElementById("cajaTablaBody");
+    if (!el) return;
 
-    if (lista.length === 0) {
-        el.innerHTML = '<div class="vacio">Todavía no hay movimientos cargados.</div>';
+    const listaCompleta = obtenerListaCajaFiltrada();
+    const totalPaginas = Math.max(1, Math.ceil(listaCompleta.length / cajaPorPagina));
+    if (cajaPaginaActual > totalPaginas) cajaPaginaActual = totalPaginas;
+
+    const inicio = (cajaPaginaActual - 1) * cajaPorPagina;
+    const listaPagina = listaCompleta.slice(inicio, inicio + cajaPorPagina);
+
+    if (listaCompleta.length === 0) {
+        el.innerHTML = '<tr><td colspan="8" class="vacio">No hay movimientos con estos filtros.</td></tr>';
+        document.getElementById("cajaPaginacionTexto").textContent = "Sin resultados";
+        document.getElementById("cajaPaginacionBotones").innerHTML = "";
         return;
     }
 
-    let html = "<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>";
+    const iconos = { "Ingreso": "↓", "Egreso": "↑", "Transferencia": "⇄" };
+    const colores = { "Ingreso": "#5fd98a", "Egreso": "#ff6b6b", "Transferencia": "#6ab6ff" };
 
-    lista.forEach(m => {
+    el.innerHTML = listaPagina.map(m => {
 
-        const fecha = m.fecha && m.fecha.toDate ? m.fecha.toDate() : null;
+        const fecha = toDateSegura(m.fecha);
         const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") : "-";
-        const color = m.tipo === "Ingreso" ? "#5fd98a" : "#ff6b6b";
-        const signo = m.tipo === "Ingreso" ? "+" : "-";
+        const horaTexto = fecha ? fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "";
+        const color = colores[m.tipo] || "#999";
+        const signo = m.tipo === "Egreso" ? "-" : m.tipo === "Ingreso" ? "+" : "";
 
-        html += `<tr>
-            <td class="mono">${fechaTexto}</td>
-            <td>${escapar(m.tipo)}</td>
+        return `<tr>
+            <td class="presu-fecha-cell">${fechaTexto}<div class="presu-fecha-hora">${horaTexto}</div></td>
+            <td><span style="color:${color};font-size:16px;">${iconos[m.tipo] || "•"}</span> ${escapar(m.tipo)}</td>
             <td>${escapar(m.descripcion)}</td>
-            <td class="mono" style="color:${color}">${signo}${formatoPlata(m.monto)}</td>
+            <td style="color:#999;">${escapar(m.contraparte || "-")}</td>
+            <td style="color:#999;">${escapar(m.categoria || "-")}</td>
+            <td class="presu-importe-cell" style="color:${color};">${signo}${formatoPlata(m.monto)}</td>
+            <td style="color:#999;">${escapar(m.medioPago || "-")}</td>
+            <td>
+                <div class="presu-acciones-cell">
+                    <div class="icono-accion-turno" onclick="abrirModalCaja('${m.id}')" title="Ver / Editar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div class="icono-accion-turno" onclick="abrirModalCaja('${m.id}')" title="Editar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                    </div>
+                    <div class="icono-accion-turno borrar" onclick="borrarMovimientoCaja('${m.id}')" title="Eliminar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/></svg>
+                    </div>
+                </div>
+            </td>
         </tr>`;
 
-    });
+    }).join("");
 
-    html += "</tbody></table>";
-    el.innerHTML = html;
+    const desdeN = inicio + 1;
+    const hastaN = Math.min(inicio + cajaPorPagina, listaCompleta.length);
+    document.getElementById("cajaPaginacionTexto").textContent = `Mostrando ${desdeN} a ${hastaN} de ${listaCompleta.length} movimientos`;
+
+    let htmlPaginas = `<button class="presu-pagina-btn" onclick="irAPaginaCaja(${Math.max(1, cajaPaginaActual - 1)})" ${cajaPaginaActual === 1 ? "disabled" : ""}>‹</button>`;
+    for (let i = 1; i <= totalPaginas; i++) {
+        if (i > 6 && i < totalPaginas - 1 && Math.abs(i - cajaPaginaActual) > 1) continue;
+        htmlPaginas += `<button class="presu-pagina-btn ${i === cajaPaginaActual ? "activo" : ""}" onclick="irAPaginaCaja(${i})">${i}</button>`;
+    }
+    htmlPaginas += `<button class="presu-pagina-btn" onclick="irAPaginaCaja(${Math.min(totalPaginas, cajaPaginaActual + 1)})" ${cajaPaginaActual === totalPaginas ? "disabled" : ""}>›</button>`;
+
+    document.getElementById("cajaPaginacionBotones").innerHTML = htmlPaginas;
 
 }
+
+window.exportarMovimientosFiltrados = function () {
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    const lista = obtenerListaCajaFiltrada().map(m => {
+        const fecha = toDateSegura(m.fecha);
+        return {
+            Fecha: fecha ? fecha.toLocaleDateString("es-AR") : "",
+            Hora: fecha ? fecha.toLocaleTimeString("es-AR") : "",
+            Tipo: m.tipo || "",
+            Descripcion: m.descripcion || "",
+            ClienteProveedor: m.contraparte || "",
+            Categoria: m.categoria || "",
+            Importe: m.monto || 0,
+            MedioDePago: m.medioPago || ""
+        };
+    });
+
+    const hoja = XLSX.utils.json_to_sheet(lista.length ? lista : [{ info: "Sin datos" }]);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Movimientos");
+    XLSX.writeFile(libro, `KM26_Movimientos_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+};
+
+// ---------- Arqueo de caja ----------
+
+window.abrirModalArqueoCaja = function () {
+
+    let saldoActual = 0;
+    cajaCache.forEach(m => {
+        if (m.tipo === "Ingreso" && (m.medioPago || "Efectivo") === "Efectivo") saldoActual += Number(m.monto) || 0;
+        else if (m.tipo === "Egreso" && (m.medioPago || "Efectivo") === "Efectivo") saldoActual -= Number(m.monto) || 0;
+    });
+
+    document.getElementById("arqueoEsperado").textContent = formatoPlata(saldoActual);
+    document.getElementById("arqueoEsperado").dataset.valor = saldoActual;
+    document.getElementById("arqueoContado").value = "";
+    document.getElementById("arqueoNotas").value = "";
+    document.getElementById("arqueoDiferencia").textContent = "$0";
+    document.getElementById("arqueoDiferencia").style.color = "#fff";
+    document.getElementById("mensajeEstadoArqueo").textContent = "";
+
+    document.getElementById("modalArqueoCaja").classList.add("abierto");
+
+};
+
+window.calcularDiferenciaArqueo = function () {
+
+    const esperado = parseFloat(document.getElementById("arqueoEsperado").dataset.valor) || 0;
+    const contado = parseFloat(document.getElementById("arqueoContado").value) || 0;
+    const diferencia = contado - esperado;
+
+    const el = document.getElementById("arqueoDiferencia");
+    el.textContent = (diferencia >= 0 ? "+" : "") + formatoPlata(diferencia);
+    el.style.color = diferencia === 0 ? "#5fd98a" : diferencia > 0 ? "#f5a623" : "#ff6b6b";
+
+};
+
+window.guardarArqueoCaja = async function () {
+
+    const esperado = parseFloat(document.getElementById("arqueoEsperado").dataset.valor) || 0;
+    const contado = parseFloat(document.getElementById("arqueoContado").value);
+    const notas = document.getElementById("arqueoNotas").value.trim();
+    const estado = document.getElementById("mensajeEstadoArqueo");
+
+    if (isNaN(contado)) {
+        estado.textContent = "Ingresá cuánto efectivo contaste.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    const diferencia = contado - esperado;
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await addDoc(collection(db, "arqueosCaja"), {
+            esperado, contado, diferencia, notas,
+            fecha: serverTimestamp()
+        });
+
+        // Si hubo diferencia, se deja registrada como un movimiento real de Caja
+        // (así el saldo del sistema queda ajustado a lo que realmente hay).
+        if (diferencia !== 0) {
+            await addDoc(collection(db, "caja"), {
+                tipo: diferencia > 0 ? "Ingreso" : "Egreso",
+                descripcion: "Ajuste por arqueo de caja" + (notas ? ` — ${notas}` : ""),
+                monto: Math.abs(diferencia),
+                medioPago: "Efectivo",
+                categoria: "Arqueo",
+                fecha: serverTimestamp()
+            });
+        }
+
+        estado.textContent = "✅ Arqueo registrado.";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 900);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
 
 // Dibuja una barra con las puntas de arriba redondeadas
 function barraRedondeada(ctx, x, y, w, h, radio) {
@@ -6524,25 +7162,52 @@ function dibujarBarras(canvas, valores, etiquetas, height, bajaVsAnterior) {
 
 }
 
-window.abrirModalCaja = function () {
-    document.getElementById("modalCaja").classList.add("abierto");
+window.abrirModalCaja = function (id) {
+
     document.getElementById("mensajeEstadoCaja").textContent = "";
-    window.elegirTipo("Ingreso");
-};
+    document.getElementById("accionesMovimientoCaja").style.display = "none";
 
-window.elegirTipo = function (tipo) {
+    if (id) {
 
-    tipoMovimiento = tipo;
+        const m = cajaCache.find(x => x.id === id);
+        if (!m) return;
 
-    document.getElementById("btnIngreso").classList.toggle("activo-ingreso", tipo === "Ingreso");
-    document.getElementById("btnEgreso").classList.toggle("activo-egreso", tipo === "Egreso");
+        document.getElementById("mMovId").value = m.id;
+        document.getElementById("mDescripcion").value = m.descripcion || "";
+        document.getElementById("mContraparte").value = m.contraparte || "";
+        document.getElementById("mCategoria").value = m.categoria || "";
+        document.getElementById("mMonto").value = m.monto || "";
+        document.getElementById("mMedioPago").value = m.medioPago || "Efectivo";
+        window.elegirTipo(m.tipo || "Ingreso");
+
+        document.getElementById("accionesMovimientoCaja").innerHTML =
+            `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="borrarMovimientoCaja('${m.id}')">🗑️ Eliminar</button>`;
+        document.getElementById("accionesMovimientoCaja").style.display = "flex";
+
+    } else {
+
+        document.getElementById("mMovId").value = "";
+        document.getElementById("mDescripcion").value = "";
+        document.getElementById("mContraparte").value = "";
+        document.getElementById("mCategoria").value = "";
+        document.getElementById("mMonto").value = "";
+        document.getElementById("mMedioPago").value = "Efectivo";
+        window.elegirTipo("Ingreso");
+
+    }
+
+    document.getElementById("modalCaja").classList.add("abierto");
 
 };
 
 window.guardarMovimiento = async function () {
 
+    const id = document.getElementById("mMovId").value;
     const descripcion = document.getElementById("mDescripcion").value.trim();
+    const contraparte = document.getElementById("mContraparte").value.trim();
+    const categoria = document.getElementById("mCategoria").value.trim();
     const monto = document.getElementById("mMonto").value.trim();
+    const medioPago = document.getElementById("mMedioPago").value;
     const estado = document.getElementById("mensajeEstadoCaja");
 
     if (!descripcion || !monto) {
@@ -6556,18 +7221,20 @@ window.guardarMovimiento = async function () {
 
     try {
 
-        await addDoc(collection(db, "caja"), {
+        const datos = {
             tipo: tipoMovimiento,
-            descripcion,
-            monto: parseFloat(monto),
-            fecha: serverTimestamp()
-        });
+            descripcion, contraparte, categoria, medioPago,
+            monto: parseFloat(monto)
+        };
+
+        if (id) {
+            await updateDoc(doc(db, "caja", id), datos);
+        } else {
+            await addDoc(collection(db, "caja"), { ...datos, fecha: serverTimestamp() });
+        }
 
         estado.textContent = "¡Movimiento guardado!";
         estado.style.color = "#5fd98a";
-
-        document.getElementById("mDescripcion").value = "";
-        document.getElementById("mMonto").value = "";
 
         setTimeout(() => {
             window.cerrarModales();
@@ -6580,11 +7247,31 @@ window.guardarMovimiento = async function () {
 
 };
 
+window.borrarMovimientoCaja = async function (id) {
+    const confirmado = confirm("¿Eliminar este movimiento definitivamente? No se puede deshacer.");
+    if (!confirmado) return;
+    await deleteDoc(doc(db, "caja", id));
+    window.cerrarModales();
+};
+
+window.elegirTipo = function (tipo) {
+
+    tipoMovimiento = tipo;
+
+    document.getElementById("btnIngreso").classList.toggle("activo-ingreso", tipo === "Ingreso");
+    document.getElementById("btnEgreso").classList.toggle("activo-egreso", tipo === "Egreso");
+    document.getElementById("btnTransferencia").classList.toggle("activo-transferencia", tipo === "Transferencia");
+
+};
+
+window.abrirModalCajaConTipo = function (tipo) {
+    window.abrirModalCaja();
+    window.elegirTipo(tipo);
+};
+
 window.addEventListener("resize", () => {
     if (document.getElementById("tab-caja").classList.contains("activa")) {
-        dibujarGraficoCaja();
-        dibujarGraficoMensual();
-        dibujarGraficoAnual();
+        dibujarLineaCaja();
     }
 });
 
