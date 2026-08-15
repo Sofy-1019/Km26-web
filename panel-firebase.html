@@ -4597,9 +4597,178 @@ header{
             <h2>Proveedores</h2>
             <button class="btn-red" onclick="abrirModalProveedor()">+ Nuevo proveedor</button>
         </div>
-        <div id="listaProveedores"></div>
+
+        <div class="turnos-stats-grid">
+            <div class="turnos-stat-card">
+                <div class="turnos-stat-icono" style="background:#0a1e33;">👥</div>
+                <div><div class="turnos-stat-numero" id="provStatTotal">0</div><div class="turnos-stat-label">Total proveedores · activos</div></div>
+            </div>
+            <div class="turnos-stat-card verde">
+                <div class="turnos-stat-icono">🛒</div>
+                <div><div class="turnos-stat-numero" id="provStatComprasMes">$0</div><div class="turnos-stat-label" id="provStatComprasMesCant">Compras del mes</div></div>
+            </div>
+            <div class="turnos-stat-card ambar">
+                <div class="turnos-stat-icono">💼</div>
+                <div><div class="turnos-stat-numero" id="provStatDeudaTotal">$0</div><div class="turnos-stat-label" id="provStatDeudaTotalCant">Deuda total</div></div>
+            </div>
+            <div class="turnos-stat-card violeta">
+                <div class="turnos-stat-icono">⏰</div>
+                <div><div class="turnos-stat-numero" id="provStatPorVencer">$0</div><div class="turnos-stat-label" id="provStatPorVencerCant">Por vencer (7 días)</div></div>
+            </div>
+            <div class="turnos-stat-card" style="border-left:3px solid #ff6b6b;">
+                <div class="turnos-stat-icono" style="background:#3a1416;">✕</div>
+                <div><div class="turnos-stat-numero" id="provStatVencidos">$0</div><div class="turnos-stat-label" id="provStatVencidosCant">Vencidos</div></div>
+            </div>
+        </div>
+
+        <div class="cc-2col">
+
+            <div class="cc-col-izq">
+
+                <div class="turnos-chips-fila" style="flex-wrap:wrap;">
+                    <button class="cv-chip-toggle activo" id="chipProvTodos" onclick="filtrarProveedores('todos')">Todos</button>
+                    <button class="cv-chip-toggle" id="chipProvActivos" onclick="filtrarProveedores('activos')">Activos</button>
+                    <button class="cv-chip-toggle" id="chipProvInactivos" onclick="filtrarProveedores('inactivos')">Inactivos</button>
+                    <button class="cv-chip-toggle" id="chipProvDeudores" onclick="filtrarProveedores('deudores')">Deudores</button>
+                    <button class="cv-chip-toggle" id="chipProvPreferidos" onclick="filtrarProveedores('preferidos')">Preferidos</button>
+                    <div style="margin-left:auto;display:flex;gap:8px;">
+                        <button class="btn-chico" onclick="document.getElementById('inputImportarProveedores').click()">⬇️ Importar</button>
+                        <input type="file" id="inputImportarProveedores" accept=".xlsx,.xls" style="display:none;" onchange="importarProveedoresDesdeExcel(this.files[0])">
+                        <button class="btn-chico" onclick="exportarProveedoresFiltrados()">⬆️ Exportar</button>
+                    </div>
+                </div>
+
+                <div class="stock-filtros-fila">
+                    <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;min-width:160px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="buscadorProveedores" placeholder="Buscar proveedor..." oninput="renderProveedores()">
+                    </div>
+                    <select id="provFiltroEstado" class="turno-estado-select" onchange="renderProveedores()">
+                        <option value="">Estado: Todos</option>
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                    <select id="provFiltroCategoria" class="turno-estado-select" onchange="renderProveedores()"><option value="">Categoría: Todas</option></select>
+                    <select id="provFiltroCondicionIva" class="turno-estado-select" onchange="renderProveedores()">
+                        <option value="">Condición IVA: Todas</option>
+                        <option>Responsable inscripto</option>
+                        <option>Monotributo</option>
+                        <option>Exento</option>
+                        <option>Consumidor final</option>
+                    </select>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#ccc;white-space:nowrap;">
+                        <input type="checkbox" id="provSoloDeudores" onchange="renderProveedores()"> Solo deudores
+                    </label>
+                </div>
+
+                <div class="presu-tabla-wrap">
+                    <table class="presu-tabla">
+                        <thead><tr><th>Proveedor</th><th>Contacto</th><th>Teléfono</th><th>Categoría</th><th>Condición IVA</th><th>Deuda</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="provTablaBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="presu-paginacion">
+                    <span id="provPaginacionTexto">-</span>
+                    <div class="presu-paginacion-botones" id="provPaginacionBotones"></div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:12px;color:#999;">Ver</span>
+                        <select id="provPorPagina" class="turno-estado-select" onchange="cambiarPorPaginaProv()">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span style="font-size:12px;color:#999;">por página</span>
+                    </div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:8px;">
+
+                    <div class="turnos-chips-fila">
+                        <button class="cv-chip-toggle activo" id="provSubtabResumen" onclick="cambiarSubtabProveedor('resumen')">Resumen</button>
+                        <button class="cv-chip-toggle" id="provSubtabCC" onclick="cambiarSubtabProveedor('cuentacorriente')">Cuenta corriente</button>
+                        <button class="cv-chip-toggle" id="provSubtabCompras" onclick="cambiarSubtabProveedor('compras')">Compras</button>
+                        <button class="cv-chip-toggle" id="provSubtabPagos" onclick="cambiarSubtabProveedor('pagos')">Pagos</button>
+                        <button class="cv-chip-toggle" id="provSubtabProductos" onclick="cambiarSubtabProveedor('productos')">Productos</button>
+                        <button class="cv-chip-toggle" id="provSubtabNotas" onclick="cambiarSubtabProveedor('notas')">Notas</button>
+                    </div>
+
+                    <p id="provSeleccionadoTexto" style="font-size:12px;color:#999;margin:10px 0;"></p>
+
+                    <div id="provPanelResumen">
+                        <div class="cc-2col" style="grid-template-columns:1fr;">
+                            <div class="turnos-2col" style="grid-template-columns:1fr 1fr 1fr;display:grid;gap:14px;">
+                                <div class="dash-panel-nuevo">
+                                    <div class="dash-panel-nuevo-titulo">Información general</div>
+                                    <div id="provInfoGeneral"></div>
+                                </div>
+                                <div class="dash-panel-nuevo">
+                                    <div class="dash-panel-nuevo-titulo">Deudas por antigüedad</div>
+                                    <div style="display:flex;align-items:center;gap:14px;">
+                                        <canvas id="provDonutAntiguedad" width="80" height="80"></canvas>
+                                        <div id="provDonutLeyenda" style="flex:1;"></div>
+                                    </div>
+                                </div>
+                                <div class="dash-panel-nuevo">
+                                    <div class="dash-panel-nuevo-titulo">Top proveedores por compras</div>
+                                    <div id="provTopCompras"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="provPanelCC" style="display:none;"></div>
+                    <div id="provPanelCompras" style="display:none;">
+                        <button class="btn-chico" id="provBtnNuevaCompra" style="margin-bottom:10px;display:none;" onclick="abrirModalCompraProveedor()">+ Nueva compra</button>
+                        <div id="provListaCompras"></div>
+                    </div>
+                    <div id="provPanelPagos" style="display:none;"></div>
+                    <div id="provPanelProductos" style="display:none;"></div>
+                    <div id="provPanelNotas" style="display:none;">
+                        <textarea id="provNotasEdit" rows="5" placeholder="Elegí un proveedor para ver y editar sus notas..." style="width:100%;" disabled></textarea>
+                        <button class="btn-chico" id="provBtnGuardarNotas" style="margin-top:8px;display:none;" onclick="guardarNotasProveedorSeleccionado()">Guardar notas</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="cc-col-der">
+
+                <div class="dash-panel-nuevo">
+                    <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Próximos pagos</span>
+                        <a class="dash-panel-nuevo-link" onclick="filtrarProveedores('deudores')">Ver todos ›</a>
+                    </div>
+                    <div id="provProximosPagos"></div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Compras recientes</span>
+                        <a class="dash-panel-nuevo-link" onclick="cambiarSubtabProveedor('compras')">Ver todas ›</a>
+                    </div>
+                    <div id="provComprasRecientes"></div>
+                </div>
+
+                <div class="dash-panel-nuevo" style="margin-top:14px;">
+                    <div class="dash-panel-nuevo-titulo">Acciones rápidas</div>
+                    <div class="caja-accesos-grid">
+                        <div class="caja-acceso-item" onclick="abrirModalProveedor()"><div class="caja-acceso-icono verde">🛒</div>Nueva compra</div>
+                        <div class="caja-acceso-item" onclick="abrirPagoRapidoProveedor()"><div class="caja-acceso-icono ambar">$</div>Registrar pago</div>
+                        <div class="caja-acceso-item" onclick="cambiarSubtabProveedor('cuentacorriente')"><div class="caja-acceso-icono azul">👤</div>Cuenta corriente</div>
+                        <div class="caja-acceso-item" onclick="alert('Elegí dos proveedores desde la tabla para comparar sus compras y deuda (próximamente un detalle lado a lado).')"><div class="caja-acceso-icono violeta">⚖️</div>Comparar proveedores</div>
+                        <div class="caja-acceso-item" onclick="filtrarProveedores('preferidos')"><div class="caja-acceso-icono ambar">⭐</div>Proveedores preferidos</div>
+                        <div class="caja-acceso-item" onclick="cambiarTab('reportes')"><div class="caja-acceso-icono gris">📊</div>Reportes</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
 
     </section>
+
 
     <section class="seccion" id="tab-categorias">
 
@@ -5305,22 +5474,95 @@ header{
         <label>Nombre / Razón social</label>
         <input type="text" id="provNombre" placeholder="Repuestos Norte SRL">
 
-        <label>Contacto (teléfono o email)</label>
+        <label>CUIT (opcional)</label>
+        <input type="text" id="provCuit" placeholder="30-71611222-1">
+
+        <label>Contacto (teléfono)</label>
         <input type="text" id="provContacto" placeholder="11 5555-1234">
 
+        <label>Email (opcional)</label>
+        <input type="text" id="provEmail" placeholder="ventas@proveedor.com">
+
+        <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+                <label>Categoría</label>
+                <input type="text" id="provCategoria" placeholder="Repuestos, Frenos, etc.">
+            </div>
+            <div>
+                <label>Condición IVA</label>
+                <select id="provCondicionIva">
+                    <option>Responsable inscripto</option>
+                    <option>Monotributo</option>
+                    <option>Exento</option>
+                    <option>Consumidor final</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+                <label>Estado</label>
+                <select id="provEstado">
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                </select>
+            </div>
+            <div>
+                <label style="display:flex;align-items:center;gap:8px;margin-top:26px;">
+                    <input type="checkbox" id="provPreferido" style="width:auto;"> Proveedor preferido ⭐
+                </label>
+            </div>
+        </div>
+
         <label>Notas (opcional)</label>
-        <input type="text" id="provNotas" placeholder="Rubro, condiciones de pago, etc.">
+        <input type="text" id="provNotas" placeholder="Condiciones de pago, observaciones, etc.">
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
             <button class="btn-red" onclick="guardarProveedor()">Guardar</button>
         </div>
 
+        <div class="modal-botones" id="accionesProveedor" style="display:none;"></div>
+
         <p id="mensajeEstadoProveedor"></p>
     </div>
 </div>
 
-<!-- ---------- Modal: pago a proveedor (genera un Egreso real en Caja) ---------- -->
+<!-- ---------- Modal: nueva compra a proveedor (genera deuda real con saldo) ---------- -->
+<div class="overlay" id="modalCompraProveedor">
+    <div class="modal">
+        <h3>🛒 Nueva compra</h3>
+
+        <input type="hidden" id="compraProvId">
+        <p id="compraProvNombre" style="font-size:13px;color:#999;margin-top:-8px;"></p>
+
+        <label>Descripción</label>
+        <input type="text" id="compraProvDescripcion" placeholder="Factura #123 - pastillas de freno">
+
+        <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+                <label>Fecha</label>
+                <input type="date" id="compraProvFecha">
+            </div>
+            <div>
+                <label>Vencimiento</label>
+                <input type="date" id="compraProvVencimiento">
+            </div>
+        </div>
+
+        <label>Monto total</label>
+        <input type="number" id="compraProvMonto" placeholder="15000">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarCompraProveedor()">Guardar compra</button>
+        </div>
+
+        <p id="mensajeEstadoCompraProveedor"></p>
+    </div>
+</div>
+
+<!-- ---------- Modal: registrar pago (contra una compra puntual o el total de deuda) ---------- -->
 <div class="overlay" id="modalPagoProveedor">
     <div class="modal">
         <h3>💸 Registrar pago a proveedor</h3>
@@ -5328,14 +5570,23 @@ header{
         <input type="hidden" id="pagoProvId">
         <p id="pagoProvNombre" style="font-size:13px;color:#999;margin-top:-8px;"></p>
 
-        <label>Concepto</label>
-        <input type="text" id="pagoProvConcepto" placeholder="Ej: pastillas de freno, factura #123">
+        <label>Compra a pagar</label>
+        <select id="pagoProvCompraId" onchange="actualizarMontoSugeridoPagoProv()"></select>
 
         <label>Monto a pagar</label>
         <input type="number" id="pagoProvMonto" placeholder="15000">
 
+        <label>Medio de pago</label>
+        <select id="pagoProvMedioPago">
+            <option>Efectivo</option>
+            <option>Transferencia</option>
+            <option>Tarjeta de Débito</option>
+            <option>Tarjeta de Crédito</option>
+            <option>Mercado Pago</option>
+        </select>
+
         <p style="font-size:11.5px;color:#777;margin-top:10px;line-height:1.5;">
-            Este pago se registra como Egreso en Caja y se descuenta automáticamente de la facturación del día.
+            Este pago se registra como Egreso en Caja y descuenta el saldo de la compra elegida.
         </p>
 
         <div class="modal-botones">
@@ -5876,6 +6127,8 @@ onAuthStateChanged(auth, (user) => {
         escucharStockMovimientos();
         escucharCuentasCC();
         escucharPagosCuentaCC();
+        escucharComprasProveedor();
+        escucharPagosProveedor();
         escucharServicios();
         escucharConfiguracion();
     } else {
@@ -6107,6 +6360,7 @@ window.cerrarModales = function () {
     document.getElementById("modalArqueoCaja").classList.remove("abierto");
     document.getElementById("modalCobrarCC").classList.remove("abierto");
     document.getElementById("modalVerCuentaCC").classList.remove("abierto");
+    document.getElementById("modalCompraProveedor").classList.remove("abierto");
 };
 
 window.guardarCliente = async function () {
@@ -9279,54 +9533,446 @@ window.abrirEtiqueta = function (id, nombre) {
 
 // ---------- Proveedores ----------
 
+// ======================================================================
+// PROVEEDORES — con compras (deuda real), pagos parciales y ficha detallada
+// ======================================================================
+// Colecciones reales:
+//   proveedores { nombre, cuit, contacto, email, categoria, condicionIva,
+//     estado, preferido, notas, creado }
+//   comprasProveedor { proveedorId, descripcion, fecha, vencimiento, monto,
+//     pagado, saldo, estado, creado }
+//   pagosProveedor { compraId, proveedorId, monto, medioPago, fecha }
+// Cada pago también genera un Egreso real en Caja, igual que hicimos con los
+// cobros de clientes en Cuentas/Cobros — un solo lugar para ver la plata real.
+
 let proveedoresCache = [];
+let comprasProveedorCache = [];
+let pagosProveedorCache = [];
+let filtroProvActivo = "todos";
+let provPaginaActual = 1;
+let provPorPagina = 10;
+let proveedorSeleccionadoId = null;
+let subtabProveedorActivo = "resumen";
 
 function escucharProveedores() {
-
     const q = query(collection(db, "proveedores"), orderBy("nombre"));
-
     onSnapshot(q, (snapshot) => {
-
         proveedoresCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderProveedores();
-
     });
+}
 
+function escucharComprasProveedor() {
+    const q = query(collection(db, "comprasProveedor"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        comprasProveedorCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderProveedores();
+    }, () => {});
+}
+
+function escucharPagosProveedor() {
+    const q = query(collection(db, "pagosProveedor"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        pagosProveedorCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderProveedores();
+    }, () => {});
+}
+
+function estadoRealCompraProveedor(c) {
+    if ((Number(c.saldo) || 0) <= 0.5) return "Pagada";
+    const venc = toDateSegura(c.vencimiento);
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    if (venc && venc < hoy) return "Vencida";
+    return "Pendiente";
+}
+
+function deudaDeProveedor(provId) {
+    return comprasProveedorCache.filter(c => c.proveedorId === provId).reduce((s, c) => s + (Number(c.saldo) || 0), 0);
+}
+
+// ---------- Filtros, tabla principal, tarjetas y paneles laterales ----------
+
+window.filtrarProveedores = function (filtro) {
+    filtroProvActivo = filtro;
+    provPaginaActual = 1;
+    ["Todos", "Activos", "Inactivos", "Deudores", "Preferidos"].forEach(n => {
+        const el = document.getElementById("chipProv" + n);
+        if (el) el.classList.toggle("activo", filtro === n.toLowerCase());
+    });
+    renderProveedores();
+};
+
+window.cambiarPorPaginaProv = function () {
+    provPorPagina = parseInt(document.getElementById("provPorPagina").value, 10);
+    provPaginaActual = 1;
+    renderProveedores();
+};
+
+window.irAPaginaProv = function (pagina) {
+    provPaginaActual = pagina;
+    renderProveedores();
+};
+
+function actualizarFiltroCategoriaProv() {
+    const sel = document.getElementById("provFiltroCategoria");
+    if (!sel) return;
+    const valor = sel.value;
+    const categorias = [...new Set(proveedoresCache.map(p => p.categoria).filter(Boolean))].sort();
+    sel.innerHTML = '<option value="">Categoría: Todas</option>' + categorias.map(c => `<option value="${escaparComillas(c)}">${escapar(c)}</option>`).join("");
+    sel.value = valor;
 }
 
 function renderProveedores() {
 
-    const el = document.getElementById("listaProveedores");
-    if (!el) return;
+    const body = document.getElementById("provTablaBody");
+    if (!body) return;
 
-    if (proveedoresCache.length === 0) {
-        el.innerHTML = '<div class="vacio">Todavía no hay proveedores cargados.</div>';
+    actualizarFiltroCategoriaProv();
+
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const en7dias = new Date(hoy); en7dias.setDate(en7dias.getDate() + 7);
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    // ---- Tarjetas de resumen ----
+    const activos = proveedoresCache.filter(p => (p.estado || "Activo") === "Activo");
+    const comprasMes = comprasProveedorCache.filter(c => { const f = toDateSegura(c.fecha); return f && f >= inicioMes; });
+    const totalComprasMes = comprasMes.reduce((s, c) => s + (Number(c.monto) || 0), 0);
+
+    const comprasConSaldo = comprasProveedorCache.filter(c => (Number(c.saldo) || 0) > 0.5);
+    const deudaTotal = comprasConSaldo.reduce((s, c) => s + (Number(c.saldo) || 0), 0);
+
+    const porVencer = comprasConSaldo.filter(c => { const v = toDateSegura(c.vencimiento); return v && v >= hoy && v <= en7dias; });
+    const vencidos = comprasConSaldo.filter(c => estadoRealCompraProveedor(c) === "Vencida");
+
+    document.getElementById("provStatTotal").textContent = activos.length;
+    document.getElementById("provStatComprasMes").textContent = formatoPlata(totalComprasMes);
+    document.getElementById("provStatComprasMesCant").textContent = `Compras del mes · ${comprasMes.length} compras`;
+    document.getElementById("provStatDeudaTotal").textContent = formatoPlata(deudaTotal);
+    document.getElementById("provStatDeudaTotalCant").textContent = `Deuda total · ${comprasConSaldo.length} proveedores`;
+    document.getElementById("provStatPorVencer").textContent = formatoPlata(porVencer.reduce((s, c) => s + c.saldo, 0));
+    document.getElementById("provStatPorVencerCant").textContent = `Por vencer (7 días) · ${porVencer.length} pagos`;
+    document.getElementById("provStatVencidos").textContent = formatoPlata(vencidos.reduce((s, c) => s + c.saldo, 0));
+    document.getElementById("provStatVencidosCant").textContent = `Vencidos · ${vencidos.length} pagos`;
+
+    // ---- Filtros de la tabla ----
+    const texto = (document.getElementById("buscadorProveedores").value || "").trim().toLowerCase();
+    const filtroEstado = document.getElementById("provFiltroEstado").value;
+    const filtroCategoria = document.getElementById("provFiltroCategoria").value;
+    const filtroIva = document.getElementById("provFiltroCondicionIva").value;
+    const soloDeudores = document.getElementById("provSoloDeudores").checked;
+
+    let lista = proveedoresCache.filter(p => {
+        if (texto && !(`${p.nombre} ${p.cuit || ""} ${p.contacto || ""}`.toLowerCase().includes(texto))) return false;
+        if (filtroEstado && (p.estado || "Activo") !== filtroEstado) return false;
+        if (filtroCategoria && p.categoria !== filtroCategoria) return false;
+        if (filtroIva && p.condicionIva !== filtroIva) return false;
+        if (soloDeudores && deudaDeProveedor(p.id) <= 0.5) return false;
+        return true;
+    });
+
+    if (filtroProvActivo === "activos") lista = lista.filter(p => (p.estado || "Activo") === "Activo");
+    else if (filtroProvActivo === "inactivos") lista = lista.filter(p => p.estado === "Inactivo");
+    else if (filtroProvActivo === "deudores") lista = lista.filter(p => deudaDeProveedor(p.id) > 0.5);
+    else if (filtroProvActivo === "preferidos") lista = lista.filter(p => p.preferido);
+
+    const totalPaginas = Math.max(1, Math.ceil(lista.length / provPorPagina));
+    if (provPaginaActual > totalPaginas) provPaginaActual = totalPaginas;
+    const inicio = (provPaginaActual - 1) * provPorPagina;
+    const listaPagina = lista.slice(inicio, inicio + provPorPagina);
+
+    if (lista.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" class="vacio">No hay proveedores con estos filtros.</td></tr>';
+        document.getElementById("provPaginacionTexto").textContent = "Sin resultados";
+        document.getElementById("provPaginacionBotones").innerHTML = "";
+    } else {
+
+        body.innerHTML = listaPagina.map(p => {
+
+            const deuda = deudaDeProveedor(p.id);
+            const estado = p.estado || "Activo";
+
+            return `<tr style="cursor:pointer;" onclick="seleccionarProveedor('${p.id}')">
+                <td>
+                    <div class="stock-producto-cell">
+                        <div class="stock-producto-icono">${getIniciales(p.nombre, "")}</div>
+                        <div>
+                            <div class="stock-producto-nombre">${escapar(p.nombre)} ${p.preferido ? "⭐" : ""}</div>
+                            <div class="stock-producto-sub">${escapar(p.cuit || "")}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="color:#999;">${escapar(p.contacto || p.email || "-")}</td>
+                <td style="color:#999;">${p.contacto ? `<a href="https://wa.me/549${String(p.contacto).replace(/\D/g, "")}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:#5fd98a;text-decoration:none;">${escapar(p.contacto)} 🟢</a>` : "-"}</td>
+                <td>${p.categoria ? `<span class="stock-codigo-chip">${escapar(p.categoria)}</span>` : "-"}</td>
+                <td style="color:#999;">${escapar(p.condicionIva || "-")}</td>
+                <td style="color:${deuda > 0.5 ? "#ff6b6b" : "#888"};font-weight:700;">${formatoPlata(deuda)}</td>
+                <td><span class="badge-estado-tabla ${estado === "Activo" ? "StockOK" : "SinStock"}">${estado === "Activo" ? "● Activo" : "● Inactivo"}</span></td>
+                <td onclick="event.stopPropagation();">
+                    <div class="presu-acciones-cell">
+                        <div class="icono-accion-turno" onclick="seleccionarProveedor('${p.id}')" title="Ver">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </div>
+                        <div class="icono-accion-turno" onclick="editarProveedor('${p.id}')" title="Editar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>
+                        </div>
+                        <div class="icono-accion-turno borrar" onclick="borrarProveedor('${p.id}', '${escaparComillas(p.nombre)}')" title="Eliminar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                        </div>
+                    </div>
+                </td>
+            </tr>`;
+
+        }).join("");
+
+        const desdeN = inicio + 1;
+        const hastaN = Math.min(inicio + provPorPagina, lista.length);
+        document.getElementById("provPaginacionTexto").textContent = `Mostrando ${desdeN} a ${hastaN} de ${lista.length} proveedores`;
+
+        let htmlPaginas = `<button class="presu-pagina-btn" onclick="irAPaginaProv(${Math.max(1, provPaginaActual - 1)})" ${provPaginaActual === 1 ? "disabled" : ""}>‹</button>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+            if (i > 6 && i < totalPaginas - 1 && Math.abs(i - provPaginaActual) > 1) continue;
+            htmlPaginas += `<button class="presu-pagina-btn ${i === provPaginaActual ? "activo" : ""}" onclick="irAPaginaProv(${i})">${i}</button>`;
+        }
+        htmlPaginas += `<button class="presu-pagina-btn" onclick="irAPaginaProv(${Math.min(totalPaginas, provPaginaActual + 1)})" ${provPaginaActual === totalPaginas ? "disabled" : ""}>›</button>`;
+        document.getElementById("provPaginacionBotones").innerHTML = htmlPaginas;
+
+    }
+
+    // ---- Panel lateral: Próximos pagos ----
+    const proximos = comprasConSaldo.filter(c => toDateSegura(c.vencimiento)).sort((a, b) => toDateSegura(a.vencimiento) - toDateSegura(b.vencimiento)).slice(0, 3);
+    document.getElementById("provProximosPagos").innerHTML = proximos.length === 0 ? '<div class="vacio">Sin pagos pendientes.</div>' : proximos.map(c => {
+        const prov = proveedoresCache.find(p => p.id === c.proveedorId);
+        const venc = toDateSegura(c.vencimiento);
+        const dias = Math.round((venc - hoy) / 86400000);
+        return `<div class="cc-vencimiento-item">
+            <div class="cc-vencimiento-fila-abajo">
+                <span class="cc-vencimiento-cliente">${prov ? escapar(prov.nombre) : "-"}</span>
+                <span class="cc-dias-badge" style="${dias < 0 ? "background:#3a1416;color:#ff6b6b;" : ""}">${dias < 0 ? "Vencido" : dias === 0 ? "Hoy" : "En " + dias + " día" + (dias > 1 ? "s" : "")}</span>
+            </div>
+            <div class="cc-vencimiento-sub">Vence ${venc.toLocaleDateString("es-AR")} · ${formatoPlata(c.saldo)}</div>
+        </div>`;
+    }).join("");
+
+    // ---- Panel lateral: Compras recientes ----
+    const recientes = comprasProveedorCache.slice(0, 3);
+    document.getElementById("provComprasRecientes").innerHTML = recientes.length === 0 ? '<div class="vacio">Sin compras registradas.</div>' : recientes.map(c => {
+        const prov = proveedoresCache.find(p => p.id === c.proveedorId);
+        const fecha = toDateSegura(c.fecha);
+        return `<div class="cc-vencimiento-item">
+            <div class="cc-vencimiento-fila-abajo">
+                <span class="cc-vencimiento-cliente">${prov ? escapar(prov.nombre) : "-"}</span>
+                <strong style="color:#fff;">${formatoPlata(c.monto)}</strong>
+            </div>
+            <div class="cc-vencimiento-sub">${fecha ? fecha.toLocaleDateString("es-AR") : "-"}</div>
+        </div>`;
+    }).join("");
+
+    renderPanelResumenGlobalProv();
+
+    if (proveedorSeleccionadoId) {
+        const prov = proveedoresCache.find(p => p.id === proveedorSeleccionadoId);
+        document.getElementById("provSeleccionadoTexto").textContent = prov ? `Mostrando detalle de: ${prov.nombre}` : "";
+        if (subtabProveedorActivo !== "resumen") renderPanelDetalleProveedor();
+    }
+
+}
+
+function renderPanelResumenGlobalProv() {
+
+    const activos = proveedoresCache.filter(p => (p.estado || "Activo") === "Activo").length;
+    const inactivos = proveedoresCache.filter(p => p.estado === "Inactivo").length;
+    const preferidos = proveedoresCache.filter(p => p.preferido).length;
+    const primeraCompra = comprasProveedorCache.slice().sort((a, b) => (toDateSegura(a.fecha) || 0) - (toDateSegura(b.fecha) || 0))[0];
+
+    document.getElementById("provInfoGeneral").innerHTML = `
+        <div class="dash-mov-fila"><span>Proveedores activos</span><strong style="margin-left:auto;">${activos}</strong></div>
+        <div class="dash-mov-fila"><span>Proveedores inactivos</span><strong style="margin-left:auto;">${inactivos}</strong></div>
+        <div class="dash-mov-fila"><span>Proveedores preferidos</span><strong style="margin-left:auto;">${preferidos}</strong></div>
+        <div class="dash-mov-fila"><span>Primera compra</span><strong style="margin-left:auto;">${primeraCompra && toDateSegura(primeraCompra.fecha) ? toDateSegura(primeraCompra.fecha).toLocaleDateString("es-AR") : "-"}</strong></div>
+    `;
+
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const en30dias = new Date(hoy); en30dias.setDate(en30dias.getDate() - 30);
+    const comprasConSaldo = comprasProveedorCache.filter(c => (Number(c.saldo) || 0) > 0.5 && toDateSegura(c.vencimiento));
+
+    const vencidoMas30 = comprasConSaldo.filter(c => toDateSegura(c.vencimiento) < en30dias);
+    const de7a30 = comprasConSaldo.filter(c => { const v = toDateSegura(c.vencimiento); return v >= en30dias && v < hoy; });
+    const hasta7 = comprasConSaldo.filter(c => toDateSegura(c.vencimiento) >= hoy);
+
+    const totalVencido = vencidoMas30.reduce((s, c) => s + c.saldo, 0);
+    const total7a30 = de7a30.reduce((s, c) => s + c.saldo, 0);
+    const totalHasta7 = hasta7.reduce((s, c) => s + c.saldo, 0);
+
+    const canvas = document.getElementById("provDonutAntiguedad");
+    if (canvas) {
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        const total = totalVencido + total7a30 + totalHasta7;
+        const cx = w / 2, cy = h / 2, radio = Math.min(w, h) / 2 - 6, grosor = 11;
+        if (total <= 0) {
+            ctx.beginPath(); ctx.arc(cx, cy, radio, 0, Math.PI * 2); ctx.strokeStyle = "#2a2a2a"; ctx.lineWidth = grosor; ctx.stroke();
+        } else {
+            let ang = -Math.PI / 2;
+            [[totalVencido, "#ff6b6b"], [total7a30, "#f5a623"], [totalHasta7, "#2fdb6e"]].forEach(([valor, color]) => {
+                if (valor <= 0) return;
+                const a = (valor / total) * Math.PI * 2;
+                ctx.beginPath(); ctx.arc(cx, cy, radio, ang, ang + a); ctx.strokeStyle = color; ctx.lineWidth = grosor; ctx.stroke();
+                ang += a;
+            });
+        }
+    }
+
+    const totalAntig = totalVencido + total7a30 + totalHasta7;
+    document.getElementById("provDonutLeyenda").innerHTML = `
+        <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#ff6b6b;"></span>Vencido (más 30 días) <strong>${formatoPlata(totalVencido)}</strong></div>
+        <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#f5a623;"></span>De 7 a 30 días <strong>${formatoPlata(total7a30)}</strong></div>
+        <div class="caja-leyenda-item"><span class="caja-leyenda-dot" style="background:#2fdb6e;"></span>Hasta 7 días <strong>${formatoPlata(totalHasta7)}</strong></div>
+    `;
+
+    const topProveedores = proveedoresCache.map(p => ({
+        prov: p,
+        total: comprasProveedorCache.filter(c => c.proveedorId === p.id).reduce((s, c) => s + (Number(c.monto) || 0), 0)
+    })).filter(x => x.total > 0).sort((a, b) => b.total - a.total).slice(0, 3);
+
+    document.getElementById("provTopCompras").innerHTML = topProveedores.length === 0 ? '<div class="vacio">Sin compras todavía.</div>' : topProveedores.map((x, i) => `
+        <div class="dash-mov-fila"><span>${i + 1}. ${escapar(x.prov.nombre)}</span><strong style="margin-left:auto;">${formatoPlata(x.total)}</strong></div>
+    `).join("");
+
+}
+
+// ---------- Ficha de proveedor seleccionado (subtabs) ----------
+
+window.seleccionarProveedor = function (id) {
+    proveedorSeleccionadoId = id;
+    window.cambiarSubtabProveedor(subtabProveedorActivo === "resumen" ? "cuentacorriente" : subtabProveedorActivo);
+};
+
+window.cambiarSubtabProveedor = function (sub) {
+
+    subtabProveedorActivo = sub;
+
+    ["Resumen", "CC", "Compras", "Pagos", "Productos", "Notas"].forEach(n => {
+        const el = document.getElementById("provSubtab" + n);
+        if (el) el.classList.toggle("activo", (n === "Resumen" && sub === "resumen") || (n === "CC" && sub === "cuentacorriente") || (n.toLowerCase() === sub));
+    });
+
+    document.getElementById("provPanelResumen").style.display = sub === "resumen" ? "block" : "none";
+    document.getElementById("provPanelCC").style.display = sub === "cuentacorriente" ? "block" : "none";
+    document.getElementById("provPanelCompras").style.display = sub === "compras" ? "block" : "none";
+    document.getElementById("provPanelPagos").style.display = sub === "pagos" ? "block" : "none";
+    document.getElementById("provPanelProductos").style.display = sub === "productos" ? "block" : "none";
+    document.getElementById("provPanelNotas").style.display = sub === "notas" ? "block" : "none";
+
+    if (sub !== "resumen") renderPanelDetalleProveedor();
+
+};
+
+function renderPanelDetalleProveedor() {
+
+    const prov = proveedoresCache.find(p => p.id === proveedorSeleccionadoId);
+    const elTexto = document.getElementById("provSeleccionadoTexto");
+
+    if (!prov) {
+        elTexto.textContent = "Elegí un proveedor de la tabla de arriba para ver su detalle.";
         return;
     }
 
-    el.innerHTML = '<div class="lista-cards">' + proveedoresCache.map(p => `
-        <div class="item-card">
-            <div class="item-avatar" style="background:linear-gradient(135deg,#555,#2a2a2a);">${getIniciales(p.nombre, "")}</div>
-            <div class="item-info">
-                <div class="item-titulo">${escapar(p.nombre)}</div>
-                <div class="item-sub">${escapar(p.contacto || p.notas || "Sin datos de contacto")}</div>
+    elTexto.textContent = `Mostrando detalle de: ${prov.nombre}`;
+
+    const compras = comprasProveedorCache.filter(c => c.proveedorId === prov.id);
+    const pagos = pagosProveedorCache.filter(p => p.proveedorId === prov.id);
+
+    if (subtabProveedorActivo === "cuentacorriente") {
+
+        const deuda = deudaDeProveedor(prov.id);
+        document.getElementById("provPanelCC").innerHTML = `
+            <div style="background:#1a1a1a;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;"><span>Deuda actual con ${escapar(prov.nombre)}</span><strong style="color:${deuda > 0.5 ? "#ff6b6b" : "#5fd98a"};">${formatoPlata(deuda)}</strong></div>
             </div>
-            <div class="item-acciones">
-                <button class="btn-confirmar-gasto" onclick="abrirModalPagoProveedor('${p.id}')">💸 Pagar</button>
-                <button class="btn-chico" onclick="editarProveedor('${p.id}')">Editar</button>
-                <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarProveedor('${p.id}', '${escaparComillas(p.nombre)}')">✕</button>
+            <div id="provCCMovimientos"></div>
+        `;
+
+        const movimientos = [
+            ...compras.map(c => ({ tipo: "compra", fecha: toDateSegura(c.fecha), texto: c.descripcion, monto: c.monto })),
+            ...pagos.map(p => ({ tipo: "pago", fecha: toDateSegura(p.fecha), texto: "Pago · " + (p.medioPago || ""), monto: -p.monto }))
+        ].sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+
+        document.getElementById("provCCMovimientos").innerHTML = movimientos.length === 0 ? '<div class="vacio">Sin movimientos todavía.</div>' : movimientos.map(m => `
+            <div class="dash-mov-fila">
+                <span>${m.fecha ? m.fecha.toLocaleDateString("es-AR") : "-"} · ${escapar(m.texto || "")}</span>
+                <strong style="margin-left:auto;color:${m.monto >= 0 ? "#f5a623" : "#5fd98a"};">${m.monto >= 0 ? "+" : ""}${formatoPlata(m.monto)}</strong>
             </div>
-        </div>
-    `).join("") + '</div>';
+        `).join("");
+
+    }
+
+    if (subtabProveedorActivo === "compras") {
+
+        document.getElementById("provBtnNuevaCompra").style.display = "inline-flex";
+        document.getElementById("provListaCompras").innerHTML = compras.length === 0 ? '<div class="vacio">Sin compras cargadas.</div>' : compras.map(c => {
+            const est = estadoRealCompraProveedor(c);
+            const estadoClase = { "Pendiente": "CCPendiente", "Vencida": "CCVencida", "Pagada": "CCPagada" };
+            return `<div class="dash-mov-fila">
+                <span>${toDateSegura(c.fecha) ? toDateSegura(c.fecha).toLocaleDateString("es-AR") : "-"} · ${escapar(c.descripcion || "")}</span>
+                <span class="badge-estado-tabla ${estadoClase[est]}" style="margin-left:auto;margin-right:10px;">${est}</span>
+                <strong>${formatoPlata(c.monto)}</strong>
+            </div>`;
+        }).join("");
+
+    }
+
+    if (subtabProveedorActivo === "pagos") {
+
+        document.getElementById("provPanelPagos").innerHTML = pagos.length === 0 ? '<div class="vacio">Sin pagos registrados.</div>' : pagos.map(p => `
+            <div class="dash-mov-fila">
+                <span>${toDateSegura(p.fecha) ? toDateSegura(p.fecha).toLocaleDateString("es-AR") : "-"} · ${escapar(p.medioPago || "")}</span>
+                <strong style="margin-left:auto;color:#5fd98a;">${formatoPlata(p.monto)}</strong>
+            </div>
+        `).join("");
+
+    }
+
+    if (subtabProveedorActivo === "productos") {
+
+        const productos = stockCache.filter(s => s.proveedorId === prov.id);
+        document.getElementById("provPanelProductos").innerHTML = productos.length === 0
+            ? '<div class="vacio">Este proveedor no tiene productos vinculados en Stock (se asigna al cargar o editar un producto).</div>'
+            : productos.map(s => `<div class="dash-mov-fila"><span>${escapar(s.nombre)}</span><strong style="margin-left:auto;">${formatoPlata(s.precio)}</strong></div>`).join("");
+
+    }
+
+    if (subtabProveedorActivo === "notas") {
+        const ta = document.getElementById("provNotasEdit");
+        ta.disabled = false;
+        ta.value = prov.notas || "";
+        document.getElementById("provBtnGuardarNotas").style.display = "inline-block";
+    }
 
 }
+
+window.guardarNotasProveedorSeleccionado = async function () {
+    if (!proveedorSeleccionadoId) return;
+    const notas = document.getElementById("provNotasEdit").value;
+    await updateDoc(doc(db, "proveedores", proveedorSeleccionadoId), { notas });
+    alert("Notas guardadas.");
+};
+
+// ---------- Alta / edición de proveedor ----------
 
 window.abrirModalProveedor = function () {
     document.getElementById("modalProveedorTitulo").textContent = "Nuevo proveedor";
     document.getElementById("provId").value = "";
     document.getElementById("provNombre").value = "";
+    document.getElementById("provCuit").value = "";
     document.getElementById("provContacto").value = "";
+    document.getElementById("provEmail").value = "";
+    document.getElementById("provCategoria").value = "";
+    document.getElementById("provCondicionIva").value = "Responsable inscripto";
+    document.getElementById("provEstado").value = "Activo";
+    document.getElementById("provPreferido").checked = false;
     document.getElementById("provNotas").value = "";
+    document.getElementById("accionesProveedor").style.display = "none";
     document.getElementById("mensajeEstadoProveedor").textContent = "";
     document.getElementById("modalProveedor").classList.add("abierto");
 };
@@ -9337,8 +9983,16 @@ window.editarProveedor = function (id) {
     document.getElementById("modalProveedorTitulo").textContent = "Editar proveedor";
     document.getElementById("provId").value = p.id;
     document.getElementById("provNombre").value = p.nombre || "";
+    document.getElementById("provCuit").value = p.cuit || "";
     document.getElementById("provContacto").value = p.contacto || "";
+    document.getElementById("provEmail").value = p.email || "";
+    document.getElementById("provCategoria").value = p.categoria || "";
+    document.getElementById("provCondicionIva").value = p.condicionIva || "Responsable inscripto";
+    document.getElementById("provEstado").value = p.estado || "Activo";
+    document.getElementById("provPreferido").checked = !!p.preferido;
     document.getElementById("provNotas").value = p.notas || "";
+    document.getElementById("accionesProveedor").innerHTML = `<button class="btn-chico" style="flex:1;color:#ff6b6b;" onclick="cerrarModales(); borrarProveedor('${p.id}', '${escaparComillas(p.nombre)}')">🗑️ Eliminar proveedor</button>`;
+    document.getElementById("accionesProveedor").style.display = "flex";
     document.getElementById("mensajeEstadoProveedor").textContent = "";
     document.getElementById("modalProveedor").classList.add("abierto");
 };
@@ -9347,8 +10001,17 @@ window.guardarProveedor = async function () {
 
     const id = document.getElementById("provId").value;
     const nombre = document.getElementById("provNombre").value.trim();
-    const contacto = document.getElementById("provContacto").value.trim();
-    const notas = document.getElementById("provNotas").value.trim();
+    const datos = {
+        nombre,
+        cuit: document.getElementById("provCuit").value.trim(),
+        contacto: document.getElementById("provContacto").value.trim(),
+        email: document.getElementById("provEmail").value.trim(),
+        categoria: document.getElementById("provCategoria").value.trim(),
+        condicionIva: document.getElementById("provCondicionIva").value,
+        estado: document.getElementById("provEstado").value,
+        preferido: document.getElementById("provPreferido").checked,
+        notas: document.getElementById("provNotas").value.trim()
+    };
     const estado = document.getElementById("mensajeEstadoProveedor");
 
     if (!nombre) {
@@ -9363,9 +10026,9 @@ window.guardarProveedor = async function () {
     try {
 
         if (id) {
-            await updateDoc(doc(db, "proveedores", id), { nombre, contacto, notas });
+            await updateDoc(doc(db, "proveedores", id), datos);
         } else {
-            await addDoc(collection(db, "proveedores"), { nombre, contacto, notas, creado: serverTimestamp() });
+            await addDoc(collection(db, "proveedores"), { ...datos, creado: serverTimestamp() });
         }
 
         estado.textContent = "¡Listo!";
@@ -9385,27 +10048,126 @@ window.borrarProveedor = async function (id, nombre) {
     await deleteDoc(doc(db, "proveedores", id));
 };
 
-// Pago a proveedor: registra el egreso REAL en la colección "caja", exactamente
-// igual que cualquier otro egreso — por eso descuenta solo de la facturación del día,
-// sin tocar ninguna otra lógica ni crear una base de datos aparte.
+// ---------- Nueva compra (genera deuda real) ----------
+
+window.abrirModalCompraProveedor = function () {
+
+    const id = proveedorSeleccionadoId;
+    const prov = proveedoresCache.find(p => p.id === id);
+
+    if (!prov) {
+        alert("Elegí un proveedor de la tabla primero (tocá su fila).");
+        return;
+    }
+
+    document.getElementById("compraProvId").value = id;
+    document.getElementById("compraProvNombre").textContent = "Proveedor: " + prov.nombre;
+    document.getElementById("compraProvDescripcion").value = "";
+    document.getElementById("compraProvFecha").value = new Date().toISOString().split("T")[0];
+    const venc = new Date(); venc.setDate(venc.getDate() + 30);
+    document.getElementById("compraProvVencimiento").value = venc.toISOString().split("T")[0];
+    document.getElementById("compraProvMonto").value = "";
+    document.getElementById("mensajeEstadoCompraProveedor").textContent = "";
+    document.getElementById("modalCompraProveedor").classList.add("abierto");
+
+};
+
+window.guardarCompraProveedor = async function () {
+
+    const proveedorId = document.getElementById("compraProvId").value;
+    const descripcion = document.getElementById("compraProvDescripcion").value.trim();
+    const fecha = document.getElementById("compraProvFecha").value;
+    const vencimiento = document.getElementById("compraProvVencimiento").value;
+    const monto = parseFloat(document.getElementById("compraProvMonto").value);
+    const estado = document.getElementById("mensajeEstadoCompraProveedor");
+
+    if (!descripcion || !monto || monto <= 0) {
+        estado.textContent = "Completá la descripción y un monto válido.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await addDoc(collection(db, "comprasProveedor"), {
+            proveedorId, descripcion,
+            fecha: new Date(fecha + "T00:00:00"),
+            vencimiento: vencimiento ? new Date(vencimiento + "T00:00:00") : null,
+            monto, pagado: 0, saldo: monto,
+            estado: "Pendiente",
+            creado: serverTimestamp()
+        });
+
+        estado.textContent = "✅ ¡Compra registrada!";
+        estado.style.color = "#5fd98a";
+        setTimeout(() => window.cerrarModales(), 700);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
+
+};
+
+// ---------- Pago a proveedor (contra una compra puntual, con saldo real) ----------
+
+window.abrirPagoRapidoProveedor = function () {
+    if (!proveedorSeleccionadoId) {
+        alert("Elegí un proveedor de la tabla primero (tocá su fila) y volvé a intentar.");
+        return;
+    }
+    window.abrirModalPagoProveedor(proveedorSeleccionadoId);
+};
+
 window.abrirModalPagoProveedor = function (id) {
+
     const p = proveedoresCache.find(x => x.id === id);
     if (!p) return;
+
     document.getElementById("pagoProvId").value = id;
     document.getElementById("pagoProvNombre").textContent = "Proveedor: " + p.nombre;
-    document.getElementById("pagoProvConcepto").value = "";
-    document.getElementById("pagoProvMonto").value = "";
+
+    const comprasPendientes = comprasProveedorCache.filter(c => c.proveedorId === id && (Number(c.saldo) || 0) > 0.5);
+    const selCompra = document.getElementById("pagoProvCompraId");
+
+    if (comprasPendientes.length === 0) {
+        selCompra.innerHTML = '<option value="">Sin compras pendientes</option>';
+        document.getElementById("pagoProvMonto").value = "";
+    } else {
+        selCompra.innerHTML = comprasPendientes.map(c => `<option value="${c.id}" data-saldo="${c.saldo}">${escapar(c.descripcion)} — saldo ${formatoPlata(c.saldo)}</option>`).join("");
+        document.getElementById("pagoProvMonto").value = comprasPendientes[0].saldo;
+    }
+
     document.getElementById("mensajeEstadoPagoProveedor").textContent = "";
     document.getElementById("modalPagoProveedor").classList.add("abierto");
+
+};
+
+window.actualizarMontoSugeridoPagoProv = function () {
+    const sel = document.getElementById("pagoProvCompraId");
+    const opcion = sel.options[sel.selectedIndex];
+    if (opcion && opcion.dataset.saldo) {
+        document.getElementById("pagoProvMonto").value = opcion.dataset.saldo;
+    }
 };
 
 window.guardarPagoProveedor = async function () {
 
-    const id = document.getElementById("pagoProvId").value;
-    const concepto = document.getElementById("pagoProvConcepto").value.trim();
+    const proveedorId = document.getElementById("pagoProvId").value;
+    const compraId = document.getElementById("pagoProvCompraId").value;
     const monto = parseFloat(document.getElementById("pagoProvMonto").value);
+    const medioPago = document.getElementById("pagoProvMedioPago").value;
     const estado = document.getElementById("mensajeEstadoPagoProveedor");
-    const proveedor = proveedoresCache.find(p => p.id === id);
+    const proveedor = proveedoresCache.find(p => p.id === proveedorId);
+
+    if (!compraId) {
+        estado.textContent = "Este proveedor no tiene compras pendientes para pagar. Cargá una compra primero.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
 
     if (!monto || monto <= 0) {
         estado.textContent = "Poné un monto válido.";
@@ -9418,11 +10180,25 @@ window.guardarPagoProveedor = async function () {
 
     try {
 
+        const compra = comprasProveedorCache.find(c => c.id === compraId);
+        const nuevoPagado = (Number(compra.pagado) || 0) + monto;
+        const nuevoSaldo = Math.max(0, (Number(compra.monto) || 0) - nuevoPagado);
+        const nuevoEstado = nuevoSaldo <= 0.5 ? "Pagada" : "Pendiente";
+
+        await updateDoc(doc(db, "comprasProveedor", compraId), { pagado: nuevoPagado, saldo: nuevoSaldo, estado: nuevoEstado });
+
+        await addDoc(collection(db, "pagosProveedor"), {
+            compraId, proveedorId, monto, medioPago,
+            fecha: serverTimestamp()
+        });
+
         await addDoc(collection(db, "caja"), {
             tipo: "Egreso",
-            descripcion: `Pago a proveedor: ${proveedor ? proveedor.nombre : ""}${concepto ? " - " + concepto : ""}`,
-            monto,
-            proveedorId: id,
+            descripcion: `Pago a proveedor: ${proveedor ? proveedor.nombre : ""}${compra ? " - " + compra.descripcion : ""}`,
+            contraparte: proveedor ? proveedor.nombre : "",
+            categoria: "Proveedores",
+            monto, medioPago,
+            proveedorId,
             fecha: serverTimestamp()
         });
 
@@ -9433,6 +10209,77 @@ window.guardarPagoProveedor = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+    }
+
+};
+
+// ---------- Importar / Exportar ----------
+
+window.exportarProveedoresFiltrados = function () {
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    const lista = proveedoresCache.map(p => ({
+        Nombre: p.nombre || "", Cuit: p.cuit || "", Contacto: p.contacto || "", Email: p.email || "",
+        Categoria: p.categoria || "", CondicionIVA: p.condicionIva || "", Estado: p.estado || "Activo",
+        Preferido: p.preferido ? "Sí" : "No", Deuda: deudaDeProveedor(p.id)
+    }));
+
+    const hoja = XLSX.utils.json_to_sheet(lista.length ? lista : [{ info: "Sin datos" }]);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Proveedores");
+    XLSX.writeFile(libro, `KM26_Proveedores_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+};
+
+window.importarProveedoresDesdeExcel = async function (archivo) {
+
+    if (!archivo) return;
+
+    if (typeof XLSX === "undefined") {
+        alert("No se pudo cargar la librería de Excel (revisá tu conexión a internet) e intentá de nuevo.");
+        return;
+    }
+
+    try {
+
+        const buffer = await archivo.arrayBuffer();
+        const libro = XLSX.read(buffer, { type: "array" });
+        const filas = XLSX.utils.sheet_to_json(libro.Sheets[libro.SheetNames[0]]);
+
+        if (filas.length === 0) { alert("El archivo no tiene filas para importar."); return; }
+
+        const confirmado = confirm(`¿Importar ${filas.length} proveedor(es) nuevos?`);
+        if (!confirmado) return;
+
+        let importados = 0;
+
+        for (const fila of filas) {
+            const nombre = String(fila.Nombre || fila.nombre || "").trim();
+            if (!nombre) continue;
+            await addDoc(collection(db, "proveedores"), {
+                nombre,
+                cuit: String(fila.Cuit || fila.cuit || "").trim(),
+                contacto: String(fila.Contacto || fila.contacto || "").trim(),
+                email: String(fila.Email || fila.email || "").trim(),
+                categoria: String(fila.Categoria || fila.categoria || "").trim(),
+                condicionIva: String(fila.CondicionIVA || "Responsable inscripto").trim(),
+                estado: "Activo",
+                preferido: false,
+                notas: "",
+                creado: serverTimestamp()
+            });
+            importados++;
+        }
+
+        document.getElementById("inputImportarProveedores").value = "";
+        alert(`¡Listo! Se importaron ${importados} proveedor(es).`);
+
+    } catch (err) {
+        alert("No se pudo importar el archivo: " + err.message);
     }
 
 };
