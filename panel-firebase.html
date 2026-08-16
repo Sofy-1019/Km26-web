@@ -1282,8 +1282,8 @@ textarea:focus,
 
 @media (min-width:760px){
     #app{
-        max-width:1000px;
-        padding:24px 24px 110px;
+        max-width:1600px;
+        padding:24px 32px 110px;
     }
 }
 
@@ -1335,7 +1335,7 @@ header{
 .header-acciones{
     display:flex;
     align-items:center;
-    gap:8px;
+    gap:14px;
 }
 
 .btn-icono-header{
@@ -2715,6 +2715,23 @@ header{
     margin-bottom:14px;
 }
 
+.buscador-simple{
+    flex:1;
+    min-width:200px;
+    padding:12px 16px;
+    border-radius:10px;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#fff;
+    font-size:13.5px;
+    font-family:'Montserrat',sans-serif;
+}
+
+.buscador-simple:focus{
+    outline:none;
+    border-color:#d71920;
+}
+
 .cv-chips-fila{
     display:flex;
     gap:10px;
@@ -4063,10 +4080,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     <section class="seccion activa" id="tab-dashboard">
 
         <div class="cv-buscador-fila">
-            <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="dashBuscador" placeholder="Buscar cliente, vehículo o patente..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
-            </div>
+            <input type="text" id="dashBuscador" class="buscador-simple" placeholder="Buscar cliente, vehículo o patente..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
             <button class="btn-chico" onclick="ejecutarBusquedaGlobal(document.getElementById('dashBuscador').value)">🔍 Buscar</button>
         </div>
 
