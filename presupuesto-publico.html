@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presupuesto · KM26 Performance</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+
+body{
+    background:#2a2a2e;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+}
+
+#contenedor{
+    max-width:480px;
+    width:100%;
+    padding:24px 20px 60px;
+}
+
+.logo-wrap{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:24px;
+}
+
+.logo-wrap img{
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    filter:drop-shadow(0 4px 14px rgba(215,25,32,.4));
+}
+
+.logo-texto{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:17px;
+    color:#ff6b6b;
+}
+
+.logo-sub{
+    font-size:11px;
+    color:#888;
+}
+
+.tarjeta{
+    background:#1a1a1a;
+    border-radius:16px;
+    padding:22px;
+    margin-bottom:18px;
+}
+
+.numero-presu{
+    font-family:'Orbitron','Montserrat',sans-serif;
+    font-size:20px;
+    color:#fff;
+    margin-bottom:4px;
+}
+
+.detalle-top{
+    color:#999;
+    font-size:13px;
+    margin-bottom:18px;
+}
+
+.badge-estado{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:5px 12px;
+    border-radius:20px;
+    margin-bottom:16px;
+}
+
+.badge-estado.Borrador, .badge-estado.Enviado{ background:#2a2408; color:#f5a623; }
+.badge-estado.Aprobado{ background:#0d2418; color:#5fd98a; }
+.badge-estado.Rechazado{ background:#3a1416; color:#ff6b6b; }
+.badge-estado.Vencido{ background:#2a2a2e; color:#999; }
+
+.item-fila{
+    display:flex;
+    justify-content:space-between;
+    padding:9px 0;
+    border-bottom:1px dashed #2a2a2a;
+    font-size:13.5px;
+}
+
+.item-fila:last-child{
+    border-bottom:none;
+}
+
+.totales{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid #333;
+}
+
+.totales .fila{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    color:#999;
+    padding:3px 0;
+}
+
+.totales .total-final{
+    display:flex;
+    justify-content:space-between;
+    font-size:20px;
+    font-weight:800;
+    color:#fff;
+    padding-top:8px;
+}
+
+.notas{
+    font-size:12.5px;
+    color:#999;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px dashed #2a2a2a;
+}
+
+.botones-accion{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:20px;
+}
+
+.btn-accion{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:15px;
+    border-radius:14px;
+    border:none;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-aprobar{
+    background:#25D366;
+    color:#fff;
+}
+
+.btn-rechazar{
+    background:#242428;
+    color:#eee;
+    border:1px solid #3a3a3a;
+}
+
+.aviso-enviado{
+    text-align:center;
+    padding:20px;
+    background:#0d2418;
+    color:#5fd98a;
+    border-radius:14px;
+    font-size:13.5px;
+    margin-top:16px;
+}
+
+.vacio{
+    text-align:center;
+    color:#666;
+    padding:30px;
+    font-size:13px;
+    background:#1a1a1a;
+    border-radius:12px;
+}
+
+.footer{
+    text-align:center;
+    color:#555;
+    font-size:11px;
+    margin-top:32px;
+    line-height:1.6;
+}
+
+.cargando{
+    text-align:center;
+    color:#777;
+    padding:60px 0;
+    font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="contenedor">
+
+    <div class="logo-wrap">
+        <img src="images/icon-192.png" alt="KM26" onerror="this.style.display='none'">
+        <div>
+            <div class="logo-texto" id="nombreNegocioTitulo">KM26 PERFORMANCE</div>
+            <div class="logo-sub">Presupuesto</div>
+        </div>
+    </div>
+
+    <div id="resultado">
+        <div class="cargando">Buscando el presupuesto...</div>
+    </div>
+
+    <div class="footer">
+        Este link es de solo consulta. Si querés aprobar o rechazar, tocá el botón —
+        le va a llegar el aviso directo al taller para confirmarlo.
+    </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyB8W3x4-b0JEaxwEXBY09qWWFPRc2q98CA",
+    authDomain: "km26-gestion.firebaseapp.com",
+    projectId: "km26-gestion",
+    storageBucket: "km26-gestion.firebasestorage.app",
+    messagingSenderId: "1006314454164",
+    appId: "1:1006314454164:web:7a4e49c99e54d125038881"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Número de WhatsApp del taller al que le llega el aviso de aprobación o
+// rechazo. Poné tu número con código de país, sin espacios ni guiones
+// (ej: 5491155551234). A propósito NO se lee de Configuración: esa
+// colección tiene datos más sensibles (como tu alias de Mercado Pago) que
+// no conviene abrir al público solo por esto.
+const WHATSAPP_TALLER = "5491155551234";
+
+
+function escapar(s) {
+    if (s === undefined || s === null) return "";
+    return String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function formatoPlata(n) {
+    n = Number(n) || 0;
+    return "$" + Math.round(n).toLocaleString("es-AR");
+}
+
+let presupuestoActual = null;
+let idActual = null;
+
+async function cargar() {
+
+    const params = new URLSearchParams(window.location.search);
+    idActual = params.get("id");
+    const el = document.getElementById("resultado");
+
+    if (!idActual) {
+        el.innerHTML = '<div class="vacio">Este link no tiene un presupuesto asociado.</div>';
+        return;
+    }
+
+    try {
+
+        // Lectura de UN SOLO documento por su ID exacto (no una lista), así
+        // que no expone el resto de los presupuestos ni de los clientes del
+        // taller — el nombre del cliente y el vehículo ya vienen guardados
+        // adentro de este mismo documento, no hace falta leer otra colección.
+        const snap = await getDoc(doc(db, "presupuestos", idActual));
+
+        if (!snap.exists()) {
+            el.innerHTML = '<div class="vacio">No se encontró este presupuesto. Puede que el link esté vencido o mal escrito.</div>';
+            return;
+        }
+
+        presupuestoActual = snap.data();
+        const p = presupuestoActual;
+
+        const numeroTexto = p.numero ? "#" + String(p.numero).padStart(5, "0") : "";
+        const fecha = p.fecha && p.fecha.toDate ? p.fecha.toDate().toLocaleDateString("es-AR") : "";
+
+        const filasItems = (p.items || []).map(i => `
+            <div class="item-fila"><span>${escapar(i.descripcion)}${i.cantidad > 1 ? " x" + i.cantidad : ""}</span><span>${formatoPlata(i.monto)}</span></div>
+        `).join("");
+
+        const descuentoMonto = (p.subtotal || p.total || 0) - (p.total || 0);
+
+        let html = `
+            <div class="tarjeta">
+                <div class="numero-presu">Presupuesto ${numeroTexto}</div>
+                <div class="detalle-top">${escapar(p.clienteNombre || "")}${p.vehiculoInfo ? " · " + escapar(p.vehiculoInfo) : ""}<br>${fecha}</div>
+                <span class="badge-estado ${escapar(p.estado)}">${escapar(p.estado)}</span>
+                ${filasItems}
+                <div class="totales">
+                    <div class="fila"><span>Subtotal</span><span>${formatoPlata(p.subtotal || p.total)}</span></div>
+                    ${descuentoMonto > 0 ? `<div class="fila"><span>Descuento</span><span>-${formatoPlata(descuentoMonto)}</span></div>` : ""}
+                    <div class="total-final"><span>Total</span><span>${formatoPlata(p.total)}</span></div>
+                </div>
+                ${p.notas ? `<div class="notas">${escapar(p.notas)}</div>` : ""}
+            </div>
+        `;
+
+        if (p.estado === "Borrador" || p.estado === "Enviado") {
+            html += `
+                <div class="botones-accion" id="botonesAccion">
+                    <button class="btn-accion btn-aprobar" onclick="window.avisarDecision('aprobar')">✅ Quiero aprobar este presupuesto</button>
+                    <button class="btn-accion btn-rechazar" onclick="window.avisarDecision('rechazar')">No estoy de acuerdo, quiero hablar</button>
+                </div>
+            `;
+        }
+
+        el.innerHTML = html;
+
+    } catch (err) {
+        el.innerHTML = '<div class="vacio">No se pudo cargar el presupuesto. Probá de nuevo más tarde.</div>';
+    }
+
+}
+
+// El cliente NUNCA cambia nada del sistema desde acá — esto solo arma un
+// mensaje de WhatsApp prolijo dirigido al taller, para que el dueño lo
+// confirme él mismo adentro del panel. Por eso no hace falta abrir ningún
+// permiso de escritura público en Firestore.
+window.avisarDecision = function (tipo) {
+
+    if (!presupuestoActual) return;
+
+    const numeroTexto = presupuestoActual.numero ? "#" + String(presupuestoActual.numero).padStart(5, "0") : "";
+    const texto = tipo === "aprobar"
+        ? `Hola! Quiero APROBAR el presupuesto ${numeroTexto} (${formatoPlata(presupuestoActual.total)}). Mi nombre: ${presupuestoActual.clienteNombre || ""}`
+        : `Hola! No estoy de acuerdo con el presupuesto ${numeroTexto}, ¿podemos hablar? Mi nombre: ${presupuestoActual.clienteNombre || ""}`;
+
+    const url = `https://wa.me/${WHATSAPP_TALLER}?text=${encodeURIComponent(texto)}`;
+    window.open(url, "_blank");
+
+    document.getElementById("botonesAccion").insertAdjacentHTML("afterend",
+        '<div class="aviso-enviado">✅ Se abrió WhatsApp con tu mensaje. Confirmalo ahí y el taller lo va a ver enseguida.</div>'
+    );
+
+};
+
+cargar();
+
+</script>
+
+</body>
+</html>

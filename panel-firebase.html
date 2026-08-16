@@ -5456,7 +5456,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                     <input type="text" id="cfgTextoFinal" placeholder="Gracias por confiar en nosotros">
                     <label>Descuento máximo permitido sin ser admin (%)</label>
                     <input type="number" id="cfgDescuentoMax" placeholder="20" min="0" max="100">
-                    <label>Mensaje de WhatsApp (usá {nombre} {items} {total} {notas})</label>
+                    <label>Mensaje de WhatsApp (usá {nombre} {items} {total} {notas} {link})</label>
                     <textarea id="cfgMensajeWhatsapp" rows="3" placeholder="Hola {nombre}!..."></textarea>
                     <button class="btn-red" style="width:100%;margin-top:10px;" onclick="guardarConfiguracion()">Guardar</button>
                 </div>
@@ -5908,9 +5908,17 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
             <div>
-                <label style="color:#fff;">Próximo service</label>
-                <input type="text" id="fvProximoService" placeholder="Ej: 15/03/2027 o 100.000 km">
+                <label style="color:#fff;">Próximo service — fecha (opcional)</label>
+                <input type="date" id="fvProximoServiceFecha" oninput="actualizarAvisoServiceEnFicha()">
             </div>
+            <div>
+                <label style="color:#fff;">Próximo service — kilometraje (opcional)</label>
+                <input type="number" id="fvProximoServiceKm" placeholder="Ej: 105000" oninput="actualizarAvisoServiceEnFicha()">
+            </div>
+        </div>
+        <p id="fvServiceAviso" style="font-size:11px;margin-top:2px;"></p>
+
+        <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
             <div>
                 <label style="color:#fff;">Vencimiento de VTV</label>
                 <input type="date" id="fvVtv" oninput="actualizarAvisoVtvEnFicha()">
@@ -7544,7 +7552,17 @@ function renderDashboard() {
     if (vehiculosVtvUrgente.length > 0) {
         filas.push({ texto: "VTV vencida o por vencer (30 días)", badge: vehiculosVtvUrgente.length, tab: "clientes" });
     }
-    avisarVtvUrgente(vehiculosVtvUrgente);
+
+    // Próximo service vencido o por vencer (por fecha y/o kilometraje).
+    const vehiculosServiceUrgente = vehiculosCache.filter(v => {
+        const info = estadoService(v.proximoServiceFecha, v.proximoServiceKm, v.kilometraje);
+        return info && info.urgente;
+    });
+    if (vehiculosServiceUrgente.length > 0) {
+        filas.push({ texto: "Vehículos con service atrasado o próximo", badge: vehiculosServiceUrgente.length, tab: "clientes" });
+    }
+
+    avisarVtvUrgente([...vehiculosVtvUrgente, ...vehiculosServiceUrgente]);
 
     // Nota: "Cliente con saldo pendiente" no se incluye porque el sistema todavía
     // no lleva cuenta corriente por cliente — no hay ese dato real para mostrar.
@@ -7899,6 +7917,11 @@ function renderTarjetasEnTaller() {
             ? `<div class="cv-card-linea" style="color:${infoVtv.color};font-weight:700;">⚠️ ${infoVtv.texto}</div>`
             : "";
 
+        const infoService = estadoService(v.proximoServiceFecha, v.proximoServiceKm, v.kilometraje);
+        const lineaService = (infoService && infoService.urgente)
+            ? `<div class="cv-card-linea" style="color:${infoService.color};font-weight:700;">🔧 ${infoService.texto}</div>`
+            : "";
+
         return `<div class="cv-card-vehiculo">
             <div class="cv-card-foto" style="background:linear-gradient(135deg,${cfg.color}33,${cfg.color}11);">
                 <span class="cv-card-badge-estado" style="background:${cfg.color};">${cfg.icono} ${escapar(v.estadoTaller)}</span>
@@ -7911,6 +7934,7 @@ function renderTarjetasEnTaller() {
                 ${cliente && cliente.telefono ? `<div class="cv-card-linea">📞 ${escapar(cliente.telefono)}</div>` : ""}
                 ${textoIngreso ? `<div class="cv-card-linea">🕐 ${textoIngreso}</div>` : ""}
                 ${lineaVtv}
+                ${lineaService}
                 ${lineaEstadoTrabajo}
                 <div class="cv-card-acciones">
                     ${telefonoLimpio ? `<a class="btn-whatsapp-lindo" href="https://wa.me/549${telefonoLimpio}" target="_blank" rel="noopener">${ICONO_WHATSAPP_SVG}WhatsApp</a>` : ""}
@@ -8329,6 +8353,45 @@ function estadoVtv(fechaVtv) {
     else { texto = `VTV vence el ${venc.toLocaleDateString("es-AR")}`; color = "#5fd98a"; }
 
     return { dias, texto, color, urgente: dias <= 30 };
+
+}
+
+// Calcula el estado del "próximo service" de un vehículo. Puede avisar por
+// fecha (si faltan 30 días o menos, o ya pasó) y/o por kilometraje (si al
+// kilometraje actual cargado le faltan 500km o menos, o ya lo pasó). Si hay
+// los dos datos cargados, se muestra el que esté más urgente.
+function estadoService(fechaService, kmService, kmActual) {
+
+    let porFecha = null;
+    if (fechaService) {
+        const venc = toDateSegura(fechaService + "T00:00:00");
+        if (venc) {
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const dias = Math.round((venc - hoy) / 86400000);
+            let texto, color;
+            if (dias < 0) { texto = `Service atrasado hace ${Math.abs(dias)} día${Math.abs(dias) === 1 ? "" : "s"}`; color = "#ff6b6b"; }
+            else if (dias === 0) { texto = "Service vence hoy"; color = "#ff6b6b"; }
+            else if (dias <= 30) { texto = `Próximo service en ${dias} día${dias === 1 ? "" : "s"}`; color = "#f5a623"; }
+            else { texto = `Próximo service el ${venc.toLocaleDateString("es-AR")}`; color = "#5fd98a"; }
+            porFecha = { dias, texto, color, urgente: dias <= 30 };
+        }
+    }
+
+    let porKm = null;
+    if (kmService && kmActual) {
+        const faltan = Number(kmService) - Number(kmActual);
+        let texto, color;
+        if (faltan < 0) { texto = `Service atrasado (pasó ${Math.abs(faltan).toLocaleString("es-AR")} km)`; color = "#ff6b6b"; }
+        else if (faltan <= 500) { texto = `Próximo service en ${faltan.toLocaleString("es-AR")} km`; color = "#f5a623"; }
+        else { texto = `Próximo service a los ${Number(kmService).toLocaleString("es-AR")} km`; color = "#5fd98a"; }
+        porKm = { faltan, texto, color, urgente: faltan <= 500 };
+    }
+
+    if (!porFecha && !porKm) return null;
+    if (porFecha && porFecha.urgente) return porFecha;
+    if (porKm && porKm.urgente) return porKm;
+    return porFecha || porKm;
 
 }
 
@@ -9886,7 +9949,18 @@ window.abrirFichaVehiculo = function (id) {
     document.getElementById("fvCombustible").value = v.combustible || "";
     document.getElementById("fvColor").value = v.color || "";
     document.getElementById("fvVin").value = v.vin || "";
-    document.getElementById("fvProximoService").value = v.proximoService || "";
+
+    // Migración honesta: si antes había texto libre en "proximoService"
+    // (ej: "15/03/2027 o 100.000 km"), no se puede separar solo en fecha y
+    // km exactos — se avisa para que se vuelva a cargar en los campos nuevos.
+    const esFechaValidaService = /^\d{4}-\d{2}-\d{2}$/.test(v.proximoServiceFecha || "");
+    document.getElementById("fvProximoServiceFecha").value = esFechaValidaService ? v.proximoServiceFecha : "";
+    document.getElementById("fvProximoServiceKm").value = v.proximoServiceKm || "";
+    document.getElementById("fvServiceAviso").textContent = (v.proximoService && !v.proximoServiceFecha && !v.proximoServiceKm)
+        ? `Antes tenía guardado "${v.proximoService}" como texto — volvé a cargar la fecha y/o el kilometraje para que avise solo.`
+        : "";
+    document.getElementById("fvServiceAviso").style.color = "#f5a623";
+    actualizarAvisoServiceEnFicha();
 
     // Si ya había una fecha real cargada, la mostramos. Si lo que había
     // guardado es texto libre de antes de este cambio (ej: "vence 08/2027"),
@@ -9902,6 +9976,24 @@ window.abrirFichaVehiculo = function (id) {
 
     document.getElementById("mensajeEstadoFichaVehiculo").textContent = "";
     document.getElementById("modalFichaVehiculo").classList.add("abierto");
+
+};
+
+// Muestra en el momento cuánto falta para el próximo service, mientras se
+// está cargando la fecha/kilometraje en la ficha del vehículo.
+window.actualizarAvisoServiceEnFicha = function () {
+
+    const fecha = document.getElementById("fvProximoServiceFecha").value;
+    const km = document.getElementById("fvProximoServiceKm").value;
+    const kmActual = document.getElementById("fvKilometraje").value;
+    const el = document.getElementById("fvServiceAviso");
+    if (!fecha && !km) return;
+
+    const info = estadoService(fecha, km, kmActual);
+    if (!info) return;
+
+    el.textContent = info.texto;
+    el.style.color = info.color;
 
 };
 
@@ -9931,7 +10023,8 @@ window.guardarFichaVehiculo = async function () {
         combustible: document.getElementById("fvCombustible").value,
         color: document.getElementById("fvColor").value.trim(),
         vin: document.getElementById("fvVin").value.trim(),
-        proximoService: document.getElementById("fvProximoService").value.trim(),
+        proximoServiceFecha: document.getElementById("fvProximoServiceFecha").value,
+        proximoServiceKm: parseInt(document.getElementById("fvProximoServiceKm").value, 10) || null,
         vtv: document.getElementById("fvVtv").value
     };
 
@@ -13532,9 +13625,18 @@ window.guardarPresupuesto = async function () {
         const numeroMax = presupuestosCache.reduce((max, p) => Math.max(max, Number(p.numero) || 0), 0);
         const numero = numeroMax + 1;
 
+        // Se guarda una "foto" del nombre del cliente y del vehículo directo
+        // acá adentro (no solo el ID) para que el portal público del cliente
+        // pueda mostrar el presupuesto leyendo SOLO esta colección — sin
+        // necesitar acceso público a la lista de clientes.
+        const clienteSel = clientesCache.find(c => c.id === clienteId);
+        const vehiculoSel = vehiculosCache.find(v => v.id === vehiculoId);
+
         await addDoc(collection(db, "presupuestos"), {
             numero,
             clienteId, vehiculoId,
+            clienteNombre: clienteSel ? `${clienteSel.nombre} ${clienteSel.apellido}` : "",
+            vehiculoInfo: vehiculoSel ? `${vehiculoSel.marca || ""} ${vehiculoSel.modelo || ""} - ${vehiculoSel.patente}` : "",
             items: presupuestoItemsTemp,
             subtotal, descuentoPorc, total: totalFinal,
             notas,
@@ -13585,15 +13687,18 @@ window.enviarPresupuestoWhatsApp = function (id) {
     const notas = p.notas ? `\n\n${p.notas}` : "";
     const nombreNegocio = configuracionActual.nombreNegocio || "KM26 Performance";
 
+    const linkPortal = `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, "")}presupuesto-publico.html?id=${p.id}`;
+
     const plantilla = configuracionActual.mensajeWhatsappPresupuesto && configuracionActual.mensajeWhatsappPresupuesto.trim()
         ? configuracionActual.mensajeWhatsappPresupuesto
-        : `Hola {nombre}.\nTu presupuesto${detalleVehiculo ? " para " + detalleVehiculo : ""} ya está listo.\nDetalle:\n{items}\nTotal: {total}{notas}\n\nPara aprobar este presupuesto respondé:\nAPROBAR\n\n${nombreNegocio}`;
+        : `Hola {nombre}.\nTu presupuesto${detalleVehiculo ? " para " + detalleVehiculo : ""} ya está listo.\nDetalle:\n{items}\nTotal: {total}{notas}\n\nMirá el detalle completo y aprobalo (o consultanos) acá:\n${linkPortal}\n\n${nombreNegocio}`;
 
     const texto = plantilla
         .replace(/\{nombre\}/g, cliente.nombre || "")
         .replace(/\{items\}/g, items)
         .replace(/\{total\}/g, formatoPlata(p.total))
-        .replace(/\{notas\}/g, notas);
+        .replace(/\{notas\}/g, notas)
+        .replace(/\{link\}/g, linkPortal);
 
     const telefonoLimpio = String(cliente.telefono).replace(/\D/g, "");
     const url = `https://wa.me/549${telefonoLimpio}?text=${encodeURIComponent(texto)}`;

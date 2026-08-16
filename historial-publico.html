@@ -224,7 +224,8 @@ async function cargar() {
                 ${v.kilometraje ? `<div class="dato-fila"><span>Kilometraje</span><span>${Number(v.kilometraje).toLocaleString("es-AR")} km</span></div>` : ""}
                 ${v.combustible ? `<div class="dato-fila"><span>Combustible</span><span>${escapar(v.combustible)}</span></div>` : ""}
                 ${v.color ? `<div class="dato-fila"><span>Color</span><span>${escapar(v.color)}</span></div>` : ""}
-                ${v.proximoService ? `<div class="dato-fila"><span>Próximo service</span><span>${escapar(v.proximoService)}</span></div>` : ""}
+                ${v.proximoServiceFecha ? `<div class="dato-fila"><span>Próximo service</span><span>${new Date(v.proximoServiceFecha + "T00:00:00").toLocaleDateString("es-AR")}</span></div>` : ""}
+                ${v.proximoServiceKm ? `<div class="dato-fila"><span>Próximo service</span><span>${Number(v.proximoServiceKm).toLocaleString("es-AR")} km</span></div>` : ""}
             </div>
             <div class="seccion-titulo">Últimos servicios</div>
         `;
