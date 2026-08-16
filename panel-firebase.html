@@ -6553,13 +6553,23 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
             <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar reparación</p>
-            <div class="ficha-historial-form">
-                <input type="text" id="itemDescripcion" placeholder="Descripción · Ej: cambio de rótulas">
-                <input type="number" id="itemMonto" placeholder="$ Precio">
-                <button class="btn-chico" onclick="agregarItemManual()">+ Agregar</button>
+
+            <label style="font-size:11.5px;">Descripción</label>
+            <input type="text" id="itemDescripcion" placeholder="Ej: cambio de rótulas">
+
+            <label style="font-size:11.5px;">Monto</label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#999;font-size:13px;pointer-events:none;">$</span>
+                <input type="number" id="itemMonto" placeholder="0" style="padding-left:26px;">
             </div>
+            <button class="btn-chico" style="width:100%;margin-top:8px;" onclick="agregarItemManual()">+ Agregar ítem</button>
+
             <button class="btn-chico" style="width:100%;margin-top:10px;" onclick="abrirEscanerParaCuenta()">📷 Escanear producto</button>
-            <button class="btn-chico" style="width:100%;margin-top:6px;" onclick="elegirServicioParaCuenta()">🔧 Elegir de Servicios</button>
+
+            <label style="font-size:11.5px;margin-top:10px;">Elegir de Servicios (opcional)</label>
+            <select id="cuentaServicioSelect" onchange="window.cuentaServicioElegido(this.value)">
+                <option value="">Elegí un servicio del catálogo...</option>
+            </select>
         </div>
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
@@ -6634,13 +6644,23 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
             <p style="font-size:12px;color:#999;margin-bottom:10px;">Agregar ítem (mano de obra, repuesto, etc.)</p>
-            <div class="ficha-historial-form">
-                <input type="text" id="presuItemDescripcion" placeholder="Ej: cambio de embrague">
-                <input type="number" id="presuItemMonto" placeholder="$">
-                <button class="btn-chico" onclick="agregarItemPresupuesto()">+ Agregar</button>
+
+            <label style="font-size:11.5px;">Descripción</label>
+            <input type="text" id="presuItemDescripcion" placeholder="Ej: cambio de embrague">
+
+            <label style="font-size:11.5px;">Monto</label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#999;font-size:13px;pointer-events:none;">$</span>
+                <input type="number" id="presuItemMonto" placeholder="0" style="padding-left:26px;">
             </div>
+            <button class="btn-chico" style="width:100%;margin-top:8px;" onclick="agregarItemPresupuesto()">+ Agregar ítem</button>
+
             <button class="btn-chico" style="width:100%;margin-top:10px;" onclick="abrirEscanerParaPresupuesto()">📷 Escanear producto</button>
-            <button class="btn-chico" style="width:100%;margin-top:6px;" onclick="elegirServicioParaPresupuesto()">🔧 Elegir de Servicios</button>
+
+            <label style="font-size:11.5px;margin-top:10px;">Elegir de Servicios (opcional)</label>
+            <select id="presuServicioSelect" onchange="window.presuServicioElegido(this.value)">
+                <option value="">Elegí un servicio del catálogo...</option>
+            </select>
         </div>
 
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
@@ -11831,6 +11851,8 @@ function escucharServicios() {
         serviciosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         renderServicios();
         if (typeof renderCategorias === "function") renderCategorias();
+        if (typeof actualizarSelectServiciosPresupuesto === "function") actualizarSelectServiciosPresupuesto();
+        if (typeof actualizarSelectServiciosCuenta === "function") actualizarSelectServiciosCuenta();
     });
 }
 
@@ -12059,34 +12081,42 @@ window.borrarServicio = async function (id, nombre) {
     window.cerrarModales();
 };
 
-// Elegir un servicio del catálogo para autocompletar el ítem manual de Cuenta o Presupuesto,
-// en vez de escribir descripción y precio a mano cada vez.
-window.elegirServicioParaCuenta = function () {
-    if (serviciosCache.length === 0) {
-        alert("Todavía no cargaste ningún servicio en el catálogo (sección Servicios).");
-        return;
-    }
-    const opciones = serviciosCache.map((s, i) => `${i + 1}. ${s.nombre} — ${formatoPlata(s.precio || 0)}`).join("\n");
-    const eleccion = prompt("Elegí un servicio escribiendo su número:\n\n" + opciones);
-    const idx = parseInt(eleccion, 10) - 1;
-    if (isNaN(idx) || !serviciosCache[idx]) return;
-    document.getElementById("itemDescripcion").value = serviciosCache[idx].nombre;
-    document.getElementById("itemMonto").value = serviciosCache[idx].precio || "";
-    servicioIdParaProximoItem = serviciosCache[idx].id;
+// Rellena el <select> de servicios de Cobros con el catálogo actual.
+function actualizarSelectServiciosCuenta() {
+    const sel = document.getElementById("cuentaServicioSelect");
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Elegí un servicio del catálogo...</option>' +
+        serviciosCache.map(s => `<option value="${s.id}">${escapar(s.nombre)} — ${formatoPlata(s.precio || 0)}</option>`).join("");
+}
+
+window.cuentaServicioElegido = function (servicioId) {
+    if (!servicioId) return;
+    const servicio = serviciosCache.find(s => s.id === servicioId);
+    if (!servicio) return;
+    document.getElementById("itemDescripcion").value = servicio.nombre;
+    document.getElementById("itemMonto").value = servicio.precio || "";
+    servicioIdParaProximoItem = servicio.id;
+    document.getElementById("cuentaServicioSelect").value = "";
 };
 
-window.elegirServicioParaPresupuesto = function () {
-    if (serviciosCache.length === 0) {
-        alert("Todavía no cargaste ningún servicio en el catálogo (sección Servicios).");
-        return;
-    }
-    const opciones = serviciosCache.map((s, i) => `${i + 1}. ${s.nombre} — ${formatoPlata(s.precio || 0)}`).join("\n");
-    const eleccion = prompt("Elegí un servicio escribiendo su número:\n\n" + opciones);
-    const idx = parseInt(eleccion, 10) - 1;
-    if (isNaN(idx) || !serviciosCache[idx]) return;
-    document.getElementById("presuItemDescripcion").value = serviciosCache[idx].nombre;
-    document.getElementById("presuItemMonto").value = serviciosCache[idx].precio || "";
-    servicioIdParaProximoItem = serviciosCache[idx].id;
+// Rellena el <select> de servicios del presupuesto con el catálogo actual.
+function actualizarSelectServiciosPresupuesto() {
+    const sel = document.getElementById("presuServicioSelect");
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Elegí un servicio del catálogo...</option>' +
+        serviciosCache.map(s => `<option value="${s.id}">${escapar(s.nombre)} — ${formatoPlata(s.precio || 0)}</option>`).join("");
+}
+
+// Al elegir un servicio del desplegable, se completan solos los campos de
+// Descripción y Monto (el mismo botón "+ Agregar ítem" de siempre lo suma).
+window.presuServicioElegido = function (servicioId) {
+    if (!servicioId) return;
+    const servicio = serviciosCache.find(s => s.id === servicioId);
+    if (!servicio) return;
+    document.getElementById("presuItemDescripcion").value = servicio.nombre;
+    document.getElementById("presuItemMonto").value = servicio.precio || "";
+    servicioIdParaProximoItem = servicio.id;
+    document.getElementById("presuServicioSelect").value = "";
 };
 
 // ---------- Escáner con cámara ----------
@@ -13012,6 +13042,7 @@ window.abrirModalCuenta = function () {
     document.getElementById("itemMonto").value = "";
     document.getElementById("cuentaDescuento").value = "";
     document.getElementById("mensajeEstadoCuenta").textContent = "";
+    actualizarSelectServiciosCuenta();
 
     document.getElementById("modalCuenta").classList.add("abierto");
 
@@ -13627,6 +13658,7 @@ window.abrirModalPresupuesto = function () {
     document.getElementById("presuDescuento").value = "";
     document.getElementById("presuNotas").value = configuracionActual.diasValidezPresupuestoDefecto || "";
     document.getElementById("mensajeEstadoPresupuesto").textContent = "";
+    actualizarSelectServiciosPresupuesto();
 
     document.getElementById("modalPresupuesto").classList.add("abierto");
 
