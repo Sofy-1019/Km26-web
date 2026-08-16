@@ -4137,6 +4137,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         </div>
 
+        <div class="dash-panel-nuevo" id="panelRecordatoriosTurnos" style="display:none;margin-top:16px;">
+            <div class="dash-panel-nuevo-titulo" style="color:#f5a623;">📲 Recordatorios pendientes — turnos de mañana</div>
+            <div id="dashRecordatoriosPendientes"></div>
+        </div>
+
         <div class="dash-paneles" style="margin-top:22px;">
 
             <div class="dash-panel">
@@ -7562,7 +7567,27 @@ function renderDashboard() {
         filas.push({ texto: "Vehículos con service atrasado o próximo", badge: vehiculosServiceUrgente.length, tab: "clientes" });
     }
 
-    avisarVtvUrgente([...vehiculosVtvUrgente, ...vehiculosServiceUrgente]);
+    // Turnos de mañana que todavía no se les mandó el recordatorio por
+    // WhatsApp (dato real: se marca solo cuando tocás "Recordar" en un turno).
+    const inicioRecordDesde = new Date(); inicioRecordDesde.setHours(0, 0, 0, 0);
+    const inicioRecordManana = new Date(inicioRecordDesde); inicioRecordManana.setDate(inicioRecordManana.getDate() + 1);
+    const inicioRecordPasado = new Date(inicioRecordManana); inicioRecordPasado.setDate(inicioRecordPasado.getDate() + 1);
+
+    const turnosMananaSinRecordar = turnosCache.filter(t => {
+        if (!t.fechaHora || !t.fechaHora.toDate) return false;
+        if (t.estado === "Cancelado") return false;
+        if (t.recordadoWhatsApp) return false;
+        const f = t.fechaHora.toDate();
+        return f >= inicioRecordManana && f < inicioRecordPasado;
+    });
+
+    if (turnosMananaSinRecordar.length > 0) {
+        filas.push({ texto: "Turnos de mañana sin recordar", badge: turnosMananaSinRecordar.length, tab: "turnos" });
+    }
+
+    renderRecordatoriosPendientes(turnosMananaSinRecordar);
+
+    avisarVtvUrgente([...vehiculosVtvUrgente, ...vehiculosServiceUrgente, ...turnosMananaSinRecordar]);
 
     // Nota: "Cliente con saldo pendiente" no se incluye porque el sistema todavía
     // no lleva cuenta corriente por cliente — no hay ese dato real para mostrar.
@@ -8439,6 +8464,40 @@ function avisarVtvUrgente(listaVehiculos) {
         reproducirBeepAviso();
         nuevos.forEach(id => vehiculosVtvYaAvisados.add(id));
     }
+
+}
+
+// Panel del Dashboard con los turnos de mañana que todavía no se les mandó
+// el recordatorio — cada uno se puede mandar con un clic, y al mandarlo
+// desaparece solo de esta lista (porque queda marcado como recordado).
+function renderRecordatoriosPendientes(turnos) {
+
+    const panel = document.getElementById("panelRecordatoriosTurnos");
+    const el = document.getElementById("dashRecordatoriosPendientes");
+    if (!panel || !el) return;
+
+    if (turnos.length === 0) {
+        panel.style.display = "none";
+        return;
+    }
+
+    panel.style.display = "block";
+
+    el.innerHTML = turnos.map(t => {
+
+        const cliente = clientesCache.find(c => c.id === t.clienteId);
+        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
+        const hora = t.fechaHora.toDate().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+        const tieneTelefono = cliente && cliente.telefono;
+
+        return `<div class="dash-mov-fila">
+            <span><strong>${hora}</strong> · ${escapar(nombreCliente)} · ${escapar(t.servicio || "")}</span>
+            ${tieneTelefono
+                ? `<button class="btn-whatsapp-lindo" style="margin-left:auto;padding:7px 14px;font-size:11.5px;" onclick="recordarTurnoWhatsApp('${t.id}')">${ICONO_WHATSAPP_SVG} Recordar</button>`
+                : `<span style="margin-left:auto;color:#777;font-size:11px;">Sin teléfono</span>`}
+        </div>`;
+
+    }).join("");
 
 }
 
@@ -12721,6 +12780,8 @@ window.recordarTurnoWhatsApp = function (id) {
     const url = `https://wa.me/549${telefonoLimpio}?text=${encodeURIComponent(texto)}`;
 
     window.open(url, "_blank");
+
+    updateDoc(doc(db, "turnos", id), { recordadoWhatsApp: true }).catch(() => {});
 
 };
 
