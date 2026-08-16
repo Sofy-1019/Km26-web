@@ -1302,8 +1302,8 @@ header{
 }
 
 .header-logo-wrap{
-    width:68px;
-    height:68px;
+    width:84px;
+    height:84px;
     border-radius:50%;
     overflow:hidden;
     flex-shrink:0;
@@ -1320,13 +1320,13 @@ header{
 
 .header-saludo{
     font-family:'Orbitron','Montserrat',sans-serif;
-    font-size:17px;
+    font-size:22px;
     color:#fff;
     letter-spacing:0;
 }
 
 .header-fecha{
-    font-size:12px;
+    font-size:14px;
     color:#fff;
     font-weight:600;
     margin-top:2px;
@@ -4012,13 +4012,6 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 </div>
             </div>
 
-            <div class="header-buscador-desktop">
-                <input type="text" id="buscadorDesktop" placeholder="Buscar cliente, vehículo o patente..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
-                <button class="btn-buscar-inline" onclick="ejecutarBusquedaGlobal(document.getElementById('buscadorDesktop').value)" title="Buscar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </button>
-            </div>
-
             <div class="header-acciones">
                 <button class="header-btn-accion" style="background:linear-gradient(180deg,#2fdb6e,#1fa851);border:none;color:#fff;" onclick="abrirModalCuenta()">💲 COBROS</button>
                 <button class="header-btn-accion roja" onclick="abrirModalCliente()">+ Nuevo cliente</button>
@@ -4047,19 +4040,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                     </div>
                 </div>
 
-                <button class="btn-icono-header btn-buscador-movil" onclick="toggleBuscador()" title="Buscar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </button>
                 <button class="btn-icono-header" onclick="cerrarSesion()" title="Salir">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 </button>
             </div>
-        </div>
-        <div class="buscador-wrap" id="buscadorWrap">
-            <input type="text" id="buscador" placeholder="Buscar por nombre o patente..." style="max-width:none;" onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
-            <button class="btn-buscar-inline" onclick="ejecutarBusquedaGlobal(document.getElementById('buscador').value)" title="Buscar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </button>
         </div>
     </header>
 
@@ -4078,8 +4062,12 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
     <section class="seccion activa" id="tab-dashboard">
 
-        <div class="dash-header-nuevo">
-            <h2>KM26 Performance</h2>
+        <div class="cv-buscador-fila">
+            <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="dashBuscador" placeholder="Buscar cliente, vehículo o patente..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
+            </div>
+            <button class="btn-chico" onclick="ejecutarBusquedaGlobal(document.getElementById('dashBuscador').value)">🔍 Buscar</button>
         </div>
 
         <div class="dash-seccion-label">Hoy</div>
@@ -7169,7 +7157,7 @@ function ejecutarBusqueda(q) {
 
 }
 
-// Búsqueda desde el buscador de arriba (header): te lleva directo a la
+// Búsqueda desde el buscador grande del Dashboard: te lleva directo a la
 // pestaña Clientes/Vehículos. Si la búsqueda matchea un solo vehículo puntual
 // (por patente, o porque solo un cliente tiene ese nombre/teléfono y tiene un
 // único vehículo), te abre la ficha de ese vehículo directo, sin hacerte
@@ -7181,8 +7169,7 @@ window.ejecutarBusquedaGlobal = function (texto) {
 
     cambiarTab("clientes");
 
-    document.getElementById("buscador").value = texto;
-    document.getElementById("buscadorDesktop").value = texto;
+    document.getElementById("dashBuscador").value = texto;
     document.getElementById("buscadorClientesVeh").value = texto;
 
     const qSinEspacios = texto.toLowerCase().replace(/\s/g, "");
@@ -7225,21 +7212,13 @@ window.ejecutarBusquedaGlobal = function (texto) {
 
 };
 
-document.getElementById("buscador").addEventListener("input", function () {
-    document.getElementById("buscadorDesktop").value = this.value;
-    document.getElementById("buscadorClientesVeh").value = this.value;
-    ejecutarBusqueda(this.value);
-});
-
-document.getElementById("buscadorDesktop").addEventListener("input", function () {
-    document.getElementById("buscador").value = this.value;
+document.getElementById("dashBuscador").addEventListener("input", function () {
     document.getElementById("buscadorClientesVeh").value = this.value;
     ejecutarBusqueda(this.value);
 });
 
 document.getElementById("buscadorClientesVeh").addEventListener("input", function () {
-    document.getElementById("buscador").value = this.value;
-    document.getElementById("buscadorDesktop").value = this.value;
+    document.getElementById("dashBuscador").value = this.value;
     ejecutarBusqueda(this.value);
 });
 
@@ -7421,14 +7400,7 @@ window.cambiarTab = function (tab) {
 
 };
 
-// ---------- Header: saludo dinámico + buscador colapsable ----------
-
-window.toggleBuscador = function () {
-    document.getElementById("buscadorWrap").classList.toggle("activo");
-    if (document.getElementById("buscadorWrap").classList.contains("activo")) {
-        document.getElementById("buscador").focus();
-    }
-};
+// ---------- Header: saludo dinámico ----------
 
 function actualizarSaludoYFecha() {
 
