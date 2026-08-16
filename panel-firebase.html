@@ -1885,6 +1885,10 @@ header{
         display:flex !important;
     }
 
+    .btn-buscador-movil{
+        display:none !important;
+    }
+
 }
 
 .btn-hamburguesa{
@@ -1912,6 +1916,15 @@ header{
     max-width:420px;
     position:relative;
     align-items:center;
+}
+
+.header-buscador-desktop > svg{
+    position:absolute;
+    left:14px;
+    width:16px;
+    height:16px;
+    color:#777;
+    pointer-events:none;
 }
 
 .header-buscador-desktop .btn-buscar-inline{
@@ -4013,7 +4026,6 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
             </div>
 
             <div class="header-buscador-desktop">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" id="buscadorDesktop" placeholder="Buscar cliente, vehículo o patente..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
                 <button class="btn-buscar-inline" onclick="ejecutarBusquedaGlobal(document.getElementById('buscadorDesktop').value)" title="Buscar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -4048,7 +4060,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                     </div>
                 </div>
 
-                <button class="btn-icono-header" onclick="toggleBuscador()" title="Buscar">
+                <button class="btn-icono-header btn-buscador-movil" onclick="toggleBuscador()" title="Buscar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
                 <button class="btn-icono-header" onclick="cerrarSesion()" title="Salir">
