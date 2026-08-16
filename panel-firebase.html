@@ -1914,13 +1914,28 @@ header{
     align-items:center;
 }
 
-.header-buscador-desktop svg{
+.header-buscador-desktop .btn-buscar-inline{
     position:absolute;
-    left:14px;
+    left:8px;
+    width:26px;
+    height:26px;
+    border:none;
+    background:none;
+    color:#999;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+}
+
+.header-buscador-desktop .btn-buscar-inline:hover{
+    color:#fff;
+}
+
+.header-buscador-desktop .btn-buscar-inline svg{
     width:16px;
     height:16px;
-    color:#777;
-    pointer-events:none;
 }
 
 .header-buscador-desktop input{
@@ -3999,7 +4014,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
             <div class="header-buscador-desktop">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="buscadorDesktop" placeholder="Buscar cliente, vehículo o patente...">
+                <input type="text" id="buscadorDesktop" placeholder="Buscar cliente, vehículo o patente..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
+                <button class="btn-buscar-inline" onclick="ejecutarBusquedaGlobal(document.getElementById('buscadorDesktop').value)" title="Buscar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
             </div>
 
             <div class="header-acciones">
@@ -4039,7 +4057,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
             </div>
         </div>
         <div class="buscador-wrap" id="buscadorWrap">
-            <input type="text" id="buscador" placeholder="Buscar por nombre o patente..." style="max-width:none;">
+            <input type="text" id="buscador" placeholder="Buscar por nombre o patente..." style="max-width:none;" onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
+            <button class="btn-buscar-inline" onclick="ejecutarBusquedaGlobal(document.getElementById('buscador').value)" title="Buscar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
         </div>
     </header>
 
@@ -4172,8 +4193,9 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <div class="cv-buscador-fila">
             <div class="header-buscador-desktop" style="display:flex;max-width:none;flex:1;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="buscadorClientesVeh" placeholder="Buscar por patente, cliente, modelo o teléfono...">
+                <input type="text" id="buscadorClientesVeh" placeholder="Buscar por patente, cliente, modelo o teléfono..." onkeydown="if(event.key==='Enter') ejecutarBusqueda(this.value)">
             </div>
+            <button class="btn-chico" onclick="ejecutarBusqueda(document.getElementById('buscadorClientesVeh').value)">🔍 Buscar</button>
             <button class="btn-red" style="white-space:nowrap;" onclick="abrirModalIngresarVehiculo()">+ Ingresar vehículo</button>
         </div>
 
@@ -7127,6 +7149,62 @@ function ejecutarBusqueda(q) {
     renderClientes(filtrados);
 
 }
+
+// Búsqueda desde el buscador de arriba (header): te lleva directo a la
+// pestaña Clientes/Vehículos. Si la búsqueda matchea un solo vehículo puntual
+// (por patente, o porque solo un cliente tiene ese nombre/teléfono y tiene un
+// único vehículo), te abre la ficha de ese vehículo directo, sin hacerte
+// buscarlo de nuevo en la lista.
+window.ejecutarBusquedaGlobal = function (texto) {
+
+    texto = (texto || "").trim();
+    if (!texto) return;
+
+    cambiarTab("clientes");
+
+    document.getElementById("buscador").value = texto;
+    document.getElementById("buscadorDesktop").value = texto;
+    document.getElementById("buscadorClientesVeh").value = texto;
+
+    const qSinEspacios = texto.toLowerCase().replace(/\s/g, "");
+
+    // 1) ¿Coincide con la patente de un único vehículo? Vamos directo a su ficha.
+    const vehiculosPorPatente = vehiculosCache.filter(v =>
+        String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(qSinEspacios)
+    );
+
+    if (vehiculosPorPatente.length === 1) {
+        ejecutarBusqueda(texto);
+        setTimeout(() => window.abrirFichaVehiculo(vehiculosPorPatente[0].id), 150);
+        return;
+    }
+
+    // 2) Si no fue por patente, ¿el texto matchea un solo cliente, y ese
+    // cliente tiene un único vehículo cargado? También vamos directo a la ficha.
+    if (vehiculosPorPatente.length === 0) {
+
+        const qMinuscula = texto.toLowerCase();
+        const clientesCoincidentes = clientesCache.filter(c =>
+            (c.nombre + " " + c.apellido).toLowerCase().includes(qMinuscula) ||
+            (c.telefono || "").includes(texto)
+        );
+
+        if (clientesCoincidentes.length === 1) {
+            const vehiculosDeEseCliente = vehiculosCache.filter(v => v.clienteId === clientesCoincidentes[0].id);
+            if (vehiculosDeEseCliente.length === 1) {
+                ejecutarBusqueda(texto);
+                setTimeout(() => window.abrirFichaVehiculo(vehiculosDeEseCliente[0].id), 150);
+                return;
+            }
+        }
+
+    }
+
+    // 3) Cualquier otro caso (varias coincidencias, o un cliente con varios
+    // vehículos): se muestra la lista filtrada, como antes.
+    ejecutarBusqueda(texto);
+
+};
 
 document.getElementById("buscador").addEventListener("input", function () {
     document.getElementById("buscadorDesktop").value = this.value;
