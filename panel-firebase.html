@@ -4814,7 +4814,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
                     <div class="modal-botones" style="margin-top:16px;">
                         <button class="btn-cancelar" onclick="limpiarFormularioCC()">Cancelar</button>
-                        <button class="btn-red" style="flex:1;" onclick="guardarCuentaCC()">Guardar cuenta</button>
+                        <button class="btn-red" id="btnGuardarCuentaCC" style="flex:1;" onclick="guardarCuentaCC(this)">Guardar cuenta</button>
                     </div>
                     <p id="mensajeEstadoCC"></p>
 
@@ -5873,7 +5873,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" onclick="guardarCliente()">Guardar</button>
+            <button class="btn-red" id="btnGuardarCliente" onclick="guardarCliente(this)">Guardar</button>
         </div>
 
         <p id="mensajeEstado"></p>
@@ -5908,7 +5908,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <label>Año</label>
                 <input type="text" id="vAnio" placeholder="2020">
                 <div class="modal-botones">
-                    <button class="btn-chico" style="flex:1;" onclick="agregarVehiculo()">+ Agregar vehículo</button>
+                    <button class="btn-chico" style="flex:1;" onclick="agregarVehiculo(this)">+ Agregar vehículo</button>
                 </div>
             </div>
 
@@ -6134,7 +6134,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" onclick="guardarMovimiento()">Guardar</button>
+            <button class="btn-red" id="btnGuardarMovimiento" onclick="guardarMovimiento(this)">Guardar</button>
         </div>
 
         <div class="modal-botones" id="accionesMovimientoCaja" style="display:none;"></div>
@@ -6651,7 +6651,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModalCuenta()">Cancelar</button>
-            <button class="btn-red" style="flex:1;" onclick="cobrarCuenta()">COBRAR</button>
+            <button class="btn-red" id="btnCobrarCuenta" style="flex:1;" onclick="cobrarCuenta(this)">COBRAR</button>
         </div>
 
         <p id="mensajeEstadoCuenta"></p>
@@ -6735,7 +6735,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModalPresupuesto()">Cancelar</button>
-            <button class="btn-red" style="flex:1;" onclick="guardarPresupuesto()">Guardar presupuesto</button>
+            <button class="btn-red" id="btnGuardarPresupuesto" style="flex:1;" onclick="guardarPresupuesto(this)">Guardar presupuesto</button>
         </div>
 
         <p id="mensajeEstadoPresupuesto"></p>
@@ -7192,6 +7192,28 @@ function escapar(s) {
     return String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// Evita que se guarde/cobre/agregue dos veces por un doble clic sin querer:
+// deja el botón bloqueado (con "Guardando..." o el texto que se le pida)
+// mientras dura la operación, y lo vuelve a dejar como estaba si algo falla
+// (si sale todo bien, el modal se cierra solo, así que no hace falta
+// reactivarlo — se resetea solo la próxima vez que se abra ese modal).
+function bloquearBoton(boton, textoCargando) {
+    if (!boton) return;
+    if (!boton.dataset.textoOriginal) boton.dataset.textoOriginal = boton.textContent;
+    boton.disabled = true;
+    boton.textContent = textoCargando || "Guardando...";
+    boton.style.opacity = "0.6";
+    boton.style.cursor = "not-allowed";
+}
+
+function desbloquearBoton(boton) {
+    if (!boton) return;
+    boton.disabled = false;
+    boton.style.opacity = "";
+    boton.style.cursor = "";
+    if (boton.dataset.textoOriginal) boton.textContent = boton.dataset.textoOriginal;
+}
+
 // Íconos SVG reutilizables (no dependen de emojis del sistema operativo,
 // así se ven siempre igual y con buen contraste sobre el fondo oscuro).
 const ICONO_WHATSAPP_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.4 5L2 22l5.1-1.3c1.5.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.4.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.1.2-.1.3-.3.5-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.6-.1.2-.2.7-.8.9-1 .2-.2.4-.2.6-.1l1.7.8c.2.1.4.2.4.3.1.2.1.7-.1 1.3z"/></svg>';
@@ -7302,6 +7324,7 @@ window.abrirModalCliente = function () {
     document.getElementById("cTelefono").value = "";
     document.getElementById("cEmail").value = "";
     document.getElementById("mensajeEstado").textContent = "";
+    desbloquearBoton(document.getElementById("btnGuardarCliente"));
     document.getElementById("modalCliente").classList.add("abierto");
 
 };
@@ -7318,6 +7341,7 @@ window.editarCliente = function (id) {
     document.getElementById("cTelefono").value = c.telefono || "";
     document.getElementById("cEmail").value = c.email || "";
     document.getElementById("mensajeEstado").textContent = "";
+    desbloquearBoton(document.getElementById("btnGuardarCliente"));
     document.getElementById("modalCliente").classList.add("abierto");
 
 };
@@ -7363,7 +7387,7 @@ window.cerrarModales = function () {
     document.getElementById("modalCambiarContrasena").classList.remove("abierto");
 };
 
-window.guardarCliente = async function () {
+window.guardarCliente = function (boton) {
 
     const nombre = document.getElementById("cNombre").value.trim();
     const apellido = document.getElementById("cApellido").value.trim();
@@ -7376,6 +7400,13 @@ window.guardarCliente = async function () {
         estado.style.color = "#ff6b6b";
         return;
     }
+
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarCliente(nombre, apellido, telefono, email, estado, boton);
+
+};
+
+async function ejecutarGuardarCliente(nombre, apellido, telefono, email, estado, boton) {
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -7407,6 +7438,7 @@ window.guardarCliente = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -8390,7 +8422,7 @@ window.guardarIngresarVehiculo = async function () {
 
 };
 
-window.agregarVehiculo = async function () {
+window.agregarVehiculo = function (boton) {
 
     const clienteId = document.getElementById("fichaClienteId").value;
     const patente = document.getElementById("vPatente").value.trim().toUpperCase();
@@ -8403,21 +8435,36 @@ window.agregarVehiculo = async function () {
         return;
     }
 
-    await addDoc(collection(db, "vehiculos"), {
-        clienteId, patente, marca, modelo, anio,
-        creado: serverTimestamp()
-    });
-
-    document.getElementById("vPatente").value = "";
-    document.getElementById("vMarca").value = "";
-    document.getElementById("vMarcaOtra").value = "";
-    document.getElementById("vMarcaOtra").style.display = "none";
-    document.getElementById("vModelo").innerHTML = "";
-    document.getElementById("vModeloOtro").value = "";
-    document.getElementById("vModeloOtro").style.display = "none";
-    document.getElementById("vAnio").value = "";
+    bloquearBoton(boton, "Agregando...");
+    ejecutarAgregarVehiculo(clienteId, patente, marca, modelo, anio, boton);
 
 };
+
+async function ejecutarAgregarVehiculo(clienteId, patente, marca, modelo, anio, boton) {
+
+    try {
+
+        await addDoc(collection(db, "vehiculos"), {
+            clienteId, patente, marca, modelo, anio,
+            creado: serverTimestamp()
+        });
+
+        document.getElementById("vPatente").value = "";
+        document.getElementById("vMarca").value = "";
+        document.getElementById("vMarcaOtra").value = "";
+        document.getElementById("vMarcaOtra").style.display = "none";
+        document.getElementById("vModelo").innerHTML = "";
+        document.getElementById("vModeloOtro").value = "";
+        document.getElementById("vModeloOtro").style.display = "none";
+        document.getElementById("vAnio").value = "";
+        desbloquearBoton(boton);
+
+    } catch (err) {
+        alert("Error al agregar el vehículo: " + err.message);
+        desbloquearBoton(boton);
+    }
+
+}
 
 // Precarga marca/modelo al abrir "Editar vehículo": si el valor guardado
 // coincide con una marca/modelo conocido, lo selecciona en la lista; si no
@@ -9380,11 +9427,12 @@ window.limpiarFormularioCC = function () {
     document.getElementById("ccDescuentoPorc").value = "";
     document.getElementById("ccImpuestoPorc").value = "21";
     document.getElementById("mensajeEstadoCC").textContent = "";
+    desbloquearBoton(document.getElementById("btnGuardarCuentaCC"));
     renderItemsCC();
 
 };
 
-window.guardarCuentaCC = async function () {
+window.guardarCuentaCC = function (boton) {
 
     const clienteId = document.getElementById("ccClienteId").value;
     const estado = document.getElementById("mensajeEstadoCC");
@@ -9404,6 +9452,13 @@ window.guardarCuentaCC = async function () {
     const baseImponible = subtotal - descuentoMonto;
     const impuestoMonto = baseImponible * impuestoPorc / 100;
     const total = baseImponible + impuestoMonto;
+
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarCuentaCC(clienteId, vehiculoId, fecha, vencimiento, observaciones, subtotal, descuentoPorc, impuestoPorc, impuestoMonto, total, estado, boton);
+
+};
+
+async function ejecutarGuardarCuentaCC(clienteId, vehiculoId, fecha, vencimiento, observaciones, subtotal, descuentoPorc, impuestoPorc, impuestoMonto, total, estado, boton) {
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -9433,6 +9488,7 @@ window.guardarCuentaCC = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -9964,6 +10020,7 @@ window.abrirModalCaja = function (id) {
 
     document.getElementById("mensajeEstadoCaja").textContent = "";
     document.getElementById("accionesMovimientoCaja").style.display = "none";
+    desbloquearBoton(document.getElementById("btnGuardarMovimiento"));
 
     if (id) {
 
@@ -9998,7 +10055,7 @@ window.abrirModalCaja = function (id) {
 
 };
 
-window.guardarMovimiento = async function () {
+window.guardarMovimiento = function (boton) {
 
     const id = document.getElementById("mMovId").value;
     const descripcion = document.getElementById("mDescripcion").value.trim();
@@ -10013,6 +10070,13 @@ window.guardarMovimiento = async function () {
         estado.style.color = "#ff6b6b";
         return;
     }
+
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarMovimiento(id, descripcion, contraparte, categoria, monto, medioPago, estado, boton);
+
+};
+
+async function ejecutarGuardarMovimiento(id, descripcion, contraparte, categoria, monto, medioPago, estado, boton) {
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -10041,6 +10105,7 @@ window.guardarMovimiento = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -13134,6 +13199,7 @@ window.abrirModalCuenta = function () {
     document.getElementById("cuentaDescuento").value = "";
     document.getElementById("mensajeEstadoCuenta").textContent = "";
     actualizarSelectServiciosCuenta();
+    desbloquearBoton(document.getElementById("btnCobrarCuenta"));
 
     document.getElementById("modalCuenta").classList.add("abierto");
 
@@ -13305,7 +13371,7 @@ window.cerrarModalCuenta = function () {
     document.getElementById("modalCuenta").classList.remove("abierto");
 };
 
-window.cobrarCuenta = async function () {
+window.cobrarCuenta = function (boton) {
 
     const clienteId = document.getElementById("cuentaCliente").value;
     const vehiculoId = document.getElementById("cuentaVehiculo").value;
@@ -13323,6 +13389,13 @@ window.cobrarCuenta = async function () {
         estado.style.color = "#ff6b6b";
         return;
     }
+
+    bloquearBoton(boton, "Cobrando...");
+    ejecutarCobroCuenta(clienteId, vehiculoId, cliente, estado, boton);
+
+};
+
+async function ejecutarCobroCuenta(clienteId, vehiculoId, cliente, estado, boton) {
 
     estado.textContent = "Cobrando...";
     estado.style.color = "#999";
@@ -13386,6 +13459,7 @@ window.cobrarCuenta = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -13750,6 +13824,7 @@ window.abrirModalPresupuesto = function () {
     document.getElementById("presuNotas").value = configuracionActual.diasValidezPresupuestoDefecto || "";
     document.getElementById("mensajeEstadoPresupuesto").textContent = "";
     actualizarSelectServiciosPresupuesto();
+    desbloquearBoton(document.getElementById("btnGuardarPresupuesto"));
 
     document.getElementById("modalPresupuesto").classList.add("abierto");
 
@@ -13855,7 +13930,7 @@ window.cerrarModalPresupuesto = function () {
     document.getElementById("modalPresupuesto").classList.remove("abierto");
 };
 
-window.guardarPresupuesto = async function () {
+window.guardarPresupuesto = function (boton) {
 
     const clienteId = document.getElementById("presuCliente").value;
     const vehiculoId = document.getElementById("presuVehiculo").value || null;
@@ -13873,6 +13948,13 @@ window.guardarPresupuesto = async function () {
         estado.style.color = "#ff6b6b";
         return;
     }
+
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarPresupuesto(clienteId, vehiculoId, notas, estado, boton);
+
+};
+
+async function ejecutarGuardarPresupuesto(clienteId, vehiculoId, notas, estado, boton) {
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -13914,6 +13996,7 @@ window.guardarPresupuesto = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
