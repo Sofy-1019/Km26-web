@@ -4034,6 +4034,19 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <button class="header-btn-accion" style="background:linear-gradient(180deg,#2fdb6e,#1fa851);border:none;color:#fff;" onclick="abrirModalCuenta()">💲 COBROS</button>
                 <button class="header-btn-accion roja" onclick="abrirModalCliente()">+ Nuevo cliente</button>
 
+                <div class="email-wrap" style="position:relative;">
+                    <button class="header-btn-accion" style="background:#fff;border:none;color:#111;" onclick="toggleMenuEmail()">✉️ E-mail</button>
+                    <div class="notif-dropdown" id="menuEmailDropdown">
+                        <div class="notif-dropdown-titulo">Elegí una cuenta</div>
+                        <a class="dash-atencion-fila" style="text-decoration:none;color:inherit;" href="https://mail.zoho.com" target="_blank" rel="noopener" onclick="cerrarMenuEmail()">
+                            <span>💲 ventas@km26.com.ar</span>
+                        </a>
+                        <a class="dash-atencion-fila" style="text-decoration:none;color:inherit;" href="https://mail.zoho.com" target="_blank" rel="noopener" onclick="cerrarMenuEmail()">
+                            <span>🚚 proveedores@km26.com.ar</span>
+                        </a>
+                    </div>
+                </div>
+
                 <div class="notif-wrap">
                     <button class="btn-icono-header" id="btnNotificaciones" onclick="toggleNotificaciones()" title="Notificaciones" style="position:relative;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -5450,7 +5463,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                     <label>Teléfono (opcional)</label>
                     <input type="text" id="cfgTelefono" placeholder="11 5555-1234">
                     <label>Email (opcional)</label>
-                    <input type="text" id="cfgEmail" placeholder="info@tutaller.com.ar">
+                    <input type="text" id="cfgEmail" placeholder="ventas@km26.com.ar">
                     <label>Web / Redes (opcional)</label>
                     <input type="text" id="cfgWeb" placeholder="www.tutaller.com.ar / @tutaller">
                     <label>CUIT / Razón social (opcional)</label>
@@ -7481,6 +7494,20 @@ window.cerrarNotificaciones = function () {
 document.addEventListener("click", function (e) {
     const wrap = document.querySelector(".notif-wrap");
     if (wrap && !wrap.contains(e.target)) window.cerrarNotificaciones();
+});
+
+window.toggleMenuEmail = function () {
+    document.getElementById("menuEmailDropdown").classList.toggle("abierto");
+};
+
+window.cerrarMenuEmail = function () {
+    const el = document.getElementById("menuEmailDropdown");
+    if (el) el.classList.remove("abierto");
+};
+
+document.addEventListener("click", function (e) {
+    const wrap = document.querySelector(".email-wrap");
+    if (wrap && !wrap.contains(e.target)) window.cerrarMenuEmail();
 });
 
 window.toggleMenuUsuario = function () {
