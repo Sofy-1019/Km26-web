@@ -2146,6 +2146,43 @@ header{
     padding:0 4px;
 }
 
+.toast-deshacer{
+    position:fixed;
+    left:50%;
+    bottom:-80px;
+    transform:translateX(-50%);
+    background:#1a1a1a;
+    border:1px solid #333;
+    border-radius:12px;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    font-size:13.5px;
+    color:#eee;
+    box-shadow:0 8px 24px rgba(0,0,0,.5);
+    z-index:9999;
+    transition:bottom .25s ease-out;
+    max-width:90vw;
+}
+
+.toast-deshacer.visible{
+    bottom:24px;
+}
+
+.toast-deshacer button{
+    background:var(--acento-app,#d71920);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:8px 14px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+    font-family:'Montserrat',sans-serif;
+}
+
 .parpadeo-alerta{
     animation:parpadeoAlerta 1.1s ease-in-out infinite;
     border-radius:50%;
@@ -6761,7 +6798,7 @@ import {
     EmailAuthProvider, reauthenticateWithCredential, updatePassword
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
-    getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, setDoc,
+    getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, setDoc, getDoc,
     onSnapshot, query, orderBy, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {
@@ -7251,6 +7288,78 @@ function iconoCopiar(texto) {
     </span>`;
 }
 
+// ---------- Deshacer una acción reciente ----------
+// Patrón: se borra de verdad al toque (como siempre), pero se guarda una
+// copia completa del dato acá en memoria por 6 segundos. Si en ese tiempo
+// se toca "Deshacer", se vuelve a crear el registro con los mismos datos
+// (queda con un ID nuevo, pero con toda la info intacta). Pasado ese tiempo,
+// la copia se descarta y el borrado queda definitivo, como siempre fue.
+let temporizadorDeshacer = null;
+let accionDeshacer = null;
+
+function mostrarToastDeshacer(mensaje, funcionParaDeshacer) {
+
+    if (temporizadorDeshacer) clearTimeout(temporizadorDeshacer);
+
+    accionDeshacer = funcionParaDeshacer;
+
+    let toast = document.getElementById("toastDeshacer");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toastDeshacer";
+        toast.className = "toast-deshacer";
+        document.body.appendChild(toast);
+    }
+
+    toast.innerHTML = `<span>${escapar(mensaje)}</span><button onclick="window.confirmarDeshacer()">Deshacer</button>`;
+    toast.classList.add("visible");
+
+    temporizadorDeshacer = setTimeout(() => {
+        toast.classList.remove("visible");
+        accionDeshacer = null;
+    }, 6000);
+
+}
+
+window.confirmarDeshacer = async function () {
+
+    const toast = document.getElementById("toastDeshacer");
+    if (toast) {
+        toast.innerHTML = `<span>Restaurando...</span>`;
+    }
+
+    if (accionDeshacer) {
+        try {
+            await accionDeshacer();
+        } catch (err) {
+            console.warn("No se pudo deshacer:", err.message);
+        }
+    }
+
+    if (temporizadorDeshacer) clearTimeout(temporizadorDeshacer);
+    accionDeshacer = null;
+    if (toast) toast.classList.remove("visible");
+
+};
+
+// Borra un documento guardando antes una copia completa de sus datos, para
+// poder ofrecer "Deshacer" — se usa desde las funciones de borrar de cada sección.
+async function borrarConDeshacer(coleccion, id, mensaje) {
+
+    const refDoc = doc(db, coleccion, id);
+    const snap = await getDoc(refDoc);
+    if (!snap.exists()) return;
+
+    const datosOriginales = snap.data();
+
+    await deleteDoc(refDoc);
+
+    mostrarToastDeshacer(mensaje, async () => {
+        await addDoc(collection(db, coleccion), datosOriginales);
+    });
+
+}
+
 // Íconos SVG reutilizables (no dependen de emojis del sistema operativo,
 // así se ven siempre igual y con buen contraste sobre el fondo oscuro).
 const ICONO_WHATSAPP_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.4 5L2 22l5.1-1.3c1.5.8 3.1 1.3 4.9 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.6-4.1-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.4.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.1.2-.1.3-.3.5-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1.1 2.2 1.4 2.5 1.6.3.1.5.1.6-.1.2-.2.7-.8.9-1 .2-.2.4-.2.6-.1l1.7.8c.2.1.4.2.4.3.1.2.1.7-.1 1.3z"/></svg>';
@@ -7482,10 +7591,10 @@ async function ejecutarGuardarCliente(nombre, apellido, telefono, email, estado,
 
 window.borrarCliente = async function (id, nombreCompleto) {
 
-    const confirmado = confirm(`¿Seguro que querés borrar a ${nombreCompleto}? No se puede deshacer.`);
+    const confirmado = confirm(`¿Borrar a ${nombreCompleto}? Vas a tener unos segundos para deshacerlo después.`);
     if (!confirmado) return;
 
-    await deleteDoc(doc(db, "clientes", id));
+    await borrarConDeshacer("clientes", id, `Cliente "${nombreCompleto}" borrado.`);
 
 };
 
@@ -8600,10 +8709,10 @@ window.guardarEdicionVehiculo = async function () {
 
 window.borrarVehiculo = async function (id) {
 
-    const confirmado = confirm("¿Seguro que querés borrar este vehículo? No se puede deshacer.");
+    const confirmado = confirm("¿Borrar este vehículo? Vas a tener unos segundos para deshacerlo después.");
     if (!confirmado) return;
 
-    await deleteDoc(doc(db, "vehiculos", id));
+    await borrarConDeshacer("vehiculos", id, "Vehículo borrado.");
 
 };
 
@@ -10148,9 +10257,9 @@ async function ejecutarGuardarMovimiento(id, descripcion, contraparte, categoria
 };
 
 window.borrarMovimientoCaja = async function (id) {
-    const confirmado = confirm("¿Eliminar este movimiento definitivamente? No se puede deshacer.");
+    const confirmado = confirm("¿Eliminar este movimiento? Vas a tener unos segundos para deshacerlo después.");
     if (!confirmado) return;
-    await deleteDoc(doc(db, "caja", id));
+    await borrarConDeshacer("caja", id, "Movimiento de caja borrado.");
     window.cerrarModales();
 };
 
@@ -10726,9 +10835,9 @@ window.ajustarCantidad = async function (id, delta) {
 };
 
 window.borrarProducto = async function (id, nombre) {
-    const confirmado = confirm(`¿Eliminar "${nombre}" del inventario? No se puede deshacer.`);
+    const confirmado = confirm(`¿Eliminar "${nombre}" del inventario? Vas a tener unos segundos para deshacerlo después.`);
     if (!confirmado) return;
-    await deleteDoc(doc(db, "stock", id));
+    await borrarConDeshacer("stock", id, `"${nombre}" borrado del inventario.`);
 };
 
 window.abrirModalProducto = function () {
@@ -11393,9 +11502,9 @@ window.guardarProveedor = async function () {
 };
 
 window.borrarProveedor = async function (id, nombre) {
-    const confirmado = confirm(`¿Seguro que querés borrar a ${nombre}? No se puede deshacer.`);
+    const confirmado = confirm(`¿Borrar a ${nombre}? Vas a tener unos segundos para deshacerlo después.`);
     if (!confirmado) return;
-    await deleteDoc(doc(db, "proveedores", id));
+    await borrarConDeshacer("proveedores", id, `Proveedor "${nombre}" borrado.`);
 };
 
 // ---------- Nueva compra (genera deuda real) ----------
@@ -11898,9 +12007,9 @@ window.guardarCategoria = async function () {
 };
 
 window.borrarCategoria = async function (id, nombre) {
-    const confirmado = confirm(`¿Eliminar la categoría "${nombre}"? Los productos y servicios que la tenían asignada quedan sin categoría (no se borra nada más).`);
+    const confirmado = confirm(`¿Eliminar la categoría "${nombre}"? Los productos y servicios que la tenían asignada quedan sin categoría. Vas a tener unos segundos para deshacer el borrado de la categoría después.`);
     if (!confirmado) return;
-    await deleteDoc(doc(db, "categorias", id));
+    await borrarConDeshacer("categorias", id, `Categoría "${nombre}" borrada.`);
     window.cerrarModales();
 };
 
@@ -12271,9 +12380,9 @@ window.guardarServicio = async function () {
 };
 
 window.borrarServicio = async function (id, nombre) {
-    const confirmado = confirm(`¿Eliminar el servicio "${nombre}"?`);
+    const confirmado = confirm(`¿Eliminar el servicio "${nombre}"? Vas a tener unos segundos para deshacerlo después.`);
     if (!confirmado) return;
-    await deleteDoc(doc(db, "servicios", id));
+    await borrarConDeshacer("servicios", id, `Servicio "${nombre}" borrado.`);
     window.cerrarModales();
 };
 
@@ -13212,10 +13321,10 @@ window.cambiarEstadoTurno = async function (id, nuevoEstado) {
 
 window.borrarTurno = async function (id) {
 
-    const confirmado = confirm("¿Seguro que querés borrar este turno? No se puede deshacer.");
+    const confirmado = confirm("¿Borrar este turno? Vas a tener unos segundos para deshacerlo después.");
     if (!confirmado) return;
 
-    await deleteDoc(doc(db, "turnos", id));
+    await borrarConDeshacer("turnos", id, "Turno borrado.");
     window.cerrarModales();
 
 };
@@ -14047,10 +14156,10 @@ window.cambiarEstadoPresupuesto = async function (id, nuevoEstado) {
 
 window.borrarPresupuesto = async function (id) {
 
-    const confirmado = confirm("¿Seguro que querés borrar este presupuesto? No se puede deshacer.");
+    const confirmado = confirm("¿Borrar este presupuesto? Vas a tener unos segundos para deshacerlo después.");
     if (!confirmado) return;
 
-    await deleteDoc(doc(db, "presupuestos", id));
+    await borrarConDeshacer("presupuestos", id, "Presupuesto borrado.");
 
 };
 
@@ -14677,10 +14786,10 @@ window.borrarUsuario = async function (id, nombre) {
         return;
     }
 
-    const confirmado = confirm(`¿Quitar a ${nombre} del panel? Ya no va a poder entrar (aunque su login de Firebase siga existiendo).`);
+    const confirmado = confirm(`¿Quitar a ${nombre} del panel? Ya no va a poder entrar (aunque su login de Firebase siga existiendo). Vas a tener unos segundos para deshacerlo después.`);
     if (!confirmado) return;
 
-    await deleteDoc(doc(db, "usuarios", id));
+    await borrarConDeshacer("usuarios", id, `${nombre} fue quitado del panel.`);
 
 };
 
