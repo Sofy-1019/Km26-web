@@ -6005,6 +6005,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <input type="date" id="fvVtv" oninput="actualizarAvisoVtvEnFicha()">
                 <p id="fvVtvAviso" style="font-size:11px;margin-top:4px;"></p>
             </div>
+            <div>
+                <label style="color:#fff;">Testigos (luces del tablero)</label>
+                <input type="text" id="fvTestigos" placeholder="Ej: Check engine, ABS, batería">
+            </div>
         </div>
 
         <div class="modal-botones">
@@ -7133,7 +7137,7 @@ function renderClientes(lista) {
             <div class="item-avatar">${getIniciales(c.nombre, c.apellido)}</div>
             <div class="item-info" ${puedeGestionarClientes ? `onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')" style="cursor:pointer;"` : ""}>
                 <div class="item-titulo">${escapar(c.apellido)}, ${escapar(c.nombre)}</div>
-                <div class="item-sub">${escapar(c.telefono || c.email || "Sin datos de contacto")}</div>
+                <div class="item-sub">${escapar(c.telefono || c.email || "Sin datos de contacto")}${c.telefono ? iconoCopiar(c.telefono) : ""}</div>
             </div>
             <div class="item-acciones">
                 ${telefonoLimpio && puedeGestionarClientes ? `<a class="btn-llamar" href="https://wa.me/549${telefonoLimpio}" target="_blank" rel="noopener" title="Llamar por WhatsApp">${ICONO_TELEFONO_SVG}</a>` : ""}
@@ -7212,6 +7216,39 @@ function desbloquearBoton(boton) {
     boton.style.opacity = "";
     boton.style.cursor = "";
     if (boton.dataset.textoOriginal) boton.textContent = boton.dataset.textoOriginal;
+}
+
+// Copia un texto (teléfono, patente, email, etc.) al portapapeles con un solo
+// toque, y muestra un ✓ verde un segundo para confirmar — así no hace falta
+// seleccionar el texto a mano, que en el celular es incómodo.
+window.copiarAlPortapapeles = function (texto, elementoIcono, event) {
+
+    if (event) event.stopPropagation(); // no dispara el click de la fila/tarjeta debajo
+
+    if (!texto) return;
+
+    navigator.clipboard.writeText(texto).then(() => {
+
+        if (!elementoIcono) return;
+        const contenidoOriginal = elementoIcono.innerHTML;
+        elementoIcono.innerHTML = "✓";
+        elementoIcono.style.color = "#5fd98a";
+
+        setTimeout(() => {
+            elementoIcono.innerHTML = contenidoOriginal;
+            elementoIcono.style.color = "";
+        }, 1200);
+
+    }).catch(() => { /* si el navegador bloquea copiar (poco común), no rompe nada */ });
+
+};
+
+// Ícono de copiar reutilizable, chiquito, para poner al lado de cualquier dato.
+function iconoCopiar(texto) {
+    const textoEscapado = String(texto).replace(/'/g, "\\'");
+    return `<span onclick="copiarAlPortapapeles('${textoEscapado}', this, event)" title="Copiar" style="cursor:pointer;display:inline-flex;margin-left:6px;opacity:.6;vertical-align:middle;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    </span>`;
 }
 
 // Íconos SVG reutilizables (no dependen de emojis del sistema operativo,
@@ -8174,10 +8211,10 @@ function renderTarjetasEnTaller() {
                 ${iconoAutoGenerico()}
             </div>
             <div class="cv-card-cuerpo">
-                <div class="cv-card-patente">${escapar(v.patente)}</div>
+                <div class="cv-card-patente">${escapar(v.patente)}${iconoCopiar(v.patente)}</div>
                 <div class="cv-card-modelo">${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
                 <div class="cv-card-linea">👤 ${escapar(nombreCliente)}</div>
-                ${cliente && cliente.telefono ? `<div class="cv-card-linea">📞 ${escapar(cliente.telefono)}</div>` : ""}
+                ${cliente && cliente.telefono ? `<div class="cv-card-linea">📞 ${escapar(cliente.telefono)}${iconoCopiar(cliente.telefono)}</div>` : ""}
                 ${textoIngreso ? `<div class="cv-card-linea">🕐 ${textoIngreso}</div>` : ""}
                 ${lineaVtv}
                 ${lineaService}
@@ -10287,6 +10324,8 @@ window.abrirFichaVehiculo = function (id) {
     document.getElementById("fvVtvAviso").style.color = "#f5a623";
     actualizarAvisoVtvEnFicha();
 
+    document.getElementById("fvTestigos").value = v.testigos || "";
+
     document.getElementById("mensajeEstadoFichaVehiculo").textContent = "";
     document.getElementById("modalFichaVehiculo").classList.add("abierto");
 
@@ -10338,7 +10377,8 @@ window.guardarFichaVehiculo = async function () {
         vin: document.getElementById("fvVin").value.trim(),
         proximoServiceFecha: document.getElementById("fvProximoServiceFecha").value,
         proximoServiceKm: parseInt(document.getElementById("fvProximoServiceKm").value, 10) || null,
-        vtv: document.getElementById("fvVtv").value
+        vtv: document.getElementById("fvVtv").value,
+        testigos: document.getElementById("fvTestigos").value.trim()
     };
 
     estado.textContent = "Guardando...";
