@@ -1641,6 +1641,29 @@ header{
     max-width:400px;
 }
 
+.btn-atras-menu{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    color:#ccc;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    padding:6px 8px 6px 0;
+    font-family:'Montserrat',sans-serif;
+}
+
+.btn-atras-menu:hover{
+    color:#fff;
+}
+
+.btn-atras-menu svg{
+    width:20px;
+    height:20px;
+}
+
 .mas-lista{
     display:flex;
     flex-direction:column;
@@ -1993,6 +2016,7 @@ header{
 
 @media (min-width:1024px){
     .header-btn-accion{ display:flex; }
+    .btn-email-movil{ display:none !important; }
 }
 
 .header-btn-accion.roja{
@@ -4035,14 +4059,23 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <button class="header-btn-accion roja" onclick="abrirModalCliente()">+ Nuevo cliente</button>
 
                 <div class="email-wrap" style="position:relative;">
-                    <button class="header-btn-accion" style="background:#fff;border:none;color:#111;" onclick="toggleMenuEmail()">✉️ E-mail</button>
+                    <button class="header-btn-accion" style="background:#fff;border:none;color:#111;position:relative;" onclick="toggleMenuEmail()">
+                        ✉️ E-mail
+                        <span class="notif-badge" id="emailBadge" style="display:none;">0</span>
+                    </button>
+                    <button class="btn-icono-header btn-email-movil" onclick="toggleMenuEmail()" title="E-mail" style="position:relative;background:#fff;color:#111;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                        <span class="notif-badge" id="emailBadgeMovil" style="display:none;">0</span>
+                    </button>
                     <div class="notif-dropdown" id="menuEmailDropdown">
                         <div class="notif-dropdown-titulo">Elegí una cuenta</div>
                         <a class="dash-atencion-fila" style="text-decoration:none;color:inherit;" href="https://mail.zoho.com" target="_blank" rel="noopener" onclick="cerrarMenuEmail()">
                             <span>💲 ventas@km26.com.ar</span>
+                            <span class="dash-atencion-badge" id="emailBadgeVentas" style="display:none;">0</span>
                         </a>
                         <a class="dash-atencion-fila" style="text-decoration:none;color:inherit;" href="https://mail.zoho.com" target="_blank" rel="noopener" onclick="cerrarMenuEmail()">
                             <span>🚚 proveedores@km26.com.ar</span>
+                            <span class="dash-atencion-badge" id="emailBadgeProveedores" style="display:none;">0</span>
                         </a>
                     </div>
                 </div>
@@ -5647,6 +5680,12 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Overlay: Más opciones (agrupa las secciones que no están en la nav inferior) ---------- -->
 <div class="overlay" id="overlayMas">
     <div class="modal">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <button class="btn-atras-menu" onclick="cerrarOverlayMas()" title="Atrás">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Atrás
+            </button>
+        </div>
         <h3>Más opciones</h3>
         <div class="mas-lista" id="masLista">
             <button class="mas-item" data-roles="admin,recepcion,mecanico" onclick="cerrarOverlayMas(); cambiarTab('clientes')">
@@ -7509,6 +7548,48 @@ document.addEventListener("click", function (e) {
     const wrap = document.querySelector(".email-wrap");
     if (wrap && !wrap.contains(e.target)) window.cerrarMenuEmail();
 });
+
+// Consulta cada 3 minutos si hay mails nuevos en ventas@ o proveedores@
+// (usando la función serverless /api/zoho-unread de Vercel). Si esa función
+// todavía no está desplegada, o falla por cualquier motivo, no rompe nada
+// del resto del panel — el botón simplemente se queda sin numerito.
+async function revisarMailsSinLeer() {
+
+    try {
+
+        const resp = await fetch("/api/zoho-unread");
+        if (!resp.ok) return;
+        const datos = await resp.json();
+        if (datos.error) return;
+
+        const badgeTotal = document.getElementById("emailBadge");
+        const badgeTotalMovil = document.getElementById("emailBadgeMovil");
+        const badgeVentas = document.getElementById("emailBadgeVentas");
+        const badgeProveedores = document.getElementById("emailBadgeProveedores");
+
+        const total = Number(datos.total) || 0;
+        badgeTotal.textContent = total > 99 ? "99+" : total;
+        badgeTotal.style.display = total > 0 ? "flex" : "none";
+        badgeTotalMovil.textContent = total > 99 ? "99+" : total;
+        badgeTotalMovil.style.display = total > 0 ? "flex" : "none";
+
+        const cantVentas = Number(datos.ventas) || 0;
+        badgeVentas.textContent = cantVentas;
+        badgeVentas.style.display = cantVentas > 0 ? "inline-flex" : "none";
+
+        const cantProveedores = Number(datos.proveedores) || 0;
+        badgeProveedores.textContent = cantProveedores;
+        badgeProveedores.style.display = cantProveedores > 0 ? "inline-flex" : "none";
+
+    } catch (e) {
+        // Sin conexión, o la función de Vercel todavía no está lista — se
+        // reintenta solo en la próxima revisión, sin mostrar ningún error.
+    }
+
+}
+
+revisarMailsSinLeer();
+setInterval(revisarMailsSinLeer, 3 * 60 * 1000);
 
 window.toggleMenuUsuario = function () {
     document.getElementById("menuUsuarioDropdown").classList.toggle("abierto");
