@@ -4248,6 +4248,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
             <div id="dashRecordatoriosPendientes"></div>
         </div>
 
+        <div class="dash-panel-nuevo" id="panelCumpleanosHoy" style="display:none;margin-top:16px;">
+            <div class="dash-panel-nuevo-titulo" style="color:#5fd98a;">🎂 Cumpleaños de hoy</div>
+            <div id="dashCumpleanosHoy"></div>
+        </div>
+
         <div class="dash-paneles" style="margin-top:22px;">
 
             <div class="dash-panel">
@@ -5908,6 +5913,9 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <label>Email (opcional)</label>
         <input type="email" id="cEmail" placeholder="juan@mail.com">
 
+        <label>Fecha de nacimiento (opcional)</label>
+        <input type="date" id="cCumpleanos">
+
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
             <button class="btn-red" id="btnGuardarCliente" onclick="guardarCliente(this)">Guardar</button>
@@ -7469,6 +7477,7 @@ window.abrirModalCliente = function () {
     document.getElementById("cApellido").value = "";
     document.getElementById("cTelefono").value = "";
     document.getElementById("cEmail").value = "";
+    document.getElementById("cCumpleanos").value = "";
     document.getElementById("mensajeEstado").textContent = "";
     desbloquearBoton(document.getElementById("btnGuardarCliente"));
     document.getElementById("modalCliente").classList.add("abierto");
@@ -7486,6 +7495,7 @@ window.editarCliente = function (id) {
     document.getElementById("cApellido").value = c.apellido || "";
     document.getElementById("cTelefono").value = c.telefono || "";
     document.getElementById("cEmail").value = c.email || "";
+    document.getElementById("cCumpleanos").value = c.cumpleanos || "";
     document.getElementById("mensajeEstado").textContent = "";
     desbloquearBoton(document.getElementById("btnGuardarCliente"));
     document.getElementById("modalCliente").classList.add("abierto");
@@ -7539,6 +7549,7 @@ window.guardarCliente = function (boton) {
     const apellido = document.getElementById("cApellido").value.trim();
     const telefono = document.getElementById("cTelefono").value.trim();
     const email = document.getElementById("cEmail").value.trim();
+    const cumpleanos = document.getElementById("cCumpleanos").value;
     const estado = document.getElementById("mensajeEstado");
 
     if (!nombre || !apellido) {
@@ -7548,11 +7559,11 @@ window.guardarCliente = function (boton) {
     }
 
     bloquearBoton(boton, "Guardando...");
-    ejecutarGuardarCliente(nombre, apellido, telefono, email, estado, boton);
+    ejecutarGuardarCliente(nombre, apellido, telefono, email, cumpleanos, estado, boton);
 
 };
 
-async function ejecutarGuardarCliente(nombre, apellido, telefono, email, estado, boton) {
+async function ejecutarGuardarCliente(nombre, apellido, telefono, email, cumpleanos, estado, boton) {
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -7562,13 +7573,13 @@ async function ejecutarGuardarCliente(nombre, apellido, telefono, email, estado,
         if (editandoId) {
 
             await updateDoc(doc(db, "clientes", editandoId), {
-                nombre, apellido, telefono, email
+                nombre, apellido, telefono, email, cumpleanos
             });
 
         } else {
 
             await addDoc(collection(db, "clientes"), {
-                nombre, apellido, telefono, email,
+                nombre, apellido, telefono, email, cumpleanos,
                 creado: serverTimestamp()
             });
 
@@ -7951,6 +7962,16 @@ function renderDashboard() {
     if (turnosMananaSinRecordar.length > 0) {
         filas.push({ texto: "Turnos de mañana sin recordar", badge: turnosMananaSinRecordar.length, tab: "turnos" });
     }
+
+    // Cumpleaños de hoy (se compara solo mes y día, no el año)
+    const hoyMesDia = `${String(inicioRecordDesde.getMonth() + 1).padStart(2, "0")}-${String(inicioRecordDesde.getDate()).padStart(2, "0")}`;
+    const clientesCumpleanosHoy = clientesCache.filter(c => c.cumpleanos && c.cumpleanos.slice(5) === hoyMesDia);
+
+    if (clientesCumpleanosHoy.length > 0) {
+        filas.push({ texto: "🎂 Cumpleaños hoy", badge: clientesCumpleanosHoy.length, tab: "clientes" });
+    }
+
+    renderCumpleanosHoy(clientesCumpleanosHoy);
 
     renderRecordatoriosPendientes(turnosMananaSinRecordar);
 
@@ -8876,6 +8897,39 @@ function renderRecordatoriosPendientes(turnos) {
             <span><strong>${hora}</strong> · ${escapar(nombreCliente)} · ${escapar(t.servicio || "")}</span>
             ${tieneTelefono
                 ? `<button class="btn-whatsapp-lindo" style="margin-left:auto;padding:7px 14px;font-size:11.5px;" onclick="recordarTurnoWhatsApp('${t.id}')">${ICONO_WHATSAPP_SVG} Recordar</button>`
+                : `<span style="margin-left:auto;color:#777;font-size:11px;">Sin teléfono</span>`}
+        </div>`;
+
+    }).join("");
+
+}
+
+// Panel del Dashboard con los clientes que cumplen años hoy — con un botón
+// para mandarles un saludo por WhatsApp con un clic.
+function renderCumpleanosHoy(clientes) {
+
+    const panel = document.getElementById("panelCumpleanosHoy");
+    const el = document.getElementById("dashCumpleanosHoy");
+    if (!panel || !el) return;
+
+    if (clientes.length === 0) {
+        panel.style.display = "none";
+        return;
+    }
+
+    panel.style.display = "block";
+
+    el.innerHTML = clientes.map(c => {
+
+        const nombreCliente = `${c.nombre} ${c.apellido}`;
+        const telefonoLimpio = c.telefono ? String(c.telefono).replace(/\D/g, "") : "";
+        const nombreNegocio = configuracionActual.nombreNegocio || "KM26 Performance";
+        const mensaje = encodeURIComponent(`¡Feliz cumpleaños, ${c.nombre}! 🎉 Te deseamos un muy lindo día de parte de todo el equipo de ${nombreNegocio}.`);
+
+        return `<div class="dash-mov-fila">
+            <span>🎂 ${escapar(nombreCliente)}</span>
+            ${telefonoLimpio
+                ? `<a class="btn-whatsapp-lindo" style="margin-left:auto;padding:7px 14px;font-size:11.5px;text-decoration:none;" href="https://wa.me/549${telefonoLimpio}?text=${mensaje}" target="_blank" rel="noopener">${ICONO_WHATSAPP_SVG} Saludar</a>`
                 : `<span style="margin-left:auto;color:#777;font-size:11px;">Sin teléfono</span>`}
         </div>`;
 
