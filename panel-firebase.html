@@ -7388,6 +7388,68 @@ window.actualizarContadorCaracteres = function (idCampo, idContador) {
     contador.style.color = actual >= max * 0.9 ? "#f5a623" : "#777";
 };
 
+// ---------- Diseño de impresión único para todo el sistema ----------
+// Antes, Presupuestos y Cuentas armaban cada uno su propio HTML de impresión
+// por separado, y habían quedado con detalles distintos entre sí (uno tenía
+// logo y condiciones comerciales, el otro no). Ahora los dos arman su tabla
+// de ítems y totales, y le piden a esta única función que ponga alrededor
+// el mismo encabezado (logo + datos del taller) y pie (condiciones + texto
+// final) — así cualquier documento que imprimas se ve igual de prolijo.
+function imprimirDocumento({ tituloDocumento, numeroTexto, fechaTexto, filasDatos, tablaHtml, totalesHtml, notasHtml }) {
+
+    const nombreNegocio = configuracionActual.nombreNegocio || "KM26 PERFORMANCE";
+    const lineaContacto = [configuracionActual.direccion, configuracionActual.telefono, configuracionActual.cuit]
+        .filter(Boolean).join(" · ");
+
+    const mostrarLogo = configuracionActual.mostrarLogoPdf !== false;
+    const logoHtml = mostrarLogo ? `<img src="images/icon-192.png" alt="" style="width:44px;height:44px;border-radius:50%;vertical-align:middle;margin-right:10px;" onerror="this.style.display='none'">` : "";
+
+    const condicionesHtml = (configuracionActual.mostrarCondiciones && configuracionActual.condicionesComerciales)
+        ? `<div class="datos" style="margin-top:10px;color:#666;">${escapar(configuracionActual.condicionesComerciales)}</div>`
+        : "";
+
+    const textoFinal = configuracionActual.textoFinalPresupuesto
+        ? escapar(configuracionActual.textoFinalPresupuesto)
+        : `${escapar(nombreNegocio)} — Gracias por confiar en nosotros.`;
+
+    const html = `
+        <!DOCTYPE html>
+        <html lang="es"><head><meta charset="UTF-8"><title>${escapar(tituloDocumento)}</title>
+        <style>
+            *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
+            body{padding:32px;color:#111;}
+            h1{font-size:20px;margin-bottom:2px;color:#c1141b;display:inline-block;vertical-align:middle;}
+            .sub{color:#666;font-size:12px;margin-bottom:20px;}
+            table{width:100%;border-collapse:collapse;margin-top:10px;}
+            td,th{padding:8px 6px;border-bottom:1px solid #ddd;font-size:13px;text-align:left;}
+            .total{font-size:18px;font-weight:bold;text-align:right;margin-top:14px;}
+            .datos{font-size:13px;margin-bottom:6px;}
+            .footer{margin-top:36px;font-size:11px;color:#888;}
+        </style></head>
+        <body>
+            <div>${logoHtml}<h1>${escapar(nombreNegocio)}</h1></div>
+            ${lineaContacto ? `<div class="sub" style="margin-bottom:2px;">${escapar(lineaContacto)}</div>` : ""}
+            <div class="sub">${escapar(tituloDocumento)} ${numeroTexto ? numeroTexto + " · " : ""}${escapar(fechaTexto || "")}</div>
+            ${filasDatos}
+            ${tablaHtml}
+            ${totalesHtml}
+            ${notasHtml || ""}
+            ${condicionesHtml}
+            <div class="footer">${textoFinal}</div>
+        </body></html>
+    `;
+
+    const ventana = window.open("", "_blank");
+    if (!ventana) {
+        alert("El navegador bloqueó la ventana de impresión. Habilitá las ventanas emergentes para este sitio.");
+        return;
+    }
+    ventana.document.write(html);
+    ventana.document.close();
+    ventana.onload = () => ventana.print();
+
+}
+
 function iconoCopiar(texto) {
     const textoEscapado = String(texto).replace(/'/g, "\\'");
     return `<span onclick="copiarAlPortapapeles('${textoEscapado}', this, event)" title="Copiar" style="cursor:pointer;display:inline-flex;margin-left:6px;opacity:.6;vertical-align:middle;">
@@ -10191,38 +10253,31 @@ window.imprimirCuentaCC = function (id) {
 
     const cliente = clientesCache.find(cl => cl.id === c.clienteId);
     const vehiculo = vehiculosCache.find(v => v.id === c.vehiculoId);
-    const nombreNegocio = configuracionActual.nombreNegocio || "KM26 PERFORMANCE";
     const numeroTexto = "#" + String(c.numero || "").padStart(5, "0");
+    const fechaTexto = toDateSegura(c.fecha) ? toDateSegura(c.fecha).toLocaleDateString("es-AR") : "";
 
     const filasItems = (c.items || []).map(i => `<tr><td>${escapar(i.descripcion)}${i.cantidad > 1 ? " x" + i.cantidad : ""}</td><td style="text-align:right;">${formatoPlata(i.monto)}</td></tr>`).join("");
 
-    const html = `
-        <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Cuenta ${numeroTexto}</title>
-        <style>
-            *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
-            body{padding:32px;color:#111;}
-            h1{font-size:20px;margin-bottom:2px;color:#c1141b;}
-            .sub{color:#666;font-size:12px;margin-bottom:20px;}
-            table{width:100%;border-collapse:collapse;margin-top:10px;}
-            td,th{padding:8px 6px;border-bottom:1px solid #ddd;font-size:13px;text-align:left;}
-            .total{font-size:18px;font-weight:bold;text-align:right;margin-top:14px;}
-            .datos{font-size:13px;margin-bottom:6px;}
-        </style></head>
-        <body>
-            <h1>${escapar(nombreNegocio)}</h1>
-            <div class="sub">Cuenta ${numeroTexto} · ${toDateSegura(c.fecha) ? toDateSegura(c.fecha).toLocaleDateString("es-AR") : ""}</div>
-            <div class="datos"><strong>Cliente:</strong> ${cliente ? escapar(cliente.apellido) + ", " + escapar(cliente.nombre) : "-"}</div>
-            <div class="datos"><strong>Vehículo:</strong> ${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") + " - " + escapar(vehiculo.patente) : "-"}</div>
-            <table><thead><tr><th>Detalle</th><th style="text-align:right;">Importe</th></tr></thead><tbody>${filasItems}</tbody></table>
-            <div class="total">Total: ${formatoPlata(c.total)}</div>
-            <div class="datos" style="margin-top:6px;">Pagado: ${formatoPlata(c.pagado)} · Saldo: ${formatoPlata(c.saldo)}</div>
-        </body></html>
+    const filasDatos = `
+        <div class="datos"><strong>Cliente:</strong> ${cliente ? escapar(cliente.apellido) + ", " + escapar(cliente.nombre) : "-"}</div>
+        <div class="datos"><strong>Vehículo:</strong> ${vehiculo ? escapar(vehiculo.marca || "") + " " + escapar(vehiculo.modelo || "") + " - " + escapar(vehiculo.patente) : "-"}</div>
     `;
 
-    const ventana = window.open("", "_blank");
-    ventana.document.write(html);
-    ventana.document.close();
-    setTimeout(() => ventana.print(), 300);
+    const tablaHtml = `<table><thead><tr><th>Detalle</th><th style="text-align:right;">Importe</th></tr></thead><tbody>${filasItems}</tbody></table>`;
+
+    const totalesHtml = `
+        <div class="total">Total: ${formatoPlata(c.total)}</div>
+        <div class="datos" style="margin-top:6px;">Pagado: ${formatoPlata(c.pagado)} · Saldo: ${formatoPlata(c.saldo)}</div>
+    `;
+
+    imprimirDocumento({
+        tituloDocumento: "Cuenta",
+        numeroTexto,
+        fechaTexto,
+        filasDatos,
+        tablaHtml,
+        totalesHtml
+    });
 
 };
 
@@ -14416,7 +14471,7 @@ window.imprimirPresupuesto = function (id) {
     const telefono = cliente ? (cliente.telefono || "") : "";
     const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
     const detalleVehiculo = vehiculo ? `${vehiculo.patente} · ${vehiculo.marca || ""} ${vehiculo.modelo || ""}` : "-";
-    const fecha = p.fecha && p.fecha.toDate ? p.fecha.toDate().toLocaleDateString("es-AR") : "-";
+    const fechaTexto = p.fecha && p.fecha.toDate ? p.fecha.toDate().toLocaleDateString("es-AR") : "-";
 
     const filasItems = (p.items || []).map(i => `
         <tr><td>${escapar(i.descripcion)}</td><td style="text-align:right;">${formatoPlata(i.monto)}</td></tr>
@@ -14437,63 +14492,32 @@ window.imprimirPresupuesto = function (id) {
             ? `<div class="datos" style="margin-top:14px;">Presupuesto válido por ${notasTexto} días.</div>`
             : `<div class="datos" style="margin-top:14px;"><strong>Notas:</strong> ${escapar(notasTexto)}</div>`;
 
-    const nombreNegocio = configuracionActual.nombreNegocio || "KM26 PERFORMANCE";
-    const lineaContacto = [configuracionActual.direccion, configuracionActual.telefono, configuracionActual.cuit]
-        .filter(Boolean).join(" · ");
-
     const prefijo = configuracionActual.prefijoPresupuesto || "PR-";
     const numeroTexto = p.numero ? prefijo + String(p.numero).padStart(5, "0") : "";
 
-    const mostrarLogo = configuracionActual.mostrarLogoPdf !== false;
-    const logoHtml = mostrarLogo ? `<img src="images/icon-192.png" alt="" style="width:44px;height:44px;border-radius:50%;vertical-align:middle;margin-right:10px;" onerror="this.style.display='none'">` : "";
-
-    const condicionesHtml = (configuracionActual.mostrarCondiciones && configuracionActual.condicionesComerciales)
-        ? `<div class="datos" style="margin-top:10px;color:#666;">${escapar(configuracionActual.condicionesComerciales)}</div>`
-        : "";
-
-    const textoFinal = configuracionActual.textoFinalPresupuesto
-        ? escapar(configuracionActual.textoFinalPresupuesto)
-        : `${escapar(nombreNegocio)} — Presupuesto sujeto a disponibilidad de repuestos.`;
-
-    const html = `
-        <!DOCTYPE html>
-        <html lang="es"><head><meta charset="UTF-8"><title>Presupuesto ${escapar(nombreCliente)}</title>
-        <style>
-            *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
-            body{padding:32px;color:#111;}
-            h1{font-size:20px;margin-bottom:2px;color:#c1141b;display:inline-block;vertical-align:middle;}
-            .sub{color:#666;font-size:12px;margin-bottom:20px;}
-            table{width:100%;border-collapse:collapse;margin-top:10px;}
-            td,th{padding:8px 6px;border-bottom:1px solid #ddd;font-size:13px;text-align:left;}
-            .total{font-size:18px;font-weight:bold;text-align:right;margin-top:14px;}
-            .datos{font-size:13px;margin-bottom:6px;}
-            .footer{margin-top:36px;font-size:11px;color:#888;}
-        </style></head>
-        <body>
-            <div>${logoHtml}<h1>${escapar(nombreNegocio)}</h1></div>
-            ${lineaContacto ? `<div class="sub" style="margin-bottom:2px;">${escapar(lineaContacto)}</div>` : ""}
-            <div class="sub">Presupuesto ${numeroTexto ? numeroTexto + " · " : ""}${fecha}</div>
-            <div class="datos"><strong>Cliente:</strong> ${escapar(nombreCliente)} ${telefono ? "· " + escapar(telefono) : ""}</div>
-            <div class="datos"><strong>Vehículo:</strong> ${escapar(detalleVehiculo)}</div>
-            <table>
-                <thead><tr><th>Detalle</th><th style="text-align:right;">Importe</th></tr></thead>
-                <tbody>${filasItems}${descuentoHtml}</tbody>
-            </table>
-            <div class="total">Total: ${formatoPlata(p.total)}</div>
-            ${notasHtml}
-            ${condicionesHtml}
-            <div class="footer">${textoFinal}</div>
-        </body></html>
+    const filasDatos = `
+        <div class="datos"><strong>Cliente:</strong> ${escapar(nombreCliente)} ${telefono ? "· " + escapar(telefono) : ""}</div>
+        <div class="datos"><strong>Vehículo:</strong> ${escapar(detalleVehiculo)}</div>
     `;
 
-    const ventana = window.open("", "_blank");
-    if (!ventana) {
-        alert("El navegador bloqueó la ventana de impresión. Habilitá las ventanas emergentes para este sitio.");
-        return;
-    }
-    ventana.document.write(html);
-    ventana.document.close();
-    ventana.onload = () => ventana.print();
+    const tablaHtml = `
+        <table>
+            <thead><tr><th>Detalle</th><th style="text-align:right;">Importe</th></tr></thead>
+            <tbody>${filasItems}${descuentoHtml}</tbody>
+        </table>
+    `;
+
+    const totalesHtml = `<div class="total">Total: ${formatoPlata(p.total)}</div>`;
+
+    imprimirDocumento({
+        tituloDocumento: "Presupuesto",
+        numeroTexto,
+        fechaTexto,
+        filasDatos,
+        tablaHtml,
+        totalesHtml,
+        notasHtml
+    });
 
 };
 
