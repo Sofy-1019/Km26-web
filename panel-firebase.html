@@ -892,80 +892,11 @@ textarea:focus,
 }
 
 .turno-fila.estado-pendiente{ border-left-color:#f5a623; }
-.turno-fila.estado-confirmado{ border-left-color:#2fdb6e; }
-.turno-fila.estado-en-taller{ border-left-color:#3f9cff; }
-.turno-fila.estado-finalizado{ border-left-color:#888; opacity:.7; }
-.turno-fila.estado-cancelado{ border-left-color:#ff4d55; opacity:.6; }
-.turno-fila.estado-no-asistio{ border-left-color:#d71920; opacity:.6; }
-
-.presu-card{
-    background:#242428;
-    border-radius:12px;
-    padding:16px;
-    margin-bottom:12px;
-    border-left:4px solid #555;
-}
-
-.presu-card.estado-borrador{ border-left-color:#888; }
-.presu-card.estado-enviado{ border-left-color:#3f9cff; }
-.presu-card.estado-aprobado{ border-left-color:#2fdb6e; }
-.presu-card.estado-rechazado{ border-left-color:#ff4d55; opacity:.7; }
-.presu-card.estado-vencido{ border-left-color:#f5a623; opacity:.7; }
-
-.presu-cabecera{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.presu-cliente{
-    font-weight:700;
-    font-size:14px;
-}
-
-.presu-detalle{
-    font-size:12px;
-    color:#999;
-    margin-top:2px;
-}
-
-.presu-total{
-    font-weight:800;
-    font-size:17px;
-    font-family:'Montserrat',sans-serif;
-    white-space:nowrap;
-}
-
-.presu-items-lista{
-    font-size:12px;
-    color:#aaa;
-    margin-top:10px;
-    padding-top:10px;
-    border-top:1px dashed #333;
-}
-
-.presu-acciones{
-    display:flex;
-    gap:8px;
-    margin-top:12px;
-    flex-wrap:wrap;
-}
-
-.badge-estado{
-    font-size:11px;
-    font-weight:700;
-    padding:4px 10px;
-    border-radius:12px;
-    white-space:nowrap;
-}
-
-.badge-estado.estado-borrador{ background:#2a2a2e; color:#aaa; }
-.badge-estado.estado-enviado{ background:#0d2038; color:#6ab6ff; }
-.badge-estado.estado-aprobado{ background:#0d2418; color:#5fd98a; }
-.badge-estado.estado-rechazado{ background:#2a0a0b; color:#ff6b6b; }
-.badge-estado.estado-vencido{ background:#2a1b0d; color:#ffb35f; }
+.turno-fila.estado-confirmado{ border-left-color:#5fd98a; }
+.turno-fila.estado-en-taller{ border-left-color:#6ab6ff; }
+.turno-fila.estado-finalizado{ border-left-color:#999; opacity:.7; }
+.turno-fila.estado-cancelado{ border-left-color:#ff6b6b; opacity:.6; }
+.turno-fila.estado-no-asistio{ border-left-color:#ff6b6b; opacity:.6; }
 
 #modalPresupuesto select,
 #modalUsuario select{
@@ -2144,6 +2075,38 @@ header{
     align-items:center;
     justify-content:center;
     padding:0 4px;
+}
+
+#btnVolverArriba{
+    position:fixed;
+    right:18px;
+    bottom:90px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:1px solid #333;
+    background:#1a1a1a;
+    color:#ccc;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,.4);
+    z-index:500;
+}
+
+#btnVolverArriba svg{
+    width:20px;
+    height:20px;
+}
+
+#btnVolverArriba:hover{
+    border-color:#d71920;
+    color:#ff8a7a;
+}
+
+@media (min-width:1024px){
+    #btnVolverArriba{ bottom:24px; }
 }
 
 .toast-deshacer{
@@ -5093,7 +5056,8 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                     <div id="provPanelPagos" style="display:none;"></div>
                     <div id="provPanelProductos" style="display:none;"></div>
                     <div id="provPanelNotas" style="display:none;">
-                        <textarea id="provNotasEdit" rows="5" placeholder="Elegí un proveedor para ver y editar sus notas..." style="width:100%;" disabled></textarea>
+                        <textarea id="provNotasEdit" rows="5" placeholder="Elegí un proveedor para ver y editar sus notas..." style="width:100%;" disabled maxlength="2000" oninput="actualizarContadorCaracteres('provNotasEdit', 'provNotasContador')"></textarea>
+                        <p id="provNotasContador" style="font-size:10.5px;color:#777;text-align:right;margin-top:2px;">0 / 2000</p>
                         <button class="btn-chico" id="provBtnGuardarNotas" style="margin-top:8px;display:none;" onclick="guardarNotasProveedorSeleccionado()">Guardar notas</button>
                     </div>
 
@@ -5574,7 +5538,8 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                     <label>Descuento máximo permitido sin ser admin (%)</label>
                     <input type="number" id="cfgDescuentoMax" placeholder="20" min="0" max="100">
                     <label>Mensaje de WhatsApp (usá {nombre} {items} {total} {notas} {link})</label>
-                    <textarea id="cfgMensajeWhatsapp" rows="3" placeholder="Hola {nombre}!..."></textarea>
+                    <textarea id="cfgMensajeWhatsapp" rows="3" placeholder="Hola {nombre}!..." maxlength="1000" oninput="actualizarContadorCaracteres('cfgMensajeWhatsapp', 'cfgMensajeContador')"></textarea>
+                    <p id="cfgMensajeContador" style="font-size:10.5px;color:#777;text-align:right;margin-top:2px;">0 / 1000</p>
                     <button class="btn-red" style="width:100%;margin-top:10px;" onclick="guardarConfiguracion()">Guardar</button>
                 </div>
             </div>
@@ -5718,6 +5683,10 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         Más
     </button>
 </nav>
+
+<button id="btnVolverArriba" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Volver arriba" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
 
 <!-- ---------- Overlay: Más opciones (agrupa las secciones que no están en la nav inferior) ---------- -->
 <div class="overlay" id="overlayMas">
@@ -7289,6 +7258,59 @@ window.copiarAlPortapapeles = function (texto, elementoIcono, event) {
 };
 
 // Ícono de copiar reutilizable, chiquito, para poner al lado de cualquier dato.
+// ---------- Color único por estado, igual en toda la app ----------
+// Antes había 3 lugares distintos (Turnos, Presupuestos recientes del
+// Dashboard, y las tablas) con tonos de verde/rojo/naranja levemente
+// distintos entre sí. Ahora todos usan esta misma paleta de 5 colores.
+const PALETA_ESTADOS = {
+    verde: "#5fd98a",
+    ambar: "#f5a623",
+    rojo: "#ff6b6b",
+    azul: "#6ab6ff",
+    gris: "#999"
+};
+
+function colorParaEstado(estado) {
+    const mapa = {
+        // Presupuestos
+        "Borrador": PALETA_ESTADOS.gris,
+        "Enviado": PALETA_ESTADOS.azul,
+        "Aprobado": PALETA_ESTADOS.verde,
+        "Rechazado": PALETA_ESTADOS.rojo,
+        "Convertido": PALETA_ESTADOS.azul,
+        "Vencido": PALETA_ESTADOS.rojo,
+        // Cuentas / Cobros
+        "Pendiente": PALETA_ESTADOS.ambar,
+        "Vencida": PALETA_ESTADOS.rojo,
+        "Pagada": PALETA_ESTADOS.verde,
+        // Turnos
+        "Confirmado": PALETA_ESTADOS.verde,
+        "En taller": PALETA_ESTADOS.azul,
+        "Finalizado": PALETA_ESTADOS.gris,
+        "Cancelado": PALETA_ESTADOS.rojo,
+        "No asistió": PALETA_ESTADOS.rojo,
+        // Stock / Proveedores / Categorías
+        "Activo": PALETA_ESTADOS.verde,
+        "Activa": PALETA_ESTADOS.verde,
+        "Inactivo": PALETA_ESTADOS.gris,
+        "Inactiva": PALETA_ESTADOS.gris
+    };
+    return mapa[estado] || PALETA_ESTADOS.gris;
+}
+
+// Actualiza el "120 / 1000" debajo de un campo largo, y lo pone en rojo
+// cuando se está quedando sin espacio (últimos 10%), para avisar antes de
+// que se corte el texto solo por el límite del campo.
+window.actualizarContadorCaracteres = function (idCampo, idContador) {
+    const campo = document.getElementById(idCampo);
+    const contador = document.getElementById(idContador);
+    if (!campo || !contador) return;
+    const max = Number(campo.getAttribute("maxlength")) || 0;
+    const actual = campo.value.length;
+    contador.textContent = `${actual} / ${max}`;
+    contador.style.color = actual >= max * 0.9 ? "#f5a623" : "#777";
+};
+
 function iconoCopiar(texto) {
     const textoEscapado = String(texto).replace(/'/g, "\\'");
     return `<span onclick="copiarAlPortapapeles('${textoEscapado}', this, event)" title="Copiar" style="cursor:pointer;display:inline-flex;margin-left:6px;opacity:.6;vertical-align:middle;">
@@ -8104,7 +8126,7 @@ function renderDashboard() {
                 const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
                 const vehiculo = vehiculosCache.find(v => v.id === p.vehiculoId);
                 const idCorto = "#" + p.id.slice(-4).toUpperCase();
-                const colorEstado = { "Borrador": "#aaa", "Enviado": "#6ab6ff", "Aprobado": "#5fd98a", "Rechazado": "#ff6b6b", "Vencido": "#ffb35f" }[p.estado] || "#aaa";
+                const colorEstado = colorParaEstado(p.estado);
                 return `<div class="dash-mov-fila">
                     <div class="dash-mov-desc"><span style="color:#666;">${idCorto}</span> ${escapar(nombreCliente)}${vehiculo ? " · " + escapar(vehiculo.patente) : ""}</div>
                     <div class="dash-mov-monto">${formatoPlata(p.total)}</div>
@@ -10341,6 +10363,13 @@ window.addEventListener("resize", () => {
     }
 });
 
+// Botón "Volver arriba": aparece solo después de scrollear bastante
+window.addEventListener("scroll", () => {
+    const btn = document.getElementById("btnVolverArriba");
+    if (!btn) return;
+    btn.style.display = window.scrollY > 400 ? "flex" : "none";
+});
+
 // ---------- Historial del vehículo, en tiempo real ----------
 
 function escucharHistorial() {
@@ -11460,6 +11489,7 @@ function renderPanelDetalleProveedor() {
         ta.disabled = false;
         ta.value = prov.notas || "";
         document.getElementById("provBtnGuardarNotas").style.display = "inline-block";
+        window.actualizarContadorCaracteres("provNotasEdit", "provNotasContador");
     }
 
 }
@@ -13167,7 +13197,7 @@ function renderTurnos() {
         const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
         const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
         const hora = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-        const colorBorde = { "Pendiente": "#f5a623", "Confirmado": "#2fdb6e", "En taller": "#3f9cff", "Finalizado": "#888", "Cancelado": "#ff4d55", "No asistió": "#d71920" }[t.estado] || "#555";
+        const colorBorde = colorParaEstado(t.estado);
         const inicialMarca = vehiculo && vehiculo.marca ? vehiculo.marca.charAt(0).toUpperCase() : "🚗";
 
         html += `<div class="turno-fila-nueva" style="border-left-color:${colorBorde};">
@@ -15315,6 +15345,7 @@ function renderFormConfiguracion() {
     document.getElementById("cfgTextoFinal").value = configuracionActual.textoFinalPresupuesto || "";
     document.getElementById("cfgDescuentoMax").value = configuracionActual.descuentoMaximoPorc || "";
     document.getElementById("cfgMensajeWhatsapp").value = configuracionActual.mensajeWhatsappPresupuesto || "";
+    window.actualizarContadorCaracteres("cfgMensajeWhatsapp", "cfgMensajeContador");
 
     const metodos = configuracionActual.metodosPago || { efectivo: true, transferencia: true, debito: true, credito: true, mercadopago: true };
     document.getElementById("cfgMetodoEfectivo").checked = metodos.efectivo !== false;
