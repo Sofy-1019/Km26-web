@@ -6135,8 +6135,8 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <p id="firmaEntregaDatosVehiculo" style="font-size:13px;color:#ccc;margin-bottom:6px;"></p>
         <p style="font-size:11.5px;color:#777;margin-bottom:14px;">Pasale la pantalla al cliente para que firme acá abajo con el dedo, confirmando que retira el vehículo conforme.</p>
 
-        <div style="background:#fff;border-radius:10px;overflow:hidden;touch-action:none;">
-            <canvas id="canvasFirmaEntrega" width="440" height="180" style="width:100%;height:180px;display:block;cursor:crosshair;"></canvas>
+        <div style="background:#fff;border-radius:10px;overflow:hidden;">
+            <canvas id="canvasFirmaEntrega" width="440" height="180" style="width:100%;height:180px;display:block;cursor:crosshair;touch-action:none;"></canvas>
         </div>
 
         <div class="modal-botones" style="margin-top:10px;">
@@ -11014,10 +11014,9 @@ function coordenadasCanvasFirma(e, canvas) {
     const rect = canvas.getBoundingClientRect();
     const escalaX = canvas.width / rect.width;
     const escalaY = canvas.height / rect.height;
-    const punto = e.touches ? e.touches[0] : e;
     return {
-        x: (punto.clientX - rect.left) * escalaX,
-        y: (punto.clientY - rect.top) * escalaY
+        x: (e.clientX - rect.left) * escalaX,
+        y: (e.clientY - rect.top) * escalaY
     };
 }
 
@@ -11033,8 +11032,13 @@ function inicializarCanvasFirma() {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
+    // Pointer Events: es el estándar pensado justo para esto — funciona
+    // igual con el dedo, el mouse, y cualquier lápiz (óptico, activo, S Pen,
+    // Apple Pencil, lápices de tablets Wacom/Samsung/Windows, etc.), sin
+    // necesidad de código distinto para cada uno.
     const empezar = (e) => {
         e.preventDefault();
+        canvas.setPointerCapture(e.pointerId); // sigue el trazo aunque el lápiz se despegue un instante
         dibujandoFirma = true;
         ultimoPuntoFirma = coordenadasCanvasFirma(e, canvas);
     };
@@ -11043,6 +11047,14 @@ function inicializarCanvasFirma() {
         if (!dibujandoFirma) return;
         e.preventDefault();
         const punto = coordenadasCanvasFirma(e, canvas);
+
+        // El S Pen (y otros lápices con presión) reportan un valor de 0 a 1
+        // en e.pressure — se usa para variar el grosor del trazo, como una
+        // birome real. El mouse y el dedo suelen reportar 0.5 fijo, así que
+        // ahí queda con un grosor parejo, sin ningún efecto raro.
+        const presion = (e.pointerType === "pen" && e.pressure > 0) ? e.pressure : 0.5;
+        ctx.lineWidth = 1.4 + presion * 2.6;
+
         ctx.beginPath();
         ctx.moveTo(ultimoPuntoFirma.x, ultimoPuntoFirma.y);
         ctx.lineTo(punto.x, punto.y);
@@ -11052,13 +11064,11 @@ function inicializarCanvasFirma() {
 
     const terminar = () => { dibujandoFirma = false; };
 
-    canvas.addEventListener("mousedown", empezar);
-    canvas.addEventListener("mousemove", dibujar);
-    canvas.addEventListener("mouseup", terminar);
-    canvas.addEventListener("mouseleave", terminar);
-    canvas.addEventListener("touchstart", empezar, { passive: false });
-    canvas.addEventListener("touchmove", dibujar, { passive: false });
-    canvas.addEventListener("touchend", terminar);
+    canvas.addEventListener("pointerdown", empezar);
+    canvas.addEventListener("pointermove", dibujar);
+    canvas.addEventListener("pointerup", terminar);
+    canvas.addEventListener("pointercancel", terminar);
+    canvas.addEventListener("pointerleave", terminar);
 
 }
 
