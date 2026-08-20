@@ -5825,7 +5825,15 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <p style="font-size:11px;color:#777;margin-top:6px;">¿Es un cliente nuevo? <span style="color:#ff6b6b;cursor:pointer;" onclick="cerrarModales(); abrirModalCliente();">Cargalo primero acá</span> y volvé a esta pantalla.</p>
 
         <label>Patente</label>
-        <input type="text" id="ivPatente" placeholder="AB123CD">
+        <input type="text" id="ivPatente" placeholder="AB123CD" oninput="verificarVehiculoConocido()">
+        <div id="ivVehiculoConocidoAviso" style="display:none;background:#1a2e1f;border:1px solid #2fdb6e;border-radius:10px;padding:12px 14px;margin-top:8px;">
+            <p style="font-size:12.5px;color:#5fd98a;font-weight:700;margin-bottom:4px;">✓ Esta patente ya está cargada</p>
+            <p id="ivVehiculoConocidoDatos" style="font-size:12.5px;color:#ccc;margin-bottom:10px;"></p>
+            <button type="button" class="btn-chico" style="width:100%;background:#2fdb6e;border-color:#2fdb6e;color:#0a1a0e;font-weight:700;" onclick="confirmarIngresoRapido()">⚡ Confirmar ingreso (sin recargar datos)</button>
+        </div>
+        <input type="hidden" id="ivVehiculoExistenteId">
+        <label id="ivKmLabel" style="display:none;">Kilometraje actual (opcional, actualiza el que ya tenía)</label>
+        <input type="text" id="ivKmActualizado" placeholder="85000" style="display:none;">
         <label>Marca</label>
         <select id="ivMarca" onchange="cambioMarcaSelect('iv')"></select>
         <input type="text" id="ivMarcaOtra" placeholder="Escribí la marca" style="display:none;margin-top:8px;">
@@ -8663,6 +8671,11 @@ window.abrirModalIngresarVehiculo = function () {
     document.getElementById("ivClienteId").value = "";
     document.getElementById("ivClienteResultados").style.display = "none";
     document.getElementById("ivPatente").value = "";
+    document.getElementById("ivVehiculoConocidoAviso").style.display = "none";
+    document.getElementById("ivVehiculoExistenteId").value = "";
+    document.getElementById("ivKmLabel").style.display = "none";
+    document.getElementById("ivKmActualizado").style.display = "none";
+    document.getElementById("ivKmActualizado").value = "";
     document.getElementById("ivMarca").value = "";
     document.getElementById("ivMarcaOtra").value = "";
     document.getElementById("ivMarcaOtra").style.display = "none";
@@ -8675,6 +8688,85 @@ window.abrirModalIngresarVehiculo = function () {
 
     document.getElementById("modalIngresarVehiculo").classList.add("abierto");
     setTimeout(() => document.getElementById("ivClienteBuscar").focus(), 100);
+
+};
+
+// Se dispara mientras se escribe la patente en "Ingresar vehículo". Si esa
+// patente ya existe en el sistema, avisa y ofrece un check-in de un solo
+// toque en vez de tener que cargar marca/modelo/año de nuevo — y de paso
+// evita el problema real que había antes: crear un vehículo duplicado sin
+// darse cuenta cuando en realidad ya estaba cargado.
+window.verificarVehiculoConocido = function () {
+
+    const patente = document.getElementById("ivPatente").value.trim().toUpperCase().replace(/\s/g, "");
+    const aviso = document.getElementById("ivVehiculoConocidoAviso");
+    const campoOculto = document.getElementById("ivVehiculoExistenteId");
+
+    if (!patente) {
+        aviso.style.display = "none";
+        campoOculto.value = "";
+        return;
+    }
+
+    const vehiculo = vehiculosCache.find(v => String(v.patente || "").toUpperCase().replace(/\s/g, "") === patente);
+
+    if (!vehiculo) {
+        aviso.style.display = "none";
+        campoOculto.value = "";
+        return;
+    }
+
+    const cliente = clientesCache.find(c => c.id === vehiculo.clienteId);
+    const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(cliente eliminado)";
+
+    document.getElementById("ivVehiculoConocidoDatos").textContent =
+        `${vehiculo.marca || ""} ${vehiculo.modelo || ""} · ${nombreCliente}`.trim();
+    aviso.style.display = "block";
+    campoOculto.value = vehiculo.id;
+
+    // Precarga el cliente automáticamente, así no hace falta buscarlo aparte
+    if (cliente) {
+        document.getElementById("ivClienteId").value = cliente.id;
+        document.getElementById("ivClienteBuscar").value = `${cliente.apellido}, ${cliente.nombre}`;
+    }
+
+    document.getElementById("ivKmLabel").style.display = "block";
+    document.getElementById("ivKmActualizado").style.display = "block";
+    document.getElementById("ivKmActualizado").placeholder = vehiculo.kilometraje ? String(vehiculo.kilometraje) : "85000";
+
+};
+
+// El botón verde de un solo toque: en vez de crear un vehículo nuevo,
+// actualiza el estado en el taller (y el kilometraje, si se cargó) del
+// vehículo que ya existía.
+window.confirmarIngresoRapido = async function () {
+
+    const vehiculoId = document.getElementById("ivVehiculoExistenteId").value;
+    const estadoTaller = document.getElementById("ivEstadoTaller").value || "Esperando aprobación";
+    const kmNuevo = document.getElementById("ivKmActualizado").value.trim();
+    const estado = document.getElementById("mensajeEstadoIngresarVehiculo");
+
+    if (!vehiculoId) return;
+
+    estado.textContent = "Registrando ingreso...";
+    estado.style.color = "#999";
+
+    try {
+
+        const datos = { estadoTaller, fechaIngresoTaller: serverTimestamp() };
+        if (kmNuevo) datos.kilometraje = parseInt(kmNuevo, 10) || null;
+
+        await updateDoc(doc(db, "vehiculos", vehiculoId), datos);
+
+        estado.textContent = "¡Listo, check-in registrado!";
+        estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Check-in registrado");
+        setTimeout(() => window.cerrarModales(), 600);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+    }
 
 };
 
@@ -8753,6 +8845,15 @@ window.guardarIngresarVehiculo = async function () {
     if (!patente) {
         estado.textContent = "Ponele al menos la patente.";
         estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    // Red de seguridad: si esta patente ya está cargada (el aviso verde de
+    // arriba la detectó), no se crea un vehículo duplicado — se actualiza
+    // el que ya existía, igual que haría el botón de check-in rápido.
+    const vehiculoExistenteId = document.getElementById("ivVehiculoExistenteId").value;
+    if (vehiculoExistenteId) {
+        await window.confirmarIngresoRapido();
         return;
     }
 
