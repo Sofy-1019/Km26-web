@@ -1,0 +1,19 @@
+{
+  "name": "km26-web",
+  "version": "1.0.0",
+  "description": "KM26 Performance - Taller mecánico en Berazategui, Buenos Aires",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve .",
+    "build": "echo 'No build step required for static HTML site'"
+  },
+  "keywords": [
+    "km26",
+    "performance",
+    "taller-mecanico",
+    "berazategui"
+  ],
+  "author": "KM26 Performance",
+  "license": "UNLICENSED"
+}
