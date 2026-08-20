@@ -455,6 +455,7 @@
 
     <div class="copyright">
         © <span id="year"></span> KM26 Performance · Todos los derechos reservados.
+        <span id="contadorVisitasWrap" style="display:block;margin-top:6px;font-size:11px;opacity:.7;">👀 <span id="contadorVisitas">-</span> visitas a esta página</span>
     </div>
 
 </footer>
@@ -548,6 +549,52 @@
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
+
+<!-- Contador de visitas público (visible en el pie de página). Usa el mismo
+     proyecto de Firebase que ya tiene el panel de gestión — no hace falta
+     crear nada nuevo. Solo suma 1 la primera vez en cada visita a la
+     página (no en cada recarga), y si por algún motivo falla (sin
+     conexión, etc.) no rompe nada más del sitio. -->
+<script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB8W3x4-b0JEaxwEXBY09qWWFPRc2q98CA",
+        authDomain: "km26-gestion.firebaseapp.com",
+        projectId: "km26-gestion",
+        storageBucket: "km26-gestion.firebasestorage.app",
+        messagingSenderId: "1006314454164",
+        appId: "1:1006314454164:web:7a4e49c99e54d125038881"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    (async () => {
+
+        try {
+
+            const ref = doc(db, "estadisticas", "visitas");
+
+            if (!sessionStorage.getItem("km26_visita_contada")) {
+                await updateDoc(ref, { total: increment(1) });
+                sessionStorage.setItem("km26_visita_contada", "1");
+            }
+
+            const snap = await getDoc(ref);
+            const total = snap.exists() ? (snap.data().total || 0) : 0;
+            const el = document.getElementById("contadorVisitas");
+            if (el) el.textContent = total.toLocaleString("es-AR");
+
+        } catch (err) {
+            console.warn("No se pudo actualizar el contador de visitas:", err);
+        }
+
+    })();
+
+</script>
 
 <a href="https://wa.me/5491138789327?text=Hola%20KM26%20Performance.%20Quisiera%20consultar%20por%20un%20turno%20para%20mi%20veh%C3%ADculo."
    target="_blank"
