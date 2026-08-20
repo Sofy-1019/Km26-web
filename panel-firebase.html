@@ -5437,6 +5437,27 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         </div>
 
+        <div class="fila-titulo" style="margin-top:22px;"><h2 style="font-size:16px;">📈 Estadísticas del taller</h2></div>
+
+        <div class="cc-3col-rep">
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">🚗 Modelos más comunes</div>
+                <div id="repModelosComunes"></div>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">⭐ Clientes más frecuentes</div>
+                <div id="repClientesFrecuentes"></div>
+            </div>
+
+            <div class="dash-panel-nuevo">
+                <div class="dash-panel-nuevo-titulo">📅 Mejor mes del año</div>
+                <div id="repMejorMesAnio"></div>
+            </div>
+
+        </div>
+
         <div class="fila-titulo" style="margin-top:8px;"><h2 style="font-size:16px;">🚗 Vehículos atendidos en el período</h2></div>
         <div id="repListaVehiculos"></div>
 
@@ -8383,6 +8404,14 @@ window.cambiarEstadoTaller = async function (id, nuevoEstado) {
         datos.fechaIngresoTaller = serverTimestamp();
     } else if (!nuevoEstado) {
         datos.fechaIngresoTaller = null;
+    }
+
+    // A partir de ahora, cada vez que un vehículo queda "Terminado" se guarda
+    // la fecha exacta. Todavía no hay estadísticas con esto (recién empieza a
+    // registrarse desde hoy), pero es la base para poder calcular más
+    // adelante cuánto tarda en promedio cada tipo de trabajo.
+    if (nuevoEstado === "Terminado") {
+        datos.fechaTerminado = serverTimestamp();
     }
 
     await updateDoc(doc(db, "vehiculos", id), datos);
@@ -15513,6 +15542,94 @@ function calcularReportes() {
                 <span style="margin-left:auto;color:#777;font-size:11px;white-space:nowrap;">${e.fecha.toLocaleDateString("es-AR")} · ${e.fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
             </div>
         `).join("");
+
+    }
+
+    calcularEstadisticasTaller();
+
+}
+
+// ---------- Estadísticas del taller (histórico completo, no depende del
+// filtro de período de arriba — mirar solo "Hoy" no tendría sentido para
+// saber cuál es el modelo más común o el cliente más frecuente) ----------
+function calcularEstadisticasTaller() {
+
+    // ---- Modelos más comunes: de todos los vehículos cargados alguna vez ----
+    const elModelos = document.getElementById("repModelosComunes");
+    if (elModelos) {
+
+        const conteoModelos = {};
+        vehiculosCache.forEach(v => {
+            const marca = (v.marca || "").trim();
+            const modelo = (v.modelo || "").trim();
+            if (!marca && !modelo) return;
+            const clave = `${marca} ${modelo}`.trim();
+            conteoModelos[clave] = (conteoModelos[clave] || 0) + 1;
+        });
+
+        const rankingModelos = Object.entries(conteoModelos).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        elModelos.innerHTML = rankingModelos.length === 0
+            ? '<div class="vacio">Todavía no hay vehículos cargados.</div>'
+            : rankingModelos.map(([nombre, veces], i) =>
+                `<div class="dash-mov-fila"><span>${i + 1}. ${escapar(nombre)}</span><strong style="margin-left:auto;">${veces} ${veces === 1 ? "vez" : "veces"}</strong></div>`
+            ).join("");
+
+    }
+
+    // ---- Clientes más frecuentes: por cantidad de turnos reales (no cancelados) ----
+    const elClientes = document.getElementById("repClientesFrecuentes");
+    if (elClientes) {
+
+        const conteoClientes = {};
+        turnosCache.forEach(t => {
+            if (t.estado === "Cancelado" || !t.clienteId) return;
+            conteoClientes[t.clienteId] = (conteoClientes[t.clienteId] || 0) + 1;
+        });
+
+        const rankingClientes = Object.entries(conteoClientes)
+            .map(([clienteId, veces]) => ({ cliente: clientesCache.find(c => c.id === clienteId), veces }))
+            .filter(x => x.cliente && x.veces > 1)
+            .sort((a, b) => b.veces - a.veces)
+            .slice(0, 5);
+
+        elClientes.innerHTML = rankingClientes.length === 0
+            ? '<div class="vacio">Todavía no hay clientes con más de un turno.</div>'
+            : rankingClientes.map((x, i) =>
+                `<div class="dash-mov-fila"><span>${i + 1}. ${escapar(x.cliente.nombre)} ${escapar(x.cliente.apellido)}</span><strong style="margin-left:auto;">${x.veces} turnos</strong></div>`
+            ).join("");
+
+    }
+
+    // ---- Mejor mes del año actual (por ingresos reales en Caja) ----
+    const elMejorMes = document.getElementById("repMejorMesAnio");
+    if (elMejorMes) {
+
+        const anioActual = new Date().getFullYear();
+        const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const ingresosPorMes = new Array(12).fill(0);
+
+        cajaCache.forEach(m => {
+            if (m.tipo !== "Ingreso") return;
+            const f = toDateSegura(m.fecha);
+            if (!f || f.getFullYear() !== anioActual) return;
+            ingresosPorMes[f.getMonth()] += Number(m.monto) || 0;
+        });
+
+        const totalAnio = ingresosPorMes.reduce((s, v) => s + v, 0);
+
+        if (totalAnio === 0) {
+            elMejorMes.innerHTML = '<div class="vacio">Sin ingresos registrados este año todavía.</div>';
+        } else {
+            const rankingMeses = ingresosPorMes
+                .map((total, i) => ({ mes: nombresMeses[i], total }))
+                .filter(x => x.total > 0)
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 5);
+            elMejorMes.innerHTML = rankingMeses.map((x, i) =>
+                `<div class="dash-mov-fila"><span>${i + 1}. ${x.mes} ${anioActual}</span><strong style="margin-left:auto;">${formatoPlata(x.total)}</strong></div>`
+            ).join("");
+        }
 
     }
 
