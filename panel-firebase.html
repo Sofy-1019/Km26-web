@@ -8046,24 +8046,76 @@ window.cambiarTab = function (tab) {
 
 const TOUR_PASOS = [
     {
+        tab: "dashboard",
         selector: "#dashBuscador",
         titulo: "🔍 Buscador rápido",
         texto: "Desde acá encontrás cualquier cliente, vehículo o patente al instante, sin importar en qué pantalla estés."
     },
     {
+        tab: "dashboard",
         selector: ".dash-acciones-grid",
         titulo: "⚡ Acciones rápidas",
         texto: "Los botones que más vas a usar en el día a día: ingresar un vehículo, cargar un turno, un presupuesto o cobrar."
     },
     {
-        selector: "#sidebarDesktop, #navInferior",
-        titulo: "🧭 Todas las secciones",
-        texto: "Acá tenés Turnos, Presupuestos, Caja, Stock y todo lo demás. En el celular, tocá \"Más\" para ver el resto."
-    },
-    {
+        tab: "dashboard",
         selector: "#btnNotificaciones",
         titulo: "🔔 Notificaciones",
-        texto: "Achá te van a avisar los vencimientos de VTV, services próximos y turnos sin confirmar — con sonido incluido."
+        texto: "Acá te van a avisar los vencimientos de VTV, services próximos y turnos sin confirmar — con sonido incluido."
+    },
+    {
+        tab: "dashboard",
+        selector: "#sidebarDesktop, #navInferior",
+        titulo: "🧭 Todas las secciones",
+        texto: "Este es el menú principal. Ahora te voy a llevar recorriendo cada sección para que veas dónde está cada cosa."
+    },
+    {
+        tab: "clientes",
+        selector: "#buscadorClientesVeh",
+        titulo: "👤 Clientes / Vehículos",
+        texto: "Buscá por nombre, teléfono o patente. Cada vehículo tiene su propia ficha con historial, VTV, service y fotos de inspección."
+    },
+    {
+        tab: "clientes",
+        selector: 'button[onclick="abrirModalIngresarVehiculo()"]',
+        titulo: "➕ Ingresar vehículo",
+        texto: "Cuando llega un auto al taller, arrancá siempre por acá. Si la patente ya existe, te ofrece un check-in de un solo toque en vez de cargar todo de nuevo."
+    },
+    {
+        tab: "turnos",
+        selector: 'button[onclick="abrirModalTurno()"]',
+        titulo: "📅 Turnos",
+        texto: "Agendá turnos y mirá la agenda del día. El sistema te avisa solo si el cliente todavía no confirmó por WhatsApp."
+    },
+    {
+        tab: "presupuestos",
+        selector: 'button[onclick="abrirModalPresupuesto()"]',
+        titulo: "📄 Presupuestos",
+        texto: "Armá una cotización con ítems y precios. El cliente la puede ver y aprobar desde un link, sin necesidad de entrar al sistema."
+    },
+    {
+        tab: "caja",
+        selector: 'button[onclick="abrirModalCaja()"]',
+        titulo: "💰 Caja",
+        texto: "Todo el movimiento de plata del taller: ingresos, egresos y transferencias. Más abajo vas a encontrar el Arqueo de caja."
+    },
+    {
+        tab: "stock",
+        selector: 'button[onclick="abrirModalProducto()"]',
+        titulo: "📦 Stock",
+        texto: "Cargá tus productos y repuestos. El sistema te avisa solo cuando algo está por quedarse sin stock."
+    },
+    {
+        tab: "cuentas",
+        selector: "#tab-cuentas .turnos-stats-grid",
+        titulo: "💲 Cuentas / Cobros",
+        texto: "Para cuando un cliente no paga todo de una — quedan las cuentas abiertas con su saldo pendiente hasta que se termina de cobrar."
+    },
+    {
+        tab: "dashboard",
+        selector: "#dashBuscador",
+        titulo: "🎉 ¡Eso es todo!",
+        texto: "Ya viste lo principal. Si en algún momento te olvidás de algo, tocá el ❓ de arriba para volver a ver esta guía cuando quieras."
     }
 ];
 
@@ -8088,12 +8140,17 @@ window.abrirTour = function () {
 
 function elementoVisibleDelPaso(paso) {
     // Algunos pasos tienen selectores alternativos separados por coma (por
-    // ejemplo, sidebar de escritorio O barra inferior de celular) — usamos
-    // el primero que efectivamente esté visible en pantalla ahora mismo.
+    // ejemplo, sidebar de escritorio O barra inferior de celular), y algunos
+    // botones se repiten en más de un lugar (el mismo "Nuevo presupuesto"
+    // aparece en el Dashboard y en su propia pestaña) — por eso se revisan
+    // TODAS las coincidencias de cada selector, y se usa la primera que
+    // esté realmente visible en pantalla en este momento.
     const selectores = paso.selector.split(",").map(s => s.trim());
     for (const sel of selectores) {
-        const el = document.querySelector(sel);
-        if (el && el.offsetParent !== null) return el;
+        const coincidencias = document.querySelectorAll(sel);
+        for (const el of coincidencias) {
+            if (el.offsetParent !== null) return el;
+        }
     }
     return null;
 }
@@ -8101,6 +8158,22 @@ function elementoVisibleDelPaso(paso) {
 function mostrarPasoTour() {
 
     const paso = TOUR_PASOS[pasoTourActual];
+    const resaltado = document.getElementById("tourResaltado");
+    const globo = document.getElementById("tourGlobo");
+
+    // Si este paso pertenece a otra pestaña, cambiamos primero — y le damos
+    // un instante para que la sección termine de mostrarse antes de buscar
+    // el elemento a resaltar (si no, a veces todavía está oculta).
+    if (paso.tab) {
+        window.cambiarTab(paso.tab);
+    }
+
+    setTimeout(() => mostrarPasoTourInterno(paso), paso.tab ? 200 : 0);
+
+}
+
+function mostrarPasoTourInterno(paso) {
+
     const resaltado = document.getElementById("tourResaltado");
     const globo = document.getElementById("tourGlobo");
 
