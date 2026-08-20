@@ -6099,6 +6099,12 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
             <button class="btn-chico" style="width:100%;" onclick="mostrarQRVehiculo()">🔳 Generar QR de historial para el cliente</button>
         </div>
 
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
+            <p style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:8px;">✍️ Conformidad de entrega</p>
+            <p id="fvUltimaFirmaTexto" style="font-size:11.5px;color:#777;margin-bottom:8px;"></p>
+            <button class="btn-red" style="width:100%;" onclick="abrirModalFirmaEntrega()">✍️ Firmar entrega del vehículo</button>
+        </div>
+
     </div>
 </div>
 
@@ -6122,10 +6128,38 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     </div>
 </div>
 
+<!-- ---------- Modal: firma digital de conformidad al entregar ---------- -->
+<div class="overlay" id="modalFirmaEntrega">
+    <div class="modal">
+        <h3>✍️ Conformidad de entrega</h3>
+        <p id="firmaEntregaDatosVehiculo" style="font-size:13px;color:#ccc;margin-bottom:6px;"></p>
+        <p style="font-size:11.5px;color:#777;margin-bottom:14px;">Pasale la pantalla al cliente para que firme acá abajo con el dedo, confirmando que retira el vehículo conforme.</p>
+
+        <div style="background:#fff;border-radius:10px;overflow:hidden;touch-action:none;">
+            <canvas id="canvasFirmaEntrega" width="440" height="180" style="width:100%;height:180px;display:block;cursor:crosshair;"></canvas>
+        </div>
+
+        <div class="modal-botones" style="margin-top:10px;">
+            <button class="btn-cancelar" style="flex:1;" onclick="borrarFirmaEntrega()">🧹 Borrar y repetir</button>
+        </div>
+
+        <label style="margin-top:10px;">Nombre de quien firma (opcional)</label>
+        <input type="text" id="firmaEntregaNombre" placeholder="Nombre de quien retira">
+
+        <div class="modal-botones">
+            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-red" onclick="guardarFirmaEntrega(this)">Guardar firma</button>
+        </div>
+
+        <p id="mensajeEstadoFirmaEntrega"></p>
+    </div>
+</div>
+
 <!-- ---------- Modal: historia clínica directa (desde la lista de Vehículos) ---------- -->
 <div class="overlay" id="modalHistorialDirecto">
     <div class="modal">
         <h3 id="historialDirectoTitulo">📋 Historia clínica</h3>
+
 
         <div id="historialDirectoContenido"></div>
 
@@ -6242,7 +6276,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
-            <button class="btn-red" onclick="guardarArqueoCaja()">Registrar arqueo</button>
+            <button class="btn-red" id="btnGuardarArqueo" onclick="guardarArqueoCaja(this)">Registrar arqueo</button>
         </div>
 
         <p id="mensajeEstadoArqueo"></p>
@@ -6538,7 +6572,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" onclick="guardarProducto()">Guardar</button>
+            <button class="btn-red" id="btnGuardarProducto" onclick="guardarProducto(this)">Guardar</button>
         </div>
 
         <p id="mensajeEstadoProducto"></p>
@@ -6578,7 +6612,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" onclick="guardarEdicionProducto()">Guardar</button>
+            <button class="btn-red" id="btnGuardarEdicionProducto" onclick="guardarEdicionProducto(this)">Guardar</button>
         </div>
 
         <div class="modal-botones" id="accionesEdicionProducto" style="display:none;"></div>
@@ -7153,6 +7187,7 @@ onAuthStateChanged(auth, (user) => {
         escucharPagosProveedor();
         escucharServicios();
         escucharConfiguracion();
+        escucharEntregasFirmadas();
         activarNotificacionesPush();
     } else {
         document.getElementById("pantallaLogin").style.display = "flex";
@@ -7752,6 +7787,7 @@ window.cerrarModales = function () {
     document.getElementById("modalServicio").classList.remove("abierto");
     document.getElementById("modalFichaVehiculo").classList.remove("abierto");
     document.getElementById("modalQRVehiculo").classList.remove("abierto");
+    document.getElementById("modalFirmaEntrega").classList.remove("abierto");
     document.getElementById("modalIngresarVehiculo").classList.remove("abierto");
     document.getElementById("modalVerPresupuesto").classList.remove("abierto");
     document.getElementById("modalArqueoCaja").classList.remove("abierto");
@@ -9657,6 +9693,7 @@ window.abrirModalArqueoCaja = function () {
     document.getElementById("arqueoDiferencia").textContent = "$0";
     document.getElementById("arqueoDiferencia").style.color = "#fff";
     document.getElementById("mensajeEstadoArqueo").textContent = "";
+    desbloquearBoton(document.getElementById("btnGuardarArqueo"));
 
     document.getElementById("modalArqueoCaja").classList.add("abierto");
 
@@ -9674,7 +9711,7 @@ window.calcularDiferenciaArqueo = function () {
 
 };
 
-window.guardarArqueoCaja = async function () {
+window.guardarArqueoCaja = function (boton) {
 
     const esperado = parseFloat(document.getElementById("arqueoEsperado").dataset.valor) || 0;
     const contado = parseFloat(document.getElementById("arqueoContado").value);
@@ -9686,6 +9723,13 @@ window.guardarArqueoCaja = async function () {
         estado.style.color = "#ff6b6b";
         return;
     }
+
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarArqueoCaja(esperado, contado, notas, estado, boton);
+
+};
+
+async function ejecutarGuardarArqueoCaja(esperado, contado, notas, estado, boton) {
 
     const diferencia = contado - esperado;
 
@@ -9714,11 +9758,13 @@ window.guardarArqueoCaja = async function () {
 
         estado.textContent = "✅ Arqueo registrado.";
         estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Arqueo de caja registrado");
         setTimeout(() => window.cerrarModales(), 900);
 
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -10781,6 +10827,7 @@ window.abrirFichaVehiculo = function (id) {
 
     fichaVehiculoActual = id;
     if (v.clienteId) registrarClienteVisto(v.clienteId);
+    actualizarUltimaFirmaEnFicha();
 
     document.getElementById("fichaVehTitulo").textContent = `${v.patente} · ${v.marca || ""} ${v.modelo || ""}`;
     document.getElementById("fvId").value = v.id;
@@ -10945,6 +10992,179 @@ window.mostrarQRVehiculo = function () {
     document.getElementById("modalQRVehiculo").classList.add("abierto");
 
 };
+
+// ---------- Firma digital de conformidad al entregar ----------
+// Colección real: entregasFirmadas { vehiculoId, clienteId, patente, firmaBase64,
+//   nombreFirmante, fecha }
+// Se guarda como una firma más en la lista (no reemplaza a la anterior), así
+// queda un historial completo si el mismo auto vuelve más adelante.
+
+let entregasFirmadasCache = [];
+let dibujandoFirma = false;
+let ultimoPuntoFirma = null;
+
+function escucharEntregasFirmadas() {
+    const q = query(collection(db, "entregasFirmadas"), orderBy("fecha", "desc"));
+    onSnapshot(q, (snapshot) => {
+        entregasFirmadasCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    });
+}
+
+function coordenadasCanvasFirma(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const escalaX = canvas.width / rect.width;
+    const escalaY = canvas.height / rect.height;
+    const punto = e.touches ? e.touches[0] : e;
+    return {
+        x: (punto.clientX - rect.left) * escalaX,
+        y: (punto.clientY - rect.top) * escalaY
+    };
+}
+
+function inicializarCanvasFirma() {
+
+    const canvas = document.getElementById("canvasFirmaEntrega");
+    if (!canvas || canvas.dataset.listo) return; // no duplicar los listeners
+    canvas.dataset.listo = "1";
+
+    const ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    const empezar = (e) => {
+        e.preventDefault();
+        dibujandoFirma = true;
+        ultimoPuntoFirma = coordenadasCanvasFirma(e, canvas);
+    };
+
+    const dibujar = (e) => {
+        if (!dibujandoFirma) return;
+        e.preventDefault();
+        const punto = coordenadasCanvasFirma(e, canvas);
+        ctx.beginPath();
+        ctx.moveTo(ultimoPuntoFirma.x, ultimoPuntoFirma.y);
+        ctx.lineTo(punto.x, punto.y);
+        ctx.stroke();
+        ultimoPuntoFirma = punto;
+    };
+
+    const terminar = () => { dibujandoFirma = false; };
+
+    canvas.addEventListener("mousedown", empezar);
+    canvas.addEventListener("mousemove", dibujar);
+    canvas.addEventListener("mouseup", terminar);
+    canvas.addEventListener("mouseleave", terminar);
+    canvas.addEventListener("touchstart", empezar, { passive: false });
+    canvas.addEventListener("touchmove", dibujar, { passive: false });
+    canvas.addEventListener("touchend", terminar);
+
+}
+
+window.borrarFirmaEntrega = function () {
+    const canvas = document.getElementById("canvasFirmaEntrega");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+};
+
+window.abrirModalFirmaEntrega = function () {
+
+    const v = vehiculosCache.find(x => x.id === fichaVehiculoActual);
+    if (!v) return;
+
+    const cliente = clientesCache.find(c => c.id === v.clienteId);
+    const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "";
+
+    document.getElementById("firmaEntregaDatosVehiculo").textContent =
+        `${v.patente} · ${v.marca || ""} ${v.modelo || ""} · ${nombreCliente}`.trim();
+    document.getElementById("firmaEntregaNombre").value = nombreCliente;
+    document.getElementById("mensajeEstadoFirmaEntrega").textContent = "";
+
+    document.getElementById("modalFirmaEntrega").classList.add("abierto");
+
+    // El canvas recién existe en el DOM una vez que el modal está abierto,
+    // por eso se inicializa acá y no antes.
+    setTimeout(() => {
+        inicializarCanvasFirma();
+        window.borrarFirmaEntrega();
+    }, 50);
+
+};
+
+window.guardarFirmaEntrega = function (boton) {
+
+    const canvas = document.getElementById("canvasFirmaEntrega");
+    const estado = document.getElementById("mensajeEstadoFirmaEntrega");
+
+    // Chequeo simple de que se dibujó algo: si el canvas está 100% en blanco,
+    // no tiene sentido guardarlo como si fuera una firma real.
+    const ctx = canvas.getContext("2d");
+    const pixeles = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const hayTrazo = pixeles.some((valor, i) => i % 4 === 3 && valor > 0);
+
+    if (!hayTrazo) {
+        estado.textContent = "Todavía no se dibujó ninguna firma.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    const v = vehiculosCache.find(x => x.id === fichaVehiculoActual);
+    if (!v) return;
+
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarFirmaEntrega(v, canvas.toDataURL("image/png"), estado, boton);
+
+};
+
+async function ejecutarGuardarFirmaEntrega(v, firmaBase64, estado, boton) {
+
+    estado.textContent = "Guardando...";
+    estado.style.color = "#999";
+
+    try {
+
+        await addDoc(collection(db, "entregasFirmadas"), {
+            vehiculoId: v.id,
+            clienteId: v.clienteId,
+            patente: v.patente,
+            nombreFirmante: document.getElementById("firmaEntregaNombre").value.trim(),
+            firmaBase64,
+            fecha: serverTimestamp()
+        });
+
+        estado.textContent = "✅ Firma guardada.";
+        estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Conformidad de entrega firmada");
+        setTimeout(() => window.cerrarModales(), 800);
+
+    } catch (err) {
+        estado.textContent = "Error: " + err.message;
+        estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
+    }
+
+}
+
+// Muestra, dentro de la ficha del vehículo, cuándo fue la última vez que se
+// firmó una entrega (si alguna vez se hizo) — así se ve de un vistazo sin
+// tener que abrir nada más.
+function actualizarUltimaFirmaEnFicha() {
+
+    const el = document.getElementById("fvUltimaFirmaTexto");
+    if (!el || !fichaVehiculoActual) return;
+
+    const ultima = entregasFirmadasCache.find(e => e.vehiculoId === fichaVehiculoActual);
+
+    if (!ultima) {
+        el.textContent = "Todavía no se firmó ninguna entrega de este vehículo.";
+        return;
+    }
+
+    const f = toDateSegura(ultima.fecha);
+    el.textContent = `Última firma: ${f ? f.toLocaleDateString("es-AR") + " " + f.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : ""}${ultima.nombreFirmante ? " · " + ultima.nombreFirmante : ""}`;
+
+}
 
 window.enviarQRPorWhatsApp = function () {
 
@@ -11230,9 +11450,10 @@ window.abrirModalProducto = function () {
     document.getElementById("pProveedor").value = "";
     document.getElementById("pCodigo").value = "";
     document.getElementById("pStockMinimo").value = configuracionActual.stockMinimoDefecto || "";
+    desbloquearBoton(document.getElementById("btnGuardarProducto"));
 };
 
-window.guardarProducto = async function () {
+window.guardarProducto = function (boton) {
 
     const nombre = document.getElementById("pNombre").value.trim();
     const codigo = document.getElementById("pCodigo").value.trim();
@@ -11250,6 +11471,13 @@ window.guardarProducto = async function () {
         return;
     }
 
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarProducto(nombre, codigo, cantidad, precio, precioCosto, stockMinimo, categoriaId, proveedorId, estado, boton);
+
+};
+
+async function ejecutarGuardarProducto(nombre, codigo, cantidad, precio, precioCosto, stockMinimo, categoriaId, proveedorId, estado, boton) {
+
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
 
@@ -11266,6 +11494,7 @@ window.guardarProducto = async function () {
 
         estado.textContent = "¡Producto guardado!";
         estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Producto guardado");
 
         document.getElementById("pNombre").value = "";
         document.getElementById("pCodigo").value = "";
@@ -11281,6 +11510,7 @@ window.guardarProducto = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -11305,11 +11535,12 @@ window.abrirEdicionProducto = function (id, nombre, cantidad, stockMinimo, preci
     document.getElementById("accionesEdicionProducto").style.display = "flex";
 
     document.getElementById("mensajeEstadoEdicionProducto").textContent = "";
+    desbloquearBoton(document.getElementById("btnGuardarEdicionProducto"));
     document.getElementById("modalEditarProducto").classList.add("abierto");
 
 };
 
-window.guardarEdicionProducto = async function () {
+window.guardarEdicionProducto = function (boton) {
 
     const id = document.getElementById("epId").value;
     const nombre = document.getElementById("epNombre").value.trim();
@@ -11327,6 +11558,13 @@ window.guardarEdicionProducto = async function () {
         estado.style.color = "#ff6b6b";
         return;
     }
+
+    bloquearBoton(boton, "Guardando...");
+    ejecutarGuardarEdicionProducto(id, nombre, codigo, cantidad, precio, precioCosto, stockMinimo, categoriaId, proveedorId, estado, boton);
+
+};
+
+async function ejecutarGuardarEdicionProducto(id, nombre, codigo, cantidad, precio, precioCosto, stockMinimo, categoriaId, proveedorId, estado, boton) {
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -11351,6 +11589,7 @@ window.guardarEdicionProducto = async function () {
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
