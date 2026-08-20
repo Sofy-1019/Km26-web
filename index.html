@@ -456,7 +456,7 @@
     <div class="copyright">
         © <span id="year"></span> KM26 Performance · Todos los derechos reservados.
         <br>
-        <span id="contadorVisitasWrap" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:14px;opacity:.9;background:rgba(255,255,255,.06);padding:6px 14px;border-radius:20px;">👀 <span id="contadorVisitas" style="font-weight:700;">-</span> visitas a esta página</span>
+        <span id="contadorVisitasWrap" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:16px;opacity:.95;background:rgba(255,255,255,.08);padding:8px 18px;border-radius:22px;">👀 <span id="contadorVisitas" style="font-weight:800;font-size:22px;color:#ff8a7a;">···</span> visitas a esta página</span>
     </div>
 
 </footer>
@@ -591,6 +591,8 @@
 
         } catch (err) {
             console.warn("No se pudo actualizar el contador de visitas:", err);
+            const wrap = document.getElementById("contadorVisitasWrap");
+            if (wrap) wrap.style.display = "none";
         }
 
     })();
