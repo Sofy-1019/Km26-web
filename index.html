@@ -173,7 +173,7 @@
     }
 
     #introOverlay.intro-abriendo .intro-persiana-css{
-        animation:introSubirPersiana 1.6s ease-in-out forwards;
+        animation:introSubirPersiana 2.2s ease-in-out forwards;
     }
 
     @keyframes introSubirPersiana{
@@ -357,6 +357,10 @@
      KM26 BOT — experiencia de bienvenida (se ve una sola vez por sesión)
      ====================================================================== -->
 <div id="introOverlay">
+
+    <audio id="audioPersianaReal" preload="auto">
+        <source src="audio/persiana.mp3" type="audio/mpeg">
+    </audio>
 
     <button id="introSaltar" onclick="saltarIntro()">Saltar ✕</button>
 
@@ -1002,24 +1006,58 @@
         return audioCtx;
     }
 
-    // Sonido de persiana metálica subiendo: un ruido grave que sube de tono
+    // Sonido de persiana metálica subiendo: usa la grabación real si carga
+    // bien; si por algún motivo falla (archivo faltante, conexión, etc.),
+    // cae al sonido generado como respaldo, para que nunca quede en silencio.
     function sonidoPersiana() {
-        try {
-            const ctx = obtenerAudio();
-            const ahora = ctx.currentTime;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = "sawtooth";
-            osc.frequency.setValueAtTime(70, ahora);
-            osc.frequency.linearRampToValueAtTime(140, ahora + 1.5);
-            gain.gain.setValueAtTime(0.001, ahora);
-            gain.gain.linearRampToValueAtTime(0.05, ahora + 0.2);
-            gain.gain.linearRampToValueAtTime(0.001, ahora + 1.5);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(ahora);
-            osc.stop(ahora + 1.6);
-        } catch (e) {}
+
+        const audioReal = document.getElementById("audioPersianaReal");
+
+        const usarSintetizado = () => {
+            try {
+                const ctx = obtenerAudio();
+                const ahora = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = "sawtooth";
+                osc.frequency.setValueAtTime(70, ahora);
+                osc.frequency.linearRampToValueAtTime(140, ahora + 1.5);
+                gain.gain.setValueAtTime(0.001, ahora);
+                gain.gain.linearRampToValueAtTime(0.05, ahora + 0.2);
+                gain.gain.linearRampToValueAtTime(0.001, ahora + 1.5);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ahora);
+                osc.stop(ahora + 1.6);
+            } catch (e) {}
+        };
+
+        if (!audioReal) {
+            usarSintetizado();
+            return;
+        }
+
+        audioReal.currentTime = 0;
+        audioReal.volume = 0.6;
+
+        const promesa = audioReal.play();
+        if (promesa && promesa.catch) promesa.catch(usarSintetizado);
+
+        // El audio real dura más que la animación visual (persiana subiendo
+        // dura ~2.2s) — se corta ahí con un fundido cortito, para no dejarlo
+        // sonando de más una vez que la persiana ya terminó de abrirse.
+        setTimeout(() => {
+            if (audioReal.paused) return;
+            const fundido = setInterval(() => {
+                if (audioReal.volume > 0.08) {
+                    audioReal.volume -= 0.08;
+                } else {
+                    audioReal.pause();
+                    clearInterval(fundido);
+                }
+            }, 40);
+        }, 2200);
+
     }
 
     // Beep cortito del scanner
@@ -1075,7 +1113,7 @@
         overlay.classList.add("intro-luces-on");
         setTimeout(() => overlay.classList.add("intro-amanecer"), 300);
 
-        await new Promise(r => setTimeout(r, 1700));
+        await new Promise(r => setTimeout(r, 2300));
 
         // Escena 3: KM26 Bot camina hacia adelante
         overlay.classList.add("intro-caminando");
