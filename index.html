@@ -199,28 +199,31 @@
 
     @media (max-width:900px){
         #introWidget{
-            right:1%;
-            bottom:0;
+            flex-direction:column;
+            align-items:flex-end;
+            right:3%;
+            bottom:16%;
             gap:8px;
+            max-width:94%;
         }
         #introBot{
-            width:30%;
-            min-width:100px;
+            width:24vw;
+            min-width:85px;
+            max-width:120px;
         }
         #introGlobo{
-            font-size:12.5px;
-            padding:12px 16px;
-            max-width:170px;
-            margin-bottom:min(20%, 60px);
+            font-size:12px;
+            padding:10px 14px;
+            max-width:78vw;
+            margin-bottom:0;
         }
         #introBotones{
-            position:static;
-            margin-top:12px;
-            justify-content:center;
+            bottom:2%;
+            gap:6px;
         }
         #introBotones button{
-            font-size:11px;
-            padding:8px 12px;
+            font-size:10.5px;
+            padding:7px 10px;
         }
     }
 
