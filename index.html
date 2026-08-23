@@ -43,8 +43,8 @@
 
     #introWidget{
         position:fixed;
-        top:100px;
-        right:14%;
+        top:68px;
+        right:6%;
         z-index:9500;
         display:flex;
         align-items:flex-start;
@@ -55,6 +55,12 @@
 
     #introWidget *{
         pointer-events:auto;
+    }
+
+    #introColumna{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
     }
 
     #introBot{
@@ -155,14 +161,9 @@
     /* ---------- Botones, en fila abajo de toda la foto ---------- */
 
     #introBotones{
-        position:fixed;
-        top:470px;
-        right:14%;
-        z-index:9500;
         display:none;
         flex-direction:column;
         gap:6px;
-        pointer-events:none;
     }
 
     #introBotones.intro-visible{
@@ -195,9 +196,14 @@
 
     @media (max-width:900px){
         #introWidget{
-            top:64px;
+            flex-direction:column;
+            align-items:flex-end;
+            top:60px;
             right:2%;
-            gap:6px;
+            gap:8px;
+        }
+        #introColumna{
+            align-items:flex-end;
         }
         #introBot{
             width:min(45vw, 192px);
@@ -205,11 +211,15 @@
         #introGlobo{
             font-size:11.5px;
             padding:10px 12px;
-            max-width:48vw;
+            max-width:65vw;
+        }
+        #introGlobo::after{
+            top:auto;
+            bottom:-7px;
+            right:20px;
+            clip-path:polygon(0 0, 50% 100%, 100% 0);
         }
         #introBotones{
-            top:280px;
-            right:2%;
             gap:5px;
         }
         #introBotones button{
@@ -234,8 +244,19 @@
 <!-- ---------- KM26 Bot, integrado en la foto de portada ---------- -->
 <div id="introWidget">
 
-    <div id="introGlobo">
-        <button class="intro-cerrar" onclick="cerrarIntro()" aria-label="Cerrar">✕</button>
+    <div id="introColumna">
+
+        <div id="introGlobo">
+            <button class="intro-cerrar" onclick="cerrarIntro()" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div id="introBotones">
+            <button onclick="introOpcion('turno')">📅 Solicitar turno</button>
+            <button onclick="introOpcion('presupuesto')">💲 Pedir presupuesto</button>
+            <button onclick="introOpcion('llegar')">📍 Cómo llegar</button>
+            <button onclick="introOpcion('whatsapp')">💬 Escribirnos por WhatsApp</button>
+        </div>
+
     </div>
 
     <div id="introBot" onclick="reabrirIntro()">
@@ -244,12 +265,6 @@
 
 </div>
 
-    <div id="introBotones">
-        <button onclick="introOpcion('turno')">📅 Solicitar turno</button>
-        <button onclick="introOpcion('presupuesto')">💲 Pedir presupuesto</button>
-        <button onclick="introOpcion('llegar')">📍 Cómo llegar</button>
-        <button onclick="introOpcion('whatsapp')">💬 Escribirnos por WhatsApp</button>
-    </div>
 
 
 <header>
