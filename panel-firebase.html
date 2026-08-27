@@ -4082,6 +4082,9 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     <br>
     <button class="btn-red" onclick="iniciarSesion()">Ingresar</button>
     <p id="errorLogin"></p>
+    <p style="margin-top:14px;">
+        <a href="#" onclick="event.preventDefault(); recuperarContrasenaLogin();" style="color:#999;font-size:12.5px;text-decoration:underline;">¿Olvidaste tu contraseña?</a>
+    </p>
 </div>
 
 <!-- ---------- App ---------- -->
@@ -6983,7 +6986,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {
     getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
-    EmailAuthProvider, reauthenticateWithCredential, updatePassword
+    EmailAuthProvider, reauthenticateWithCredential, updatePassword, sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
     getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, setDoc, getDoc,
@@ -7180,6 +7183,39 @@ window.iniciarSesion = function () {
 
 window.cerrarSesion = function () {
     signOut(auth);
+};
+
+// Recuperar contraseña propia desde la pantalla de login, sin necesidad de
+// estar logueado — usa el mismo mecanismo de Firebase que el botón de
+// "Restablecer contraseña" en Usuarios: manda un mail con un link para
+// elegir una contraseña nueva, nadie (ni vos como admin) ve la contraseña
+// de nadie en ningún momento.
+window.recuperarContrasenaLogin = function () {
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const error = document.getElementById("errorLogin");
+
+    if (!email) {
+        error.textContent = "Escribí tu email arriba primero, y volvé a tocar el link.";
+        error.style.color = "#ff6b6b";
+        return;
+    }
+
+    error.textContent = "Enviando...";
+    error.style.color = "#999";
+
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            error.textContent = "✅ Listo, te mandamos un mail a " + email + " con el link para elegir una contraseña nueva.";
+            error.style.color = "#5fd98a";
+        })
+        .catch((err) => {
+            error.textContent = err.code === "auth/user-not-found"
+                ? "No encontramos ninguna cuenta con ese email."
+                : "No se pudo enviar el mail: " + err.message;
+            error.style.color = "#ff6b6b";
+        });
+
 };
 
 // ---------- PWA: se puede "instalar" en el celular o la compu ----------
@@ -15651,11 +15687,34 @@ function renderUsuarios() {
             </div>
             <span class="badge-rol ${u.rol}">${u.rol}</span>
             <button class="btn-chico" onclick="abrirModalUsuario('${u.id}')">Editar</button>
+            <button class="btn-chico" onclick="resetearContrasenaUsuario('${escaparComillas(u.email)}', this)">🔑 Restablecer contraseña</button>
             <button class="btn-chico" style="color:#ff6b6b;" onclick="borrarUsuario('${u.id}', '${escaparComillas(u.nombre)}')">Quitar</button>
         </div>
     `).join("");
 
 }
+
+// Le manda a ese usuario un mail de Firebase con un link para que elija una
+// contraseña nueva — nadie ve ni escribe la contraseña de nadie en ningún
+// momento, es el mismo mecanismo estándar que usan bancos y otras apps.
+window.resetearContrasenaUsuario = function (email, boton) {
+
+    const confirmado = confirm(`¿Mandarle un mail a ${email} para que elija una contraseña nueva?`);
+    if (!confirmado) return;
+
+    bloquearBoton(boton, "Enviando...");
+
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            window.mostrarToastExito(`Mail enviado a ${email}`);
+            desbloquearBoton(boton);
+        })
+        .catch((err) => {
+            alert("No se pudo enviar el mail: " + err.message);
+            desbloquearBoton(boton);
+        });
+
+};
 
 window.abrirModalUsuario = function (id) {
 
