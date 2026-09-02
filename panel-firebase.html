@@ -4070,7 +4070,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     <img src="images/icon-192.png" alt="KM26">
     <h1>Panel de gestión</h1>
     <p>KM26 Performance</p>
-    <input type="text" id="loginEmail" placeholder="Usuario (ej: admin@km26.com)">
+    <input type="text" id="loginEmail" placeholder="Usuario">
 
     <div class="campo-password">
         <input type="password" id="loginPassword" placeholder="Contraseña">
@@ -4080,7 +4080,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     </div>
 
     <br>
-    <button class="btn-red" onclick="iniciarSesion()">Ingresar</button>
+    <button class="btn-red" id="botonIngresar" onclick="iniciarSesion()">Ingresar</button>
     <p id="errorLogin"></p>
     <p style="margin-top:14px;">
         <a href="#" onclick="event.preventDefault(); recuperarContrasenaLogin();" style="color:#999;font-size:12.5px;text-decoration:underline;">¿Olvidaste tu contraseña?</a>
@@ -6895,8 +6895,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     <div class="modal">
         <h3>👤 Usuario del equipo</h3>
 
-        <label>Email (el mismo que usa para iniciar sesión)</label>
-        <input type="text" id="usuarioEmail" placeholder="ej: mecanico@km26.com">
+        <label>Nombre de usuario (con esto entra al panel todos los días)</label>
+        <input type="text" id="usuarioLogin" placeholder="ej: mecanico1">
+
+        <label>Email real de esa persona (solo para recuperar la contraseña, no lo usa para entrar)</label>
+        <input type="text" id="usuarioEmail" placeholder="ej: juan.perez@gmail.com">
 
         <label>Nombre</label>
         <input type="text" id="usuarioNombre" placeholder="Nombre y apellido">
@@ -7166,18 +7169,58 @@ window.mostrarPassword = function () {
 
 };
 
-window.iniciarSesion = function () {
+// Cada usuario tiene un "usuario" corto (ej: mecanico1) para entrar día a
+// día, y por detrás un email real (el suyo, que sí revisa) solo para el
+// tema de recuperar contraseña. Esta función busca ese email real a partir
+// de lo que la persona escribió: si ya escribió un email (tiene "@") lo usa
+// directo, si no, lo busca en la tabla "usuariosLogin".
+async function resolverEmailReal(valorIngresado) {
 
-    const email = document.getElementById("loginEmail").value.trim();
+    const valor = valorIngresado.trim();
+
+    if (valor.includes("@")) return valor;
+
+    const refLogin = doc(db, "usuariosLogin", valor.toLowerCase());
+    const snap = await getDoc(refLogin);
+
+    if (!snap.exists()) return null;
+
+    return snap.data().email;
+
+}
+
+window.iniciarSesion = async function () {
+
+    const valorIngresado = document.getElementById("loginEmail").value.trim();
     const pass = document.getElementById("loginPassword").value;
     const error = document.getElementById("errorLogin");
+    const botonIngresar = document.getElementById("botonIngresar");
 
     error.textContent = "";
 
-    signInWithEmailAndPassword(auth, email, pass)
-        .catch(() => {
-            error.textContent = "Email o contraseña incorrectos.";
-        });
+    if (!valorIngresado || !pass) {
+        error.textContent = "Completá usuario y contraseña.";
+        return;
+    }
+
+    if (botonIngresar) { botonIngresar.disabled = true; botonIngresar.textContent = "Ingresando..."; }
+
+    try {
+
+        const emailReal = await resolverEmailReal(valorIngresado);
+
+        if (!emailReal) {
+            error.textContent = "No encontramos ese usuario.";
+            return;
+        }
+
+        await signInWithEmailAndPassword(auth, emailReal, pass);
+
+    } catch (err) {
+        error.textContent = "Usuario o contraseña incorrectos.";
+    } finally {
+        if (botonIngresar) { botonIngresar.disabled = false; botonIngresar.textContent = "Ingresar"; }
+    }
 
 };
 
@@ -7190,13 +7233,13 @@ window.cerrarSesion = function () {
 // "Restablecer contraseña" en Usuarios: manda un mail con un link para
 // elegir una contraseña nueva, nadie (ni vos como admin) ve la contraseña
 // de nadie en ningún momento.
-window.recuperarContrasenaLogin = function () {
+window.recuperarContrasenaLogin = async function () {
 
-    const email = document.getElementById("loginEmail").value.trim();
+    const valorIngresado = document.getElementById("loginEmail").value.trim();
     const error = document.getElementById("errorLogin");
 
-    if (!email) {
-        error.textContent = "Escribí tu email arriba primero, y volvé a tocar el link.";
+    if (!valorIngresado) {
+        error.textContent = "Escribí tu usuario arriba primero, y volvé a tocar el link.";
         error.style.color = "#ff6b6b";
         return;
     }
@@ -7204,17 +7247,26 @@ window.recuperarContrasenaLogin = function () {
     error.textContent = "Enviando...";
     error.style.color = "#999";
 
-    sendPasswordResetEmail(auth, email)
-        .then(() => {
-            error.textContent = "✅ Listo, te mandamos un mail a " + email + " con el link para elegir una contraseña nueva.";
-            error.style.color = "#5fd98a";
-        })
-        .catch((err) => {
-            error.textContent = err.code === "auth/user-not-found"
-                ? "No encontramos ninguna cuenta con ese email."
-                : "No se pudo enviar el mail: " + err.message;
+    try {
+
+        const emailReal = await resolverEmailReal(valorIngresado);
+
+        if (!emailReal) {
+            error.textContent = "No encontramos ese usuario.";
             error.style.color = "#ff6b6b";
-        });
+            return;
+        }
+
+        await sendPasswordResetEmail(auth, emailReal);
+        error.textContent = "✅ Listo, te mandamos un mail con el link para elegir una contraseña nueva.";
+        error.style.color = "#5fd98a";
+
+    } catch (err) {
+        error.textContent = err.code === "auth/user-not-found"
+            ? "No encontramos ninguna cuenta asociada."
+            : "No se pudo enviar el mail: " + err.message;
+        error.style.color = "#ff6b6b";
+    }
 
 };
 
@@ -15609,10 +15661,12 @@ function escucharUsuarios() {
             // Nadie tiene rol asignado todavía: el primero en entrar queda como admin automáticamente
             await setDoc(doc(db, "usuarios", usuarioActual.email), {
                 email: usuarioActual.email,
+                usuarioLogin: "admin",
                 nombre: "Admin",
                 rol: "admin",
                 creado: serverTimestamp()
             });
+            await setDoc(doc(db, "usuariosLogin", "admin"), { email: usuarioActual.email });
             return; // el propio onSnapshot se vuelve a disparar solo con el dato nuevo
         }
 
@@ -15682,7 +15736,7 @@ function renderUsuarios() {
     el.innerHTML = usuariosCache.map(u => `
         <div class="usuario-fila">
             <div>
-                <div class="usuario-nombre">${escapar(u.nombre)}</div>
+                <div class="usuario-nombre">${escapar(u.nombre)} <span style="color:#999;font-weight:400;">· usuario: ${escapar(u.usuarioLogin || "—")}</span></div>
                 <div class="usuario-email">${escapar(u.email)}</div>
             </div>
             <span class="badge-rol ${u.rol}">${u.rol}</span>
@@ -15720,12 +15774,16 @@ window.abrirModalUsuario = function (id) {
 
     if (id) {
         const u = usuariosCache.find(x => x.id === id);
+        document.getElementById("usuarioLogin").value = u.usuarioLogin || "";
+        document.getElementById("usuarioLogin").disabled = true;
         document.getElementById("usuarioEmail").value = u.email;
         document.getElementById("usuarioEmail").disabled = true;
         document.getElementById("usuarioNombre").value = u.nombre;
         document.getElementById("usuarioRol").value = u.rol;
         document.getElementById("modalUsuario").dataset.editandoId = id;
     } else {
+        document.getElementById("usuarioLogin").value = "";
+        document.getElementById("usuarioLogin").disabled = false;
         document.getElementById("usuarioEmail").value = "";
         document.getElementById("usuarioEmail").disabled = false;
         document.getElementById("usuarioNombre").value = "";
@@ -15740,14 +15798,21 @@ window.abrirModalUsuario = function (id) {
 
 window.guardarUsuario = async function () {
 
+    const usuarioLogin = document.getElementById("usuarioLogin").value.trim().toLowerCase();
     const email = document.getElementById("usuarioEmail").value.trim().toLowerCase();
     const nombre = document.getElementById("usuarioNombre").value.trim();
     const rol = document.getElementById("usuarioRol").value;
     const editandoId = document.getElementById("modalUsuario").dataset.editandoId;
     const estado = document.getElementById("mensajeEstadoUsuario");
 
-    if (!email || !nombre) {
-        estado.textContent = "Completá el email y el nombre.";
+    if (!usuarioLogin || !email || !nombre) {
+        estado.textContent = "Completá el usuario, el email y el nombre.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    if (usuarioLogin.includes("@") || usuarioLogin.includes(" ")) {
+        estado.textContent = "El nombre de usuario no puede tener espacios ni @ (para eso está el campo Email).";
         estado.style.color = "#ff6b6b";
         return;
     }
@@ -15758,10 +15823,23 @@ window.guardarUsuario = async function () {
     try {
 
         if (editandoId) {
-            // El email es el identificador: nunca se cambia al editar, solo nombre y rol
+            // El email y el usuario son el identificador: nunca se cambian al editar, solo nombre y rol
             await updateDoc(doc(db, "usuarios", editandoId), { nombre, rol });
         } else {
-            await setDoc(doc(db, "usuarios", email), { email, nombre, rol, creado: serverTimestamp() });
+
+            // Antes de crear, verificamos que ese nombre de usuario no esté tomado
+            const snapLogin = await getDoc(doc(db, "usuariosLogin", usuarioLogin));
+            if (snapLogin.exists()) {
+                estado.textContent = "Ese nombre de usuario ya está en uso, elegí otro.";
+                estado.style.color = "#ff6b6b";
+                return;
+            }
+
+            await setDoc(doc(db, "usuarios", email), { email, usuarioLogin, nombre, rol, creado: serverTimestamp() });
+            // Tabla liviana usuario -> email, es la que se consulta ANTES de iniciar sesión
+            // (por eso vive aparte: se puede leer sin estar logueado, sin exponer nada más)
+            await setDoc(doc(db, "usuariosLogin", usuarioLogin), { email });
+
         }
 
         estado.textContent = "¡Listo!";
@@ -15787,7 +15865,15 @@ window.borrarUsuario = async function (id, nombre) {
     const confirmado = confirm(`¿Quitar a ${nombre} del panel? Ya no va a poder entrar (aunque su login de Firebase siga existiendo). Vas a tener unos segundos para deshacerlo después.`);
     if (!confirmado) return;
 
+    const u = usuariosCache.find(x => x.id === id);
+
     await borrarConDeshacer("usuarios", id, `${nombre} fue quitado del panel.`);
+
+    // La tabla usuario -> email no forma parte del "deshacer" (es un dato liviano
+    // que se puede recrear con solo volver a editar y guardar si hiciera falta)
+    if (u && u.usuarioLogin) {
+        try { await deleteDoc(doc(db, "usuariosLogin", u.usuarioLogin)); } catch (e) {}
+    }
 
 };
 
