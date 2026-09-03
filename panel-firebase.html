@@ -6044,7 +6044,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <input type="text" id="ivClienteBuscar" placeholder="Ej: Esteban o AB123CD" autocomplete="off" oninput="buscarClienteIngresarVehiculo()" onfocus="buscarClienteIngresarVehiculo()">
         <input type="hidden" id="ivClienteId">
         <div id="ivClienteResultados" style="display:none;background:#1a1a1a;border:1px solid #333;border-radius:8px;margin-top:4px;max-height:180px;overflow-y:auto;"></div>
-        <p style="font-size:11px;color:#777;margin-top:6px;">¿Es un cliente nuevo? <span style="color:#ff6b6b;cursor:pointer;" onclick="cerrarModales(); abrirModalCliente();">Cargalo primero acá</span> y volvé a esta pantalla.</p>
+        <p style="font-size:11px;color:#777;margin-top:6px;">¿Es un cliente nuevo? <span style="color:#ff6b6b;cursor:pointer;" onclick="irACrearClienteDesdeIngreso()">Cargalo acá mismo</span>, volvés directo a esta pantalla con él ya elegido.</p>
 
         <label>Patente</label>
         <input type="text" id="ivPatente" placeholder="AB123CD" oninput="verificarVehiculoConocido()">
@@ -6056,6 +6056,17 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <input type="hidden" id="ivVehiculoExistenteId">
         <label id="ivKmLabel" style="display:none;">Kilometraje actual (opcional, actualiza el que ya tenía)</label>
         <input type="text" id="ivKmActualizado" placeholder="85000" style="display:none;">
+        <label id="ivCombustibleLabel" style="display:none;">Combustible</label>
+        <select id="ivCombustibleIngreso" style="display:none;">
+            <option value="">Sin especificar</option>
+            <option value="Nafta">Nafta</option>
+            <option value="Diesel">Diesel</option>
+            <option value="GNC">GNC</option>
+            <option value="Híbrido">Híbrido</option>
+            <option value="Eléctrico">Eléctrico</option>
+        </select>
+        <label id="ivObservacionesLabel" style="display:none;">Observaciones / daños existentes (opcional)</label>
+        <input type="text" id="ivObservacionesIngreso" placeholder="Ej: rayón puerta trasera, falta tapa de rueda" style="display:none;">
         <label>Marca</label>
         <select id="ivMarca" onchange="cambioMarcaSelect('iv')"></select>
         <input type="text" id="ivMarcaOtra" placeholder="Escribí la marca" style="display:none;margin-top:8px;">
@@ -6140,7 +6151,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         <input type="date" id="cCumpleanos">
 
         <div class="modal-botones">
-            <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
+            <button class="btn-cancelar" onclick="volverAIngresoTrasCrearCliente = false; cerrarModales();">Cancelar</button>
             <button class="btn-red" id="btnGuardarCliente" onclick="guardarCliente(this)">Guardar</button>
         </div>
 
@@ -7242,6 +7253,12 @@ function valorFinalModelo(prefijo) {
 let clientesCache = [];
 let vehiculosCache = [];
 let editandoId = null;
+
+// Punto 3 del pedido: crear un cliente nuevo desde "Ingresar vehículo" tiene
+// que volver sola a esa pantalla, con el cliente ya elegido — sin que la
+// persona tenga que hacerlo de nuevo a mano.
+let volverAIngresoTrasCrearCliente = false;
+let patenteRecordadaParaIngreso = "";
 let fichaClienteActual = null;
 let vehiculoHistorialDirectoActual = null;
 
@@ -8283,6 +8300,8 @@ async function ejecutarGuardarCliente(nombre, apellido, telefono, email, cumplea
 
     try {
 
+        let idClienteNuevo = editandoId;
+
         if (editandoId) {
 
             await updateDoc(doc(db, "clientes", editandoId), {
@@ -8291,10 +8310,11 @@ async function ejecutarGuardarCliente(nombre, apellido, telefono, email, cumplea
 
         } else {
 
-            await addDoc(collection(db, "clientes"), {
+            const refNuevo = await addDoc(collection(db, "clientes"), {
                 nombre, apellido, telefono, email, cumpleanos,
                 creado: serverTimestamp()
             });
+            idClienteNuevo = refNuevo.id;
 
         }
 
@@ -8303,7 +8323,25 @@ async function ejecutarGuardarCliente(nombre, apellido, telefono, email, cumplea
         estado.style.color = "#5fd98a";
 
         setTimeout(() => {
+
             window.cerrarModales();
+
+            // Punto 3 del pedido: si este cliente se creó desde "Ingresar
+            // vehículo", volvemos ahí solos, con el cliente ya elegido y la
+            // patente que ya había escrito, en vez de dejar que lo busque
+            // de nuevo a mano.
+            if (volverAIngresoTrasCrearCliente) {
+
+                volverAIngresoTrasCrearCliente = false;
+                window.abrirModalIngresarVehiculo();
+
+                document.getElementById("ivClienteId").value = idClienteNuevo;
+                document.getElementById("ivClienteBuscar").value = `${apellido}, ${nombre}`;
+                document.getElementById("ivPatente").value = patenteRecordadaParaIngreso;
+                if (patenteRecordadaParaIngreso) window.verificarVehiculoConocido();
+
+            }
+
         }, 500);
 
     } catch (err) {
@@ -9397,6 +9435,13 @@ function renderFichaHistorialCompleto() {
 
 // ---------- Ingresar vehículo (desde la pestaña Clientes/Vehículos) ----------
 
+window.irACrearClienteDesdeIngreso = function () {
+    patenteRecordadaParaIngreso = document.getElementById("ivPatente").value.trim();
+    volverAIngresoTrasCrearCliente = true;
+    cerrarModales();
+    abrirModalCliente();
+};
+
 window.abrirModalIngresarVehiculo = function () {
 
     document.getElementById("ivClienteBuscar").value = "";
@@ -9408,6 +9453,12 @@ window.abrirModalIngresarVehiculo = function () {
     document.getElementById("ivKmLabel").style.display = "none";
     document.getElementById("ivKmActualizado").style.display = "none";
     document.getElementById("ivKmActualizado").value = "";
+    document.getElementById("ivCombustibleLabel").style.display = "none";
+    document.getElementById("ivCombustibleIngreso").style.display = "none";
+    document.getElementById("ivCombustibleIngreso").value = "";
+    document.getElementById("ivObservacionesLabel").style.display = "none";
+    document.getElementById("ivObservacionesIngreso").style.display = "none";
+    document.getElementById("ivObservacionesIngreso").value = "";
     document.getElementById("ivMarca").value = "";
     document.getElementById("ivMarcaOtra").value = "";
     document.getElementById("ivMarcaOtra").style.display = "none";
@@ -9466,19 +9517,31 @@ window.verificarVehiculoConocido = function () {
     document.getElementById("ivKmActualizado").style.display = "block";
     document.getElementById("ivKmActualizado").placeholder = vehiculo.kilometraje ? String(vehiculo.kilometraje) : "85000";
 
+    document.getElementById("ivCombustibleLabel").style.display = "block";
+    document.getElementById("ivCombustibleIngreso").style.display = "block";
+    document.getElementById("ivCombustibleIngreso").value = vehiculo.combustible || "";
+
+    document.getElementById("ivObservacionesLabel").style.display = "block";
+    document.getElementById("ivObservacionesIngreso").style.display = "block";
+
 };
 
 // El botón verde de un solo toque: en vez de crear un vehículo nuevo,
-// actualiza el estado en el taller (y el kilometraje, si se cargó) del
-// vehículo que ya existía.
+// actualiza el estado en el taller (y el kilometraje/combustible, si se
+// cargaron) del vehículo que ya existía. Si hay observaciones, quedan
+// guardadas en el historial del vehículo (se ven ahí mismo en su ficha).
 window.confirmarIngresoRapido = async function () {
 
     const vehiculoId = document.getElementById("ivVehiculoExistenteId").value;
     const estadoTaller = document.getElementById("ivEstadoTaller").value || "Esperando aprobación";
     const kmNuevo = document.getElementById("ivKmActualizado").value.trim();
+    const combustibleNuevo = document.getElementById("ivCombustibleIngreso").value;
+    const observaciones = document.getElementById("ivObservacionesIngreso").value.trim();
     const estado = document.getElementById("mensajeEstadoIngresarVehiculo");
 
     if (!vehiculoId) return;
+
+    const vehiculo = vehiculosCache.find(v => v.id === vehiculoId);
 
     estado.textContent = "Registrando ingreso...";
     estado.style.color = "#999";
@@ -9487,13 +9550,29 @@ window.confirmarIngresoRapido = async function () {
 
         const datos = { estadoTaller, fechaIngresoTaller: serverTimestamp() };
         if (kmNuevo) datos.kilometraje = parseInt(kmNuevo, 10) || null;
+        if (combustibleNuevo) datos.combustible = combustibleNuevo;
 
         await updateDoc(doc(db, "vehiculos", vehiculoId), datos);
+
+        if (observaciones) {
+            await addDoc(collection(db, "historial"), {
+                vehiculoId,
+                descripcion: "Ingreso al taller: " + observaciones,
+                costo: null,
+                fecha: serverTimestamp()
+            });
+        }
 
         estado.textContent = "¡Listo, check-in registrado!";
         estado.style.color = "#5fd98a";
         window.mostrarToastExito("Check-in registrado");
-        setTimeout(() => window.cerrarModales(), 600);
+
+        setTimeout(() => {
+            window.cerrarModales();
+            if (vehiculo && confirm("¿Sacar fotos de inspección de este ingreso ahora?")) {
+                window.abrirInspeccion(vehiculoId, vehiculo.patente);
+            }
+        }, 600);
 
     } catch (err) {
         estado.textContent = "Error: " + err.message;
