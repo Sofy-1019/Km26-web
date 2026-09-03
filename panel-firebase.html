@@ -14701,6 +14701,9 @@ function renderTurnos() {
                 ${ESTADOS_TURNO.map(e => `<option value="${e}" ${t.estado === e ? "selected" : ""}>${e}</option>`).join("")}
             </select>
             <div class="acciones-col">
+                ${t.estado === "Pendiente" ? `<button class="btn-chico" style="padding:5px 10px;font-size:11px;" onclick="cambiarEstadoTurno('${t.id}', 'Confirmado')">✓ Confirmar</button>` : ""}
+                ${(t.estado === "Pendiente" || t.estado === "Confirmado") ? `<button class="btn-chico" style="padding:5px 10px;font-size:11px;color:#5fd98a;" onclick="marcarTurnoIngreso('${t.id}')">🚗 Ingresó</button>` : ""}
+                ${t.estado === "En taller" ? `<button class="btn-chico" style="padding:5px 10px;font-size:11px;color:#14b8a6;" onclick="cambiarEstadoTurno('${t.id}', 'Finalizado')">✓ Finalizar</button>` : ""}
                 <div class="icono-accion-turno" onclick="abrirModalTurno('${t.id}')" title="Ver / Editar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
                 </div>
@@ -14883,6 +14886,28 @@ window.guardarTurno = async function () {
 
 window.cambiarEstadoTurno = async function (id, nuevoEstado) {
     await updateDoc(doc(db, "turnos", id), { estado: nuevoEstado });
+};
+
+// El botón "Ingresó" no es solo cambiarle la etiqueta al turno: si el turno
+// tiene un vehículo asociado, ese auto pasa de verdad a estar activo en el
+// taller (mismo criterio que usa el check-in rápido del punto 3), para que
+// aparezca solo en "Vehículos en taller" sin tener que cargarlo de nuevo.
+window.marcarTurnoIngreso = async function (id) {
+
+    const t = turnosCache.find(x => x.id === id);
+    if (!t) return;
+
+    await updateDoc(doc(db, "turnos", id), { estado: "En taller" });
+
+    if (t.vehiculoId) {
+        const vehiculo = vehiculosCache.find(v => v.id === t.vehiculoId);
+        if (vehiculo && !vehiculo.estadoTaller) {
+            await cambiarEstadoTaller(t.vehiculoId, "Esperando aprobación");
+        }
+    }
+
+    window.mostrarToastExito("Vehículo ingresado al taller");
+
 };
 
 window.borrarTurno = async function (id) {
