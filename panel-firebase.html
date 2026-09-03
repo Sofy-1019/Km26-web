@@ -6221,10 +6221,26 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
 <!-- ---------- Modal: ficha completa del vehículo ---------- -->
 <div class="overlay" id="modalFichaVehiculo">
-    <div class="modal" style="max-width:520px;">
+    <div class="modal" style="max-width:640px;">
         <h3 id="fichaVehTitulo" style="color:#fff;">Ficha del vehículo</h3>
 
         <input type="hidden" id="fvId">
+
+        <!-- ---------- Datos del cliente + estado actual + acciones rápidas
+             (todo visible de un vistazo, sin ir a otro módulo) ---------- -->
+        <div style="background:#161616;border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+            <div id="fvDatosCliente" style="margin-bottom:10px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+                <span style="font-size:11px;color:#888;">Estado actual:</span>
+                <select class="select-estado-taller" id="fvEstadoTaller" onchange="cambiarEstadoTaller(document.getElementById('fvId').value, this.value)" title="Estado en el taller"></select>
+            </div>
+            <div class="vp-acciones">
+                <button class="btn-chico" style="background:#5fd98a;color:#0a1a0e;border-color:#5fd98a;" onclick="vpIngresarVehiculo(document.getElementById('fvId').value, this)">🚗 Ingresar</button>
+                <button class="btn-chico" onclick="vpNuevoPresupuesto(document.getElementById('fvId').value)">📄 Presupuesto</button>
+                <button class="btn-chico" onclick="vpCobrar(document.getElementById('fvId').value)">💲 Cobro</button>
+                <button class="btn-chico" onclick="abrirInspeccion(document.getElementById('fvId').value, document.getElementById('fvId').dataset.patente)">📸 Inspección</button>
+            </div>
+        </div>
 
         <div class="modal-fila-2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div>
@@ -6285,6 +6301,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
         </div>
 
         <p id="mensajeEstadoFichaVehiculo"></p>
+
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #262626;">
+            <p style="font-size:15px;font-weight:800;color:#fff;margin-bottom:12px;">📋 Historial</p>
+            <div id="fvHistorialContenido"></div>
+        </div>
 
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid #262626;">
             <p style="font-size:15px;font-weight:800;color:#25D366;margin-bottom:12px;">📲 Mensajes rápidos por WhatsApp</p>
@@ -11374,9 +11395,9 @@ function escucharHistorial() {
             vehiculos.forEach(v => renderHistorialVehiculo(v.id));
         }
 
-        // Si está abierto el historial directo desde Vehículos, también se refresca
-        if (vehiculoHistorialDirectoActual) {
-            renderHistorialVehiculo(vehiculoHistorialDirectoActual);
+        // Si hay una ficha de vehículo abierta (con su historial embebido), también se refresca
+        if (fichaVehiculoActual) {
+            renderHistorialVehiculo(fichaVehiculoActual);
         }
 
     });
@@ -11408,27 +11429,11 @@ function renderHistorialVehiculo(vehiculoId) {
 
 }
 
+// Antes abría un modal aparte, solo con el historial. Ahora abre la ficha
+// completa del vehículo (que ya incluye el historial adentro, punto 2 del
+// pedido) — así no hay que ir a un módulo distinto para ver esto.
 window.abrirHistorialDirecto = function (vehiculoId, patente) {
-
-    vehiculoHistorialDirectoActual = vehiculoId;
-
-    document.getElementById("historialDirectoTitulo").textContent = "📋 " + patente;
-
-    document.getElementById("historialDirectoContenido").innerHTML = `
-        <div class="ficha-historial" id="historial-${vehiculoId}">
-            <p style="font-size:12px;color:#777;">Cargando historial...</p>
-        </div>
-        <div class="ficha-historial-form">
-            <input type="text" id="hDesc-${vehiculoId}" placeholder="Ej: cambio de rótulas">
-            <input type="number" id="hCosto-${vehiculoId}" placeholder="$ gasto">
-            <button class="btn-confirmar-gasto" onclick="agregarHistorial('${vehiculoId}')">✓ Confirmar gasto</button>
-        </div>
-    `;
-
-    renderHistorialVehiculo(vehiculoId);
-
-    document.getElementById("modalHistorialDirecto").classList.add("abierto");
-
+    window.abrirFichaVehiculo(vehiculoId);
 };
 
 window.agregarHistorial = async function (vehiculoId) {
@@ -11475,6 +11480,29 @@ window.abrirFichaVehiculo = function (id) {
     if (v.clienteId) registrarClienteVisto(v.clienteId);
     actualizarUltimaFirmaEnFicha();
 
+    // Datos del cliente, para no tener que ir a "Clientes" a buscarlo
+    const cliente = clientesCache.find(c => c.id === v.clienteId);
+    const elCliente = document.getElementById("fvDatosCliente");
+    if (cliente) {
+        const telLimpio = String(cliente.telefono || "").replace(/\D/g, "");
+        elCliente.innerHTML = `
+            <div style="font-size:15px;font-weight:800;color:#fff;">${escapar(cliente.nombre)} ${escapar(cliente.apellido)}</div>
+            <div style="font-size:12.5px;color:#999;">
+                ${cliente.telefono ? escapar(cliente.telefono) : "Sin teléfono cargado"}
+                ${telLimpio ? ` · <a href="https://wa.me/${telLimpio}" target="_blank" style="color:#25D366;">WhatsApp</a>` : ""}
+            </div>
+        `;
+    } else {
+        elCliente.innerHTML = `<div style="font-size:12.5px;color:#888;">Sin cliente asociado</div>`;
+    }
+
+    // Estado actual — mismo selector y misma función que ya se usa en la
+    // lista de Vehículos, no se duplica nada
+    document.getElementById("fvEstadoTaller").innerHTML =
+        ESTADOS_TALLER.map(e => `<option value="${e}" ${((v.estadoTaller || "") === e) ? "selected" : ""}>${e || "Sin asignar"}</option>`).join("");
+
+    document.getElementById("fvId").dataset.patente = v.patente;
+
     document.getElementById("fichaVehTitulo").textContent = `${v.patente} · ${v.marca || ""} ${v.modelo || ""}`;
     document.getElementById("fvId").value = v.id;
     document.getElementById("fvKilometraje").value = v.kilometraje || "";
@@ -11507,6 +11535,18 @@ window.abrirFichaVehiculo = function (id) {
     actualizarAvisoVtvEnFicha();
 
     document.getElementById("fvTestigos").value = v.testigos || "";
+
+    document.getElementById("fvHistorialContenido").innerHTML = `
+        <div class="ficha-historial" id="historial-${v.id}">
+            <p style="font-size:12px;color:#777;">Cargando historial...</p>
+        </div>
+        <div class="ficha-historial-form">
+            <input type="text" id="hDesc-${v.id}" placeholder="Ej: cambio de rótulas">
+            <input type="number" id="hCosto-${v.id}" placeholder="$ gasto">
+            <button class="btn-confirmar-gasto" onclick="agregarHistorial('${v.id}')">✓ Confirmar gasto</button>
+        </div>
+    `;
+    renderHistorialVehiculo(v.id);
 
     document.getElementById("mensajeEstadoFichaVehiculo").textContent = "";
     document.getElementById("modalFichaVehiculo").classList.add("abierto");
