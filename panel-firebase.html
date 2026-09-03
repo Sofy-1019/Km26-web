@@ -2857,6 +2857,85 @@ header{
     margin-bottom:14px;
 }
 
+/* ---------- Vista previa del vehículo en la búsqueda global ---------- */
+
+.vp-tarjeta{
+    background:#161616;
+    border:1px solid #d71920;
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:18px;
+}
+
+.vp-cabecera{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:14px;
+    margin-bottom:14px;
+}
+
+.vp-patente{
+    background:#fff;
+    color:#111;
+    font-weight:800;
+    font-size:15px;
+    letter-spacing:1px;
+    padding:6px 12px;
+    border-radius:6px;
+    border:2px solid #222;
+    flex-shrink:0;
+}
+
+.vp-nombre{
+    font-size:16px;
+    font-weight:800;
+}
+
+.vp-modelo{
+    font-size:12.5px;
+    color:#999;
+}
+
+.vp-datos{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.vp-dato-label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:#777;
+    margin-bottom:2px;
+}
+
+.vp-dato-valor{
+    font-size:13px;
+    font-weight:700;
+}
+
+.vp-acciones{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.vp-multiple-item{
+    padding:10px 12px;
+    border-radius:8px;
+    background:#1e1e1e;
+    cursor:pointer;
+    margin-bottom:6px;
+    font-size:13px;
+}
+
+.vp-multiple-item:hover{
+    background:#262626;
+}
+
 .buscador-simple{
     flex:1;
     min-width:200px;
@@ -4265,9 +4344,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
     <section class="seccion activa" id="tab-dashboard">
 
         <div class="cv-buscador-fila">
-            <input type="text" id="dashBuscador" class="buscador-simple" placeholder="Buscar cliente, vehículo o patente..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)">
+            <input type="text" id="dashBuscador" class="buscador-simple" placeholder="Buscar patente, cliente, teléfono, marca, modelo..." onkeydown="if(event.key==='Enter') ejecutarBusquedaGlobal(this.value)" oninput="buscarEnVivoDashboard(this.value)">
             <button class="btn-chico" onclick="ejecutarBusquedaGlobal(document.getElementById('dashBuscador').value)">🔍 Buscar</button>
         </div>
+
+        <div id="vistaPreviaBusqueda" style="display:none;"></div>
 
         <div class="dash-seccion-label">Hoy</div>
 
@@ -7797,10 +7878,14 @@ function ejecutarBusqueda(q) {
     const filtrados = clientesCache.filter(c => {
         const coincideNombre = (c.nombre + " " + c.apellido).toLowerCase().includes(q);
         const coincideTelefono = (c.telefono || "").includes(q);
-        const coincidePatente = vehiculosCache.some(v =>
-            v.clienteId === c.id && String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(qSinEspacios)
+        const coincidePatenteOModelo = vehiculosCache.some(v =>
+            v.clienteId === c.id && (
+                String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(qSinEspacios) ||
+                String(v.marca || "").toLowerCase().includes(q) ||
+                String(v.modelo || "").toLowerCase().includes(q)
+            )
         );
-        return coincideNombre || coincideTelefono || coincidePatente;
+        return coincideNombre || coincideTelefono || coincidePatenteOModelo;
     });
 
     renderClientes(filtrados);
@@ -7871,6 +7956,205 @@ document.getElementById("buscadorClientesVeh").addEventListener("input", functio
     document.getElementById("dashBuscador").value = this.value;
     ejecutarBusqueda(this.value);
 });
+
+// ---------- Vista previa en vivo del buscador del Dashboard (punto 1 del
+// pedido: la patente/cliente como centro del sistema) ----------
+
+let temporizadorVistaPrevia = null;
+
+window.buscarEnVivoDashboard = function (texto) {
+
+    clearTimeout(temporizadorVistaPrevia);
+    temporizadorVistaPrevia = setTimeout(() => {
+
+        texto = (texto || "").trim();
+        const el = document.getElementById("vistaPreviaBusqueda");
+
+        if (!texto) {
+            el.style.display = "none";
+            el.innerHTML = "";
+            return;
+        }
+
+        const qSinEspacios = texto.toLowerCase().replace(/\s/g, "");
+        const q = texto.toLowerCase();
+
+        const vehiculosCoincidentes = vehiculosCache.filter(v =>
+            String(v.patente || "").toLowerCase().replace(/\s/g, "").includes(qSinEspacios) ||
+            String(v.marca || "").toLowerCase().includes(q) ||
+            String(v.modelo || "").toLowerCase().includes(q) ||
+            (() => {
+                const cliente = clientesCache.find(c => c.id === v.clienteId);
+                if (!cliente) return false;
+                return (cliente.nombre + " " + cliente.apellido).toLowerCase().includes(q) ||
+                    (cliente.telefono || "").includes(texto);
+            })()
+        );
+
+        if (vehiculosCoincidentes.length === 0) {
+            el.style.display = "none";
+            el.innerHTML = "";
+        } else if (vehiculosCoincidentes.length === 1) {
+            mostrarVistaPreviaVehiculo(vehiculosCoincidentes[0].id);
+        } else {
+            mostrarVistaPreviaMultiple(vehiculosCoincidentes.slice(0, 8));
+        }
+
+    }, 200);
+
+};
+
+function mostrarVistaPreviaMultiple(lista) {
+
+    const el = document.getElementById("vistaPreviaBusqueda");
+    el.style.display = "block";
+
+    el.innerHTML = `<div class="vp-tarjeta">` + lista.map(v => {
+        const cliente = clientesCache.find(c => c.id === v.clienteId);
+        const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(sin cliente)";
+        return `<div class="vp-multiple-item" onclick="mostrarVistaPreviaVehiculo('${v.id}')">
+            <strong>${escapar(v.patente)}</strong> — ${escapar(v.marca || "")} ${escapar(v.modelo || "")} · ${escapar(nombreCliente)}
+        </div>`;
+    }).join("") + `</div>`;
+
+}
+
+// El corazón del punto 1: apenas se encuentra un vehículo único, se arma
+// esta tarjeta con todo lo importante de un vistazo — reutilizando los
+// mismos datos y funciones que ya existen en el resto del panel (estados,
+// VTV, service, presupuestos, cuentas), sin duplicar ninguna lógica.
+window.mostrarVistaPreviaVehiculo = function (vehiculoId) {
+
+    const v = vehiculosCache.find(x => x.id === vehiculoId);
+    const el = document.getElementById("vistaPreviaBusqueda");
+    if (!v) { el.style.display = "none"; return; }
+
+    const cliente = clientesCache.find(c => c.id === v.clienteId);
+    const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(sin cliente)";
+
+    // Última visita y último trabajo: del historial real de este vehículo
+    const historialDeEste = historialCache
+        .filter(h => h.vehiculoId === vehiculoId)
+        .sort((a, b) => (toDateSegura(b.fecha) || 0) - (toDateSegura(a.fecha) || 0));
+    const ultimoTrabajo = historialDeEste[0];
+    const fechaUltimaVisita = ultimoTrabajo ? toDateSegura(ultimoTrabajo.fecha) : toDateSegura(v.fechaIngresoTaller);
+
+    // Presupuestos pendientes de este vehículo
+    const presuPendientes = presupuestosCache.filter(p => p.vehiculoId === vehiculoId && p.estado === "Pendiente");
+
+    // Cuenta con saldo pendiente de este vehículo (si hay más de una, se suman)
+    const cuentasAbiertas = cuentasCache.filter(c => c.vehiculoId === vehiculoId && (Number(c.saldo) || 0) > 0.5);
+    const saldoPendiente = cuentasAbiertas.reduce((s, c) => s + (Number(c.saldo) || 0), 0);
+
+    const infoVtv = estadoVtv(v.vtv) || { texto: "Sin cargar", color: "#888" };
+    const infoService = estadoService(v.proximoServiceFecha, v.proximoServiceKm, v.kilometraje) || { texto: "Sin cargar", color: "#888" };
+
+    const infoEstado = CONFIG_ESTADO_TALLER[v.estadoTaller] || null;
+
+    el.style.display = "block";
+    el.innerHTML = `
+        <div class="vp-tarjeta">
+
+            <div class="vp-cabecera">
+                <span class="vp-patente">${escapar(v.patente)}</span>
+                <div>
+                    <div class="vp-nombre">${escapar(nombreCliente)}</div>
+                    <div class="vp-modelo">${escapar(v.marca || "")} ${escapar(v.modelo || "")}${v.anio ? " " + escapar(String(v.anio)) : ""}</div>
+                </div>
+            </div>
+
+            <div class="vp-datos">
+                <div>
+                    <div class="vp-dato-label">Última visita</div>
+                    <div class="vp-dato-valor">${fechaUltimaVisita ? fechaUltimaVisita.toLocaleDateString("es-AR") : "Sin registros"}</div>
+                </div>
+                <div>
+                    <div class="vp-dato-label">Último trabajo</div>
+                    <div class="vp-dato-valor">${ultimoTrabajo ? escapar(ultimoTrabajo.descripcion) : "Sin registros"}</div>
+                </div>
+                <div>
+                    <div class="vp-dato-label">Estado actual</div>
+                    <div class="vp-dato-valor" style="color:${infoEstado ? infoEstado.color : "#888"};">${v.estadoTaller ? escapar(v.estadoTaller) : "Sin asignar"}</div>
+                </div>
+                <div>
+                    <div class="vp-dato-label">Presupuesto pendiente</div>
+                    <div class="vp-dato-valor" style="color:${presuPendientes.length ? "#f5a623" : "#888"};">${presuPendientes.length ? presuPendientes.length + " sin aprobar" : "Ninguno"}</div>
+                </div>
+                <div>
+                    <div class="vp-dato-label">Saldo pendiente</div>
+                    <div class="vp-dato-valor" style="color:${saldoPendiente > 0.5 ? "#ff6b6b" : "#5fd98a"};">${saldoPendiente > 0.5 ? formatoPlata(saldoPendiente) : "Al día"}</div>
+                </div>
+                <div>
+                    <div class="vp-dato-label">Próximo service</div>
+                    <div class="vp-dato-valor" style="color:${infoService.color};">${infoService.texto}</div>
+                </div>
+                <div>
+                    <div class="vp-dato-label">VTV</div>
+                    <div class="vp-dato-valor" style="color:${infoVtv.color};">${infoVtv.texto}</div>
+                </div>
+            </div>
+
+            <div class="vp-acciones">
+                <button class="btn-chico" style="background:#5fd98a;color:#0a1a0e;border-color:#5fd98a;" onclick="vpIngresarVehiculo('${vehiculoId}', this)">🚗 Ingresar vehículo</button>
+                <button class="btn-chico" onclick="abrirHistorialDirecto('${vehiculoId}', '${escaparComillas(v.patente)}')">📋 Ver historial</button>
+                <button class="btn-chico" onclick="vpNuevoPresupuesto('${vehiculoId}')">📄 Nuevo presupuesto</button>
+                <button class="btn-chico" onclick="vpCobrar('${vehiculoId}')">💲 Cobrar</button>
+                ${cliente && cliente.telefono ? `<button class="btn-chico" style="color:#25D366;" onclick="vpWhatsapp('${vehiculoId}')">💬 WhatsApp</button>` : ""}
+            </div>
+
+        </div>
+    `;
+
+};
+
+// Ingresar en un solo toque: si el vehículo ya está en el taller no hace
+// nada raro, solo lo pone "Esperando aprobación" (el primer paso real del
+// flujo) — reutiliza la misma función que ya usa el selector de estado.
+window.vpIngresarVehiculo = function (vehiculoId, boton) {
+    bloquearBoton(boton, "Ingresando...");
+    cambiarEstadoTaller(vehiculoId, "Esperando aprobación").then(() => {
+        window.mostrarToastExito("Vehículo ingresado");
+        mostrarVistaPreviaVehiculo(vehiculoId);
+    });
+};
+
+window.vpNuevoPresupuesto = function (vehiculoId) {
+    const v = vehiculosCache.find(x => x.id === vehiculoId);
+    if (!v) return;
+    window.abrirModalPresupuesto();
+    document.getElementById("presuCliente").value = v.clienteId;
+    window.actualizarVehiculosPresupuesto();
+    document.getElementById("presuVehiculo").value = vehiculoId;
+};
+
+window.vpCobrar = function (vehiculoId) {
+
+    const v = vehiculosCache.find(x => x.id === vehiculoId);
+    if (!v) return;
+
+    // Si ya hay una cuenta con saldo pendiente para este vehículo, se abre
+    // directo para cobrarla — no tiene sentido crear una cuenta nueva.
+    const cuentaAbierta = cuentasCache.find(c => c.vehiculoId === vehiculoId && (Number(c.saldo) || 0) > 0.5);
+    if (cuentaAbierta) {
+        window.cobrarCuentaDesdeTabla(cuentaAbierta.id);
+        return;
+    }
+
+    window.abrirModalCuenta();
+    window.seleccionarClienteCuenta(v.clienteId);
+    document.getElementById("cuentaVehiculo").value = vehiculoId;
+
+};
+
+window.vpWhatsapp = function (vehiculoId) {
+    const v = vehiculosCache.find(x => x.id === vehiculoId);
+    if (!v) return;
+    const cliente = clientesCache.find(c => c.id === v.clienteId);
+    if (!cliente || !cliente.telefono) return;
+    const telefono = String(cliente.telefono).replace(/\D/g, "");
+    const mensaje = encodeURIComponent(`Hola ${cliente.nombre}! Te escribimos de KM26 Performance por tu ${v.marca || ""} ${v.modelo || ""} (${v.patente}).`);
+    window.open(`https://wa.me/${telefono}?text=${mensaje}`, "_blank");
+};
 
 
 // ---------- Modal nuevo/editar cliente ----------
