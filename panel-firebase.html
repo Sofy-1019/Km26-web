@@ -2517,7 +2517,7 @@ header{
 }
 
 @media (min-width:900px){
-    .dash-hoy-grid{ grid-template-columns:repeat(5,1fr); }
+    .dash-hoy-grid{ grid-template-columns:repeat(6,1fr); }
 }
 
 .dash-hoy-card{
@@ -4401,6 +4401,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
                 <div class="dash-hoy-numero" id="hoyVehiculosTaller">0</div>
                 <div class="dash-hoy-icono">🚗</div>
                 <div class="dash-hoy-label">Vehículos en taller</div>
+            </div>
+            <div class="dash-hoy-card verde" onclick="cambiarTab('clientes')">
+                <div class="dash-hoy-numero" id="hoyVehiculosListos">0</div>
+                <div class="dash-hoy-icono">✅</div>
+                <div class="dash-hoy-label">Listos para entregar</div>
             </div>
             <div class="dash-hoy-card ambar" onclick="cambiarTab('presupuestos')">
                 <div class="dash-hoy-numero" id="hoyPresuEsperando">0</div>
@@ -8995,6 +9000,7 @@ function renderDashboard() {
     document.getElementById("hoyTurnosHoy").textContent = turnosHoy.length;
     document.getElementById("hoyCobrosPendientes").textContent = presuAprobadosSinCobrar.length;
     document.getElementById("hoyFacturadoHoy").textContent = formatoPlata(facturacionHoy);
+    document.getElementById("hoyVehiculosListos").textContent = listosEntregar.length;
 
     // ---------- Panel "En taller" (mini resumen) ----------
 
@@ -9019,6 +9025,18 @@ function renderDashboard() {
 
     if (presuAprobadosSinCobrar.length > 0) {
         filas.push({ texto: "Presupuestos aprobados sin cobrar", badge: presuAprobadosSinCobrar.length, tab: "presupuestos" });
+    }
+
+    if (listosEntregar.length > 0) {
+        filas.push({ texto: "🟢 Vehículos listos para entregar", badge: listosEntregar.length, tab: "clientes" });
+    }
+
+    // Cuentas con saldo pendiente (esto sí existe hoy: cuentasCache lleva el
+    // saldo real de cada cuenta emitida — el comentario viejo que decía que
+    // no había este dato ya no era cierto).
+    const cuentasConSaldo = cuentasCache.filter(c => (Number(c.saldo) || 0) > 0.5);
+    if (cuentasConSaldo.length > 0) {
+        filas.push({ texto: "Cuentas con saldo pendiente", badge: cuentasConSaldo.length, tab: "cuentas" });
     }
 
     if (stockBajo.length > 0 && configuracionActual.alertaStockDashboard !== false) {
@@ -9085,9 +9103,6 @@ function renderDashboard() {
     renderRecordatoriosPendientes(turnosMananaSinRecordar);
 
     avisarVtvUrgente([...vehiculosVtvUrgente, ...vehiculosServiceUrgente, ...turnosMananaSinRecordar]);
-
-    // Nota: "Cliente con saldo pendiente" no se incluye porque el sistema todavía
-    // no lleva cuenta corriente por cliente — no hay ese dato real para mostrar.
 
     if (filas.length === 0) {
         elAtencion.innerHTML = '<div class="vacio">Todo al día, no hay nada urgente 🎉</div>';
