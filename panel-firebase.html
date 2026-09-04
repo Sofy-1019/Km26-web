@@ -6162,7 +6162,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
 <!-- ---------- Modal: ver detalle de un presupuesto ---------- -->
 <div class="overlay" id="modalVerPresupuesto">
-    <div class="modal" style="max-width:480px;">
+    <div class="modal" style="max-width:720px;">
         <h3 id="verPresuTitulo">Presupuesto</h3>
 
         <div style="font-size:13px;color:#ccc;margin-bottom:4px;" id="verPresuCliente"></div>
@@ -6216,6 +6216,17 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <label>Fecha de nacimiento (opcional)</label>
         <input type="date" id="cCumpleanos">
+
+        <div style="background:#161616;border-radius:10px;padding:12px 14px;margin-top:14px;">
+            <label style="display:flex;align-items:center;gap:8px;margin:0;">
+                <input type="checkbox" id="cCuentaCorriente" style="width:auto;" onchange="document.getElementById('cLimiteCreditoWrap').style.display = this.checked ? 'block' : 'none';">
+                💳 Tiene cuenta corriente habilitada
+            </label>
+            <div id="cLimiteCreditoWrap" style="display:none;margin-top:10px;">
+                <label style="font-size:11.5px;">Límite de crédito (opcional)</label>
+                <input type="number" id="cLimiteCredito" placeholder="Sin límite">
+            </div>
+        </div>
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="volverAIngresoTrasCrearCliente = false; cerrarModales();">Cancelar</button>
@@ -6299,7 +6310,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
 <!-- ---------- Modal: ficha completa del vehículo ---------- -->
 <div class="overlay" id="modalFichaVehiculo">
-    <div class="modal" style="max-width:640px;">
+    <div class="modal" style="max-width:720px;">
         <h3 id="fichaVehTitulo" style="color:#fff;">Ficha del vehículo</h3>
 
         <input type="hidden" id="fvId">
@@ -6466,7 +6477,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
 <!-- ---------- Modal: Orden de Trabajo ---------- -->
 <div class="overlay" id="modalOrdenTrabajo">
-    <div class="modal" style="max-width:560px;">
+    <div class="modal" style="max-width:720px;">
         <h3 id="otTitulo">🔧 Orden de trabajo</h3>
 
         <input type="hidden" id="otId">
@@ -6520,6 +6531,15 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
             <input type="number" id="otTrabajoManoObra" placeholder="Mano de obra $">
             <input type="text" id="otTrabajoRepuestos" placeholder="Repuestos usados">
             <button type="button" class="btn-chico" onclick="agregarTrabajoOrden()">+ Agregar</button>
+        </div>
+
+        <label style="margin-top:14px;">Repuestos del stock (se descuentan solos)</label>
+        <div id="listaRepuestosOrdenStock"></div>
+
+        <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-top:8px;">
+            <select id="otStockSelect"></select>
+            <input type="number" id="otStockCantidad" placeholder="Cantidad" value="1" min="1">
+            <button type="button" class="btn-chico" style="color:#5fd98a;" onclick="usarRepuestoDelStock()">📦 Usar del stock</button>
         </div>
 
         <label style="margin-top:14px;">Observaciones</label>
@@ -6705,7 +6725,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
 <!-- ---------- Modal: ver detalle de una cuenta ---------- -->
 <div class="overlay" id="modalVerCuentaCC">
-    <div class="modal" style="max-width:480px;">
+    <div class="modal" style="max-width:720px;">
         <h3 id="verCCTitulo">Cuenta</h3>
         <div style="font-size:12px;color:#888;margin-bottom:10px;" id="verCCSub"></div>
 
@@ -7712,7 +7732,7 @@ function renderClientes(lista) {
         html += `<div class="item-card">
             <div class="item-avatar">${getIniciales(c.nombre, c.apellido)}</div>
             <div class="item-info" ${puedeGestionarClientes ? `onclick="abrirFicha('${c.id}', '${escaparComillas(c.nombre)} ${escaparComillas(c.apellido)}')" style="cursor:pointer;"` : ""}>
-                <div class="item-titulo">${escapar(c.apellido)}, ${escapar(c.nombre)}</div>
+                <div class="item-titulo">${escapar(c.apellido)}, ${escapar(c.nombre)}${c.cuentaCorriente ? ' <span style="font-size:10px;font-weight:700;color:#0a1a0e;background:#5fd98a;padding:2px 7px;border-radius:10px;vertical-align:middle;">💳 Cta. Cte.</span>' : ""}</div>
                 <div class="item-sub">${escapar(c.telefono || c.email || "Sin datos de contacto")}${c.telefono ? iconoCopiar(c.telefono) : ""}</div>
             </div>
             <div class="item-acciones">
@@ -8309,6 +8329,7 @@ window.vpIngresarVehiculo = function (vehiculoId, boton) {
 window.vpNuevoPresupuesto = function (vehiculoId) {
     const v = vehiculosCache.find(x => x.id === vehiculoId);
     if (!v) return;
+    cerrarModales();
     window.abrirModalPresupuesto();
     document.getElementById("presuCliente").value = v.clienteId;
     window.actualizarVehiculosPresupuesto();
@@ -8319,6 +8340,8 @@ window.vpCobrar = function (vehiculoId) {
 
     const v = vehiculosCache.find(x => x.id === vehiculoId);
     if (!v) return;
+
+    cerrarModales();
 
     // Si ya hay una cuenta con saldo pendiente para este vehículo, se abre
     // directo para cobrarla — no tiene sentido crear una cuenta nueva.
@@ -8357,6 +8380,9 @@ window.abrirModalCliente = function () {
     document.getElementById("cTelefono").value = "";
     document.getElementById("cEmail").value = "";
     document.getElementById("cCumpleanos").value = "";
+    document.getElementById("cCuentaCorriente").checked = false;
+    document.getElementById("cLimiteCredito").value = "";
+    document.getElementById("cLimiteCreditoWrap").style.display = "none";
     document.getElementById("mensajeEstado").textContent = "";
     desbloquearBoton(document.getElementById("btnGuardarCliente"));
     document.getElementById("modalCliente").classList.add("abierto");
@@ -8375,6 +8401,9 @@ window.editarCliente = function (id) {
     document.getElementById("cTelefono").value = c.telefono || "";
     document.getElementById("cEmail").value = c.email || "";
     document.getElementById("cCumpleanos").value = c.cumpleanos || "";
+    document.getElementById("cCuentaCorriente").checked = !!c.cuentaCorriente;
+    document.getElementById("cLimiteCredito").value = c.limiteCredito || "";
+    document.getElementById("cLimiteCreditoWrap").style.display = c.cuentaCorriente ? "block" : "none";
     document.getElementById("mensajeEstado").textContent = "";
     desbloquearBoton(document.getElementById("btnGuardarCliente"));
     document.getElementById("modalCliente").classList.add("abierto");
@@ -8421,6 +8450,7 @@ window.cerrarModales = function () {
     document.getElementById("modalVerCuentaCC").classList.remove("abierto");
     document.getElementById("modalCompraProveedor").classList.remove("abierto");
     document.getElementById("modalCambiarContrasena").classList.remove("abierto");
+    document.getElementById("modalOrdenTrabajo").classList.remove("abierto");
 };
 
 window.guardarCliente = function (boton) {
@@ -8430,6 +8460,8 @@ window.guardarCliente = function (boton) {
     const telefono = document.getElementById("cTelefono").value.trim();
     const email = document.getElementById("cEmail").value.trim();
     const cumpleanos = document.getElementById("cCumpleanos").value;
+    const cuentaCorriente = document.getElementById("cCuentaCorriente").checked;
+    const limiteCredito = parseFloat(document.getElementById("cLimiteCredito").value) || null;
     const estado = document.getElementById("mensajeEstado");
 
     if (!nombre || !apellido) {
@@ -8439,11 +8471,11 @@ window.guardarCliente = function (boton) {
     }
 
     bloquearBoton(boton, "Guardando...");
-    ejecutarGuardarCliente(nombre, apellido, telefono, email, cumpleanos, estado, boton);
+    ejecutarGuardarCliente(nombre, apellido, telefono, email, cumpleanos, cuentaCorriente, limiteCredito, estado, boton);
 
 };
 
-async function ejecutarGuardarCliente(nombre, apellido, telefono, email, cumpleanos, estado, boton) {
+async function ejecutarGuardarCliente(nombre, apellido, telefono, email, cumpleanos, cuentaCorriente, limiteCredito, estado, boton) {
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -8455,13 +8487,13 @@ async function ejecutarGuardarCliente(nombre, apellido, telefono, email, cumplea
         if (editandoId) {
 
             await updateDoc(doc(db, "clientes", editandoId), {
-                nombre, apellido, telefono, email, cumpleanos
+                nombre, apellido, telefono, email, cumpleanos, cuentaCorriente, limiteCredito
             });
 
         } else {
 
             const refNuevo = await addDoc(collection(db, "clientes"), {
-                nombre, apellido, telefono, email, cumpleanos,
+                nombre, apellido, telefono, email, cumpleanos, cuentaCorriente, limiteCredito,
                 creado: serverTimestamp()
             });
             idClienteNuevo = refNuevo.id;
@@ -15333,6 +15365,7 @@ async function ejecutarCobroCuenta(clienteId, vehiculoId, cliente, estado, boton
 
 let ordenesTrabajoCache = [];
 let ordenTrabajosTemp = [];
+let ordenRepuestosTemp = [];
 
 function escucharOrdenesTrabajo() {
 
@@ -15399,6 +15432,72 @@ function renderListaTrabajosOrden() {
 
 }
 
+// ---------- Repuestos del stock, descontados de verdad (punto 13) ----------
+
+function actualizarSelectStockOrden() {
+    const sel = document.getElementById("otStockSelect");
+    sel.innerHTML = '<option value="">Elegí un producto...</option>' +
+        stockCache.map(p => `<option value="${p.id}">${escapar(p.nombre)} (quedan ${p.cantidad ?? 0})</option>`).join("");
+}
+
+// Descuenta de verdad del inventario apenas se toca el botón — no queda
+// "para después": el stock baja al toque, con el mismo registro que ya usa
+// el resto del sistema (stockMovimientos), y sin volver a cargar el
+// producto ni el precio a mano.
+window.usarRepuestoDelStock = async function () {
+
+    const stockId = document.getElementById("otStockSelect").value;
+    const cantidad = parseInt(document.getElementById("otStockCantidad").value, 10) || 1;
+
+    if (!stockId) {
+        alert("Elegí un producto del stock.");
+        return;
+    }
+
+    const producto = stockCache.find(p => p.id === stockId);
+    if (!producto) return;
+
+    if ((Number(producto.cantidad) || 0) < cantidad) {
+        const seguro = confirm(`Ojo: quedan ${producto.cantidad ?? 0} unidades y estás pidiendo ${cantidad}. ¿Descontar igual?`);
+        if (!seguro) return;
+    }
+
+    const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) - cantidad);
+
+    await updateDoc(doc(db, "stock", stockId), { cantidad: nuevaCantidad });
+    await registrarMovimientoStock(stockId, producto.nombre, -cantidad, nuevaCantidad, "Usado en orden de trabajo");
+
+    ordenRepuestosTemp.push({
+        stockId,
+        nombre: producto.nombre,
+        cantidad,
+        montoUnitario: Number(producto.precio) || 0
+    });
+
+    document.getElementById("otStockCantidad").value = "1";
+    renderListaRepuestosOrdenStock();
+    window.mostrarToastExito(`Se descontaron ${cantidad} de "${producto.nombre}"`);
+
+};
+
+function renderListaRepuestosOrdenStock() {
+
+    const el = document.getElementById("listaRepuestosOrdenStock");
+
+    if (ordenRepuestosTemp.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Todavía no usaste ningún repuesto del stock.</p>';
+        return;
+    }
+
+    el.innerHTML = ordenRepuestosTemp.map(r => `
+        <div class="cuenta-item-fila">
+            <span class="cuenta-item-nombre">📦 ${escapar(r.nombre)} x${r.cantidad}</span>
+            <span class="cuenta-item-monto">${formatoPlata(r.montoUnitario * r.cantidad)}</span>
+        </div>
+    `).join("");
+
+}
+
 // Llena el selector de mecánicos con los usuarios que tengan ese rol —
 // mismo criterio que ya se usa en el filtro de Turnos, sin duplicar nada.
 function actualizarSelectMecanicosOrden(valorActual) {
@@ -15416,6 +15515,8 @@ window.abrirModalOrdenTrabajo = function (vehiculoId, presupuestoOrigenId) {
 
     const v = vehiculosCache.find(x => x.id === vehiculoId);
     if (!v) return;
+
+    cerrarModales();
 
     const cliente = clientesCache.find(c => c.id === v.clienteId);
 
@@ -15452,6 +15553,10 @@ window.abrirModalOrdenTrabajo = function (vehiculoId, presupuestoOrigenId) {
     }
     renderListaTrabajosOrden();
 
+    ordenRepuestosTemp = [];
+    actualizarSelectStockOrden();
+    renderListaRepuestosOrdenStock();
+
     desbloquearBoton(document.getElementById("btnGuardarOrdenTrabajo"));
     document.getElementById("modalOrdenTrabajo").classList.add("abierto");
 
@@ -15486,6 +15591,10 @@ window.verOrdenTrabajo = function (id) {
 
     ordenTrabajosTemp = (o.trabajos || []).map(t => ({ ...t }));
     renderListaTrabajosOrden();
+
+    ordenRepuestosTemp = (o.repuestosUsados || []).map(r => ({ ...r }));
+    actualizarSelectStockOrden();
+    renderListaRepuestosOrdenStock();
 
     // Punto 6: si la orden está Lista, ofrece generar la cuenta de cobro
     // directo, sin volver a cargar los trabajos a mano.
@@ -15533,6 +15642,7 @@ async function ejecutarGuardarOrdenTrabajo(vehiculoId, estadoEl, boton) {
             patente: v ? v.patente : "",
             kilometraje: parseInt(document.getElementById("otKilometraje").value, 10) || null,
             trabajos: ordenTrabajosTemp,
+            repuestosUsados: ordenRepuestosTemp,
             mecanico: document.getElementById("otMecanico").value || null,
             estado: document.getElementById("otEstado").value,
             observaciones: document.getElementById("otObservaciones").value.trim(),
@@ -15612,11 +15722,20 @@ window.finalizarOrdenYGenerarCuenta = function (id) {
     const o = ordenesTrabajoCache.find(x => x.id === id);
     if (!o) return;
 
-    cuentaItems = (o.trabajos || []).map(t => ({
-        tipo: "manual",
-        descripcion: t.descripcion + (t.repuestos ? " (" + t.repuestos + ")" : ""),
-        monto: Number(t.manoObra) || 0
-    }));
+    cuentaItems = [
+        ...(o.trabajos || []).map(t => ({
+            tipo: "manual",
+            descripcion: t.descripcion + (t.repuestos ? " (" + t.repuestos + ")" : ""),
+            monto: Number(t.manoObra) || 0
+        })),
+        ...(o.repuestosUsados || []).map(r => ({
+            tipo: "stock",
+            stockId: r.stockId,
+            descripcion: r.nombre,
+            cantidad: r.cantidad,
+            monto: (Number(r.montoUnitario) || 0) * (Number(r.cantidad) || 1)
+        }))
+    ];
 
     const cliente = clientesCache.find(c => c.id === o.clienteId);
     document.getElementById("cuentaCliente").value = o.clienteId || "";
@@ -16339,6 +16458,7 @@ function escucharInspecciones() {
 window.abrirInspeccion = function (vehiculoId, patente) {
 
     inspeccionFotosSlots = new Array(ANGULOS_INSPECCION.length).fill(null);
+    cerrarModales();
 
     document.getElementById("inspeccionTitulo").textContent = "📷 Inspección de ingreso - " + patente;
     document.getElementById("inspeccionVehiculoId").value = vehiculoId;
