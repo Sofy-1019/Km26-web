@@ -1844,6 +1844,39 @@ header{
     letter-spacing:1px;
     text-transform:uppercase;
     margin:18px 0 6px 12px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    user-select:none;
+    background:none;
+    border:none;
+    padding:0;
+    font-family:'Montserrat',sans-serif;
+    width:100%;
+    text-align:left;
+}
+
+.sidebar-separador:hover{
+    color:#999;
+}
+
+.sidebar-separador .flechita{
+    transition:transform .2s;
+    font-size:9px;
+}
+
+.sidebar-separador.abierto .flechita{
+    transform:rotate(90deg);
+}
+
+#sidebarMasOpciones{
+    display:none;
+    flex-direction:column;
+}
+
+#sidebarMasOpciones.abierto{
+    display:flex;
 }
 
 .sidebar-nav-btn.pendiente{
@@ -4258,7 +4291,11 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
             Cuentas / Cobros
         </button>
 
-        <div class="sidebar-separador">Más opciones</div>
+        <button class="sidebar-separador" id="sidebarSeparadorMas" onclick="alternarMasOpcionesSidebar()">
+            <span class="flechita">▶</span> Más opciones
+        </button>
+
+        <div id="sidebarMasOpciones">
 
         <button class="sidebar-nav-btn" data-nav="proveedores" data-roles="admin,recepcion" onclick="cambiarTab('proveedores')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
@@ -4288,6 +4325,9 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Respaldo de datos
         </button>
+
+        </div>
+
     </nav>
 
     <div class="sidebar-salir">
@@ -8560,6 +8600,13 @@ window.borrarCliente = async function (id, nombreCompleto) {
 
 // ---------- Tabs ----------
 
+window.alternarMasOpcionesSidebar = function () {
+    const grupo = document.getElementById("sidebarMasOpciones");
+    const separador = document.getElementById("sidebarSeparadorMas");
+    const abierto = grupo.classList.toggle("abierto");
+    separador.classList.toggle("abierto", abierto);
+};
+
 window.cambiarTab = function (tab) {
 
     // La nav.tabs original (ahora oculta, vive dentro de "Más opciones") solo tiene
@@ -8581,6 +8628,14 @@ window.cambiarTab = function (tab) {
     document.querySelectorAll(".sidebar-nav-btn[data-nav]").forEach(b => b.classList.remove("activo"));
     const btnSidebar = document.querySelector(`.sidebar-nav-btn[data-nav="${tab}"]`);
     if (btnSidebar) btnSidebar.classList.add("activo");
+
+    // Si la sección activa vive dentro de "Más opciones", se abre ese grupo
+    // solo — para que no parezca que la sección desapareció del menú.
+    const grupoMas = document.getElementById("sidebarMasOpciones");
+    if (grupoMas && btnSidebar && grupoMas.contains(btnSidebar)) {
+        grupoMas.classList.add("abierto");
+        document.getElementById("sidebarSeparadorMas").classList.add("abierto");
+    }
 
     window.cerrarOverlayMas();
     window.cerrarNotificaciones();
