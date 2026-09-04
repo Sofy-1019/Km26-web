@@ -1141,6 +1141,47 @@ textarea:focus,
     flex-wrap:wrap;
 }
 
+/* ---------- Patente estilo chapa argentina, usada en todo el panel ---------- */
+
+.patente-chapa{
+    display:inline-block;
+    background:#fff;
+    color:#111;
+    font-weight:800;
+    letter-spacing:1.5px;
+    font-family:'Montserrat',sans-serif;
+    border:1.5px solid #111;
+    border-radius:4px;
+    padding:11px 10px 5px;
+    position:relative;
+    line-height:1;
+    text-align:center;
+    white-space:nowrap;
+}
+
+.patente-chapa::before{
+    content:"ARGENTINA";
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    background:#1d3f8f;
+    color:#fff;
+    font-size:5px;
+    font-weight:700;
+    letter-spacing:.8px;
+    text-align:center;
+    padding:1.5px 0;
+    border-radius:2px 2px 0 0;
+}
+
+/* Variante chica, para listas apretadas */
+.patente-chapa.chica{
+    font-size:12px;
+    letter-spacing:1px;
+    padding:9px 7px 4px;
+}
+
 .ficha-vehiculo-patente{
     font-weight:700;
     font-size:14px;
@@ -8338,7 +8379,7 @@ function mostrarVistaPreviaMultiple(lista) {
         const cliente = clientesCache.find(c => c.id === v.clienteId);
         const nombreCliente = cliente ? `${cliente.nombre} ${cliente.apellido}` : "(sin cliente)";
         return `<div class="vp-multiple-item" onclick="mostrarVistaPreviaVehiculo('${v.id}')">
-            <strong>${escapar(v.patente)}</strong> — ${escapar(v.marca || "")} ${escapar(v.modelo || "")} · ${escapar(nombreCliente)}
+            <span class="patente-chapa chica">${escapar(v.patente)}</span> ${escapar(v.marca || "")} ${escapar(v.modelo || "")} · ${escapar(nombreCliente)}
         </div>`;
     }).join("") + `</div>`;
 
@@ -9453,7 +9494,7 @@ function renderDashboardAhora() {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
                     </div>
                     <div class="item-info">
-                        <div class="item-titulo" style="font-size:13.5px;">${escapar(v.marca || "")} ${escapar(v.modelo || "")} <span style="color:#777;font-weight:400;">· ${escapar(v.patente || "")}</span></div>
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="patente-chapa chica">${escapar(v.patente || "")}</span><span class="item-titulo" style="font-size:13.5px;">${escapar(v.marca || "")} ${escapar(v.modelo || "")}</span></div>
                         <div class="item-sub">${escapar(nombreCliente)}</div>
                         <div class="dash-vehiculo-taller-estado" style="color:${cfg.color};">${cfg.icono} ${escapar(v.estadoTaller)}</div>
                     </div>
@@ -9677,7 +9718,7 @@ function renderTarjetasEnTaller() {
                 ${iconoAutoGenerico()}
             </div>
             <div class="cv-card-cuerpo">
-                <div class="cv-card-patente">${escapar(v.patente)}${iconoCopiar(v.patente)}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span class="patente-chapa chica">${escapar(v.patente)}</span>${iconoCopiar(v.patente)}</div>
                 <div class="cv-card-modelo">${escapar(v.marca || "")} ${escapar(v.modelo || "")}</div>
                 <div class="cv-card-linea">👤 ${escapar(nombreCliente)}</div>
                 ${cliente && cliente.telefono ? `<div class="cv-card-linea">📞 ${escapar(cliente.telefono)}${iconoCopiar(cliente.telefono)}</div>` : ""}
@@ -9746,7 +9787,7 @@ function renderFichaVehiculos() {
             html += `<div class="ficha-vehiculo">
                 <div class="ficha-vehiculo-cabecera">
                     <div>
-                        <div class="ficha-vehiculo-patente">${escapar(v.patente)}</div>
+                        <div><span class="patente-chapa chica">${escapar(v.patente)}</span></div>
                         <div class="ficha-vehiculo-detalle">${escapar(v.marca || "")} ${escapar(v.modelo || "")} ${escapar(v.anio || "")}</div>
                     </div>
                     <div>
