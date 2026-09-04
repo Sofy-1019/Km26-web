@@ -1206,6 +1206,27 @@ textarea:focus,
 @media (max-width:600px){
     header{flex-direction:column;align-items:stretch;}
     #buscador{max-width:none;}
+
+    /* Punto 17 (mobile): las grillas de 2, 3 y 4 columnas de los modales
+       (ficha del vehículo, orden de trabajo, etc.) quedan apretadísimas en
+       una pantalla angosta — en celular se apilan una debajo de otra. */
+    .modal .modal-fila-2,
+    .modal [style*="grid-template-columns:2fr 1fr 1fr auto"],
+    .modal [style*="grid-template-columns:2fr 1fr auto"]{
+        grid-template-columns:1fr !important;
+    }
+
+    /* La fila de acciones rápidas de la ficha: botones más chicos para que
+       entren sin desbordar. */
+    .vp-acciones button{
+        font-size:11px;
+        padding:7px 10px;
+    }
+
+    /* Vista previa del buscador: menos columnas para que no se corte. */
+    .vp-datos{
+        grid-template-columns:1fr 1fr;
+    }
 }
 
 /* ======================================================================
