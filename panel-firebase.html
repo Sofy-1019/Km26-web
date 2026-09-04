@@ -1164,6 +1164,12 @@ textarea:focus,
     padding:8px 0;
     border-bottom:1px dashed #262626;
     line-height:1.5;
+    transition:.1s;
+}
+
+.ficha-historial-item[onclick]:hover{
+    background:#1a1a1a;
+    padding-left:6px;
 }
 
 .ficha-historial-fecha{
@@ -10720,6 +10726,7 @@ function escucharCuentasCC() {
         cuentasCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         if (typeof renderCuentasCC === "function") renderCuentasCC();
         if (typeof renderServicios === "function") renderServicios();
+        if (fichaVehiculoActual) renderHistorialVehiculo(fichaVehiculoActual);
     }, () => {});
 }
 
@@ -11314,9 +11321,18 @@ window.verCuentaCC = function (id) {
     document.getElementById("verCCTitulo").textContent = `Cuenta ${numeroTexto}`;
     document.getElementById("verCCSub").textContent = `${cliente ? cliente.apellido + ", " + cliente.nombre : "-"}${vehiculo ? " · " + vehiculo.marca + " " + vehiculo.modelo + " - " + vehiculo.patente : ""}`;
 
-    document.getElementById("verCCItems").innerHTML = (c.items || []).map(i =>
-        `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;"><span>${escapar(i.descripcion)} ${i.cantidad > 1 ? "x" + i.cantidad : ""}</span><span>${formatoPlata(i.monto)}</span></div>`
-    ).join("") || '<div style="color:#777;font-size:12px;">Sin ítems.</div>';
+    const itemsCuenta = c.items || [];
+    const manoDeObra = itemsCuenta.filter(i => i.tipo !== "stock");
+    const repuestos = itemsCuenta.filter(i => i.tipo === "stock");
+
+    function filaItem(i) {
+        return `<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;"><span>${escapar(i.descripcion)} ${i.cantidad > 1 ? "x" + i.cantidad : ""}</span><span>${formatoPlata(i.monto)}</span></div>`;
+    }
+
+    document.getElementById("verCCItems").innerHTML =
+        (manoDeObra.length ? `<div style="font-size:11px;color:#999;margin:6px 0 2px;">🔧 Mano de obra</div>${manoDeObra.map(filaItem).join("")}` : "") +
+        (repuestos.length ? `<div style="font-size:11px;color:#999;margin:10px 0 2px;">📦 Repuestos</div>${repuestos.map(filaItem).join("")}` : "") ||
+        '<div style="color:#777;font-size:12px;">Sin ítems.</div>';
 
     document.getElementById("verCCSubtotal").textContent = formatoPlata(c.subtotal);
     document.getElementById("verCCDescuento").textContent = c.descuentoPorc ? `-${c.descuentoPorc}%` : "$0";
@@ -11665,26 +11681,87 @@ function escucharHistorial() {
 
 }
 
+// Línea de tiempo unificada del vehículo (punto 11 del pedido): junta notas
+// manuales, presupuestos, órdenes de trabajo y cobros — todo lo que le pasó
+// a este vehículo, ordenado por fecha, sin tener que ir a otro módulo a
+// buscarlo. Cada evento se puede tocar para ver el detalle completo.
 function renderHistorialVehiculo(vehiculoId) {
 
     const el = document.getElementById("historial-" + vehiculoId);
     if (!el) return;
 
-    const historial = historialCache.filter(h => h.vehiculoId === vehiculoId);
+    const eventos = [];
 
-    if (historial.length === 0) {
-        el.innerHTML = '<p style="font-size:12px;color:#777;">Sin trabajos registrados todavía.</p>';
+    const vehiculo = vehiculosCache.find(v => v.id === vehiculoId);
+    if (vehiculo && vehiculo.fechaIngresoTaller) {
+        eventos.push({
+            fecha: toDateSegura(vehiculo.fechaIngresoTaller),
+            icono: "🚗",
+            texto: `Ingreso al taller${vehiculo.estadoTaller ? " — " + vehiculo.estadoTaller : ""}`,
+            monto: null,
+            onclick: null
+        });
+    }
+
+    historialCache.filter(h => h.vehiculoId === vehiculoId).forEach(h => {
+        eventos.push({
+            fecha: toDateSegura(h.fecha),
+            icono: "🔧",
+            texto: h.descripcion,
+            monto: h.costo || null,
+            onclick: null
+        });
+    });
+
+    presupuestosCache.filter(p => p.vehiculoId === vehiculoId).forEach(p => {
+        eventos.push({
+            fecha: toDateSegura(p.fecha),
+            icono: "📄",
+            texto: `Presupuesto ${p.estado === "Aprobado" ? "aprobado" : p.estado === "Enviado" ? "enviado" : "creado"}`,
+            monto: p.total || null,
+            onclick: `verPresupuesto('${p.id}')`
+        });
+    });
+
+    ordenesTrabajoCache.filter(o => o.vehiculoId === vehiculoId).forEach(o => {
+        const totalManoObra = (o.trabajos || []).reduce((s, t) => s + (Number(t.manoObra) || 0), 0);
+        eventos.push({
+            fecha: toDateSegura(o.creado),
+            icono: "🔧",
+            texto: `Orden de trabajo #${String(o.numero || "").padStart(4, "0")} — ${escapar(o.estado)}`,
+            monto: totalManoObra || null,
+            onclick: `verOrdenTrabajo('${o.id}')`
+        });
+    });
+
+    cuentasCache.filter(c => c.vehiculoId === vehiculoId).forEach(c => {
+        eventos.push({
+            fecha: toDateSegura(c.fecha),
+            icono: "💲",
+            texto: `Cuenta #${String(c.numero || "").padStart(5, "0")}${(Number(c.saldo) || 0) > 0.5 ? " — con saldo pendiente" : " — pagada"}`,
+            monto: c.total || null,
+            onclick: `verCuentaCC('${c.id}')`
+        });
+    });
+
+    eventos.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+
+    if (eventos.length === 0) {
+        el.innerHTML = '<p style="font-size:12px;color:#777;">Sin actividad registrada todavía.</p>';
         return;
     }
 
-    el.innerHTML = historial.map(h => {
+    el.innerHTML = eventos.map(e => {
 
-        const fecha = h.fecha && h.fecha.toDate ? h.fecha.toDate() : null;
-        const fechaTexto = fecha ? fecha.toLocaleDateString("es-AR") : "";
-        const horaTexto = fecha ? fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "";
-        const costo = h.costo ? " · " + formatoPlata(h.costo) : "";
+        const fechaTexto = e.fecha ? e.fecha.toLocaleDateString("es-AR") : "";
+        const horaTexto = e.fecha ? e.fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : "";
+        const monto = e.monto ? " · " + formatoPlata(e.monto) : "";
+        const clickeable = e.onclick ? ` style="cursor:pointer;" onclick="${e.onclick}"` : "";
 
-        return `<div class="ficha-historial-item"><span class="ficha-historial-fecha">${fechaTexto}${horaTexto ? " · " + horaTexto + "hs" : ""}</span><br>${escapar(h.descripcion)}${costo}</div>`;
+        return `<div class="ficha-historial-item"${clickeable}>
+            <span class="ficha-historial-fecha">${fechaTexto}${horaTexto ? " · " + horaTexto + "hs" : ""}</span><br>
+            ${e.icono} ${escapar(e.texto)}${monto}
+        </div>`;
 
     }).join("");
 
@@ -15266,8 +15343,12 @@ function escucharOrdenesTrabajo() {
         ordenesTrabajoCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
         // Si hay una ficha de vehículo abierta, se refresca sola la lista
-        // de órdenes que se muestra ahí adentro.
-        if (fichaVehiculoActual) renderOrdenesDelVehiculo(fichaVehiculoActual);
+        // de órdenes que se muestra ahí adentro, y también la línea de
+        // tiempo unificada (punto 11), que ahora incluye las órdenes.
+        if (fichaVehiculoActual) {
+            renderOrdenesDelVehiculo(fichaVehiculoActual);
+            renderHistorialVehiculo(fichaVehiculoActual);
+        }
 
     });
 
@@ -15565,6 +15646,7 @@ function escucharPresupuestos() {
         renderPresupuestos();
         if (typeof renderDashboard === "function") renderDashboard();
         if (typeof renderServicios === "function") renderServicios();
+        if (fichaVehiculoActual) renderHistorialVehiculo(fichaVehiculoActual);
 
     });
 
