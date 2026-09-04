@@ -9065,7 +9065,19 @@ function getIniciales(nombre, apellido) {
 
 // ---------- Dashboard: se recalcula solo cuando cambian caja/turnos/stock/presupuestos ----------
 
+// Punto 16 (velocidad): el dashboard es lo más pesado de recalcular (recorre
+// vehículos, turnos, presupuestos, cuentas y stock). Como Firebase suele
+// mandar varios cambios casi al mismo tiempo, antes se redibujaba todo
+// muchas veces seguidas al pedo. Ahora se agrupan: si llegan 5 cambios
+// juntos, se redibuja una sola vez al final.
+let temporizadorRenderDashboard = null;
+
 function renderDashboard() {
+    clearTimeout(temporizadorRenderDashboard);
+    temporizadorRenderDashboard = setTimeout(renderDashboardAhora, 60);
+}
+
+function renderDashboardAhora() {
 
     const elTitulo = document.getElementById("hoyVehiculosTaller");
     if (!elTitulo) return; // el DOM del dashboard todavía no existe (raro, pero por las dudas)
@@ -9378,6 +9390,8 @@ function renderDashboard() {
 
 // ---------- Vehículos en tiempo real ----------
 
+let temporizadorRenderVehiculos = null;
+
 function escucharVehiculos() {
 
     const q = query(collection(db, "vehiculos"), orderBy("patente"));
@@ -9385,13 +9399,16 @@ function escucharVehiculos() {
     onSnapshot(q, (snapshot) => {
 
         vehiculosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderClientes(clientesCache);
-        renderTableroTaller();
 
-        // Si hay una ficha abierta, también se refresca sola
-        if (fichaClienteActual) {
-            renderFichaVehiculos();
-        }
+        // Mismo criterio que el dashboard (punto 16): la lista de clientes y
+        // el tablero del taller son pesados de redibujar, así que si llegan
+        // varios cambios de vehículos casi juntos, se redibuja una sola vez.
+        clearTimeout(temporizadorRenderVehiculos);
+        temporizadorRenderVehiculos = setTimeout(() => {
+            renderClientes(clientesCache);
+            renderTableroTaller();
+            if (fichaClienteActual) renderFichaVehiculos();
+        }, 60);
 
     });
 
