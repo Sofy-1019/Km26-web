@@ -6802,7 +6802,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" style="flex:1;" onclick="guardarInspeccion()">Guardar inspección</button>
+            <button class="btn-red" style="flex:1;" id="btnGuardarInspeccion" onclick="guardarInspeccion(this)">Guardar inspección</button>
         </div>
 
         <p id="mensajeEstadoInspeccion"></p>
@@ -16866,6 +16866,7 @@ window.abrirInspeccion = function (vehiculoId, patente) {
     renderInspeccionSlots();
     renderInspeccionesAnteriores(vehiculoId);
 
+    desbloquearBoton(document.getElementById("btnGuardarInspeccion"));
     document.getElementById("modalInspeccion").classList.add("abierto");
 
 };
@@ -17053,7 +17054,7 @@ window.borrarInspeccion = async function (inspeccionId, saltarConfirmacion) {
 
 };
 
-window.guardarInspeccion = async function () {
+window.guardarInspeccion = async function (boton) {
 
     const vehiculoId = document.getElementById("inspeccionVehiculoId").value;
     const notas = document.getElementById("inspeccionNotas").value.trim();
@@ -17072,6 +17073,12 @@ window.guardarInspeccion = async function () {
         const seguir = confirm(`Todavía faltan estas fotos: ${faltan}.\n¿Guardar igual con las que ya sacaste?`);
         if (!seguir) return;
     }
+
+    // Bloqueo crítico acá: subir varias fotos puede tardar 10-20 segundos, y
+    // es muy probable que alguien toque dos veces pensando que no anduvo.
+    // Sin esto, se subían TODAS las fotos dos veces (ocupando el doble de
+    // espacio en Firebase Storage, que se paga).
+    bloquearBoton(boton, "Subiendo...");
 
     estado.textContent = `Subiendo fotos (0/${fotosListas.length})...`;
     estado.style.color = "#999";
@@ -17107,14 +17114,18 @@ window.guardarInspeccion = async function () {
 
         estado.textContent = "✅ ¡Inspección guardada!";
         estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Inspección guardada");
 
         inspeccionFotosSlots = new Array(ANGULOS_INSPECCION.length).fill(null);
         renderInspeccionSlots();
+        renderInspeccionesAnteriores(vehiculoId);
         document.getElementById("inspeccionNotas").value = "";
+        desbloquearBoton(boton);
 
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -18207,7 +18218,14 @@ window.exportarRespaldoCompleto = function () {
             ["Usuarios", usuariosCache],
             ["Proveedores", proveedoresCache],
             ["Categorias", categoriasCache],
-            ["Servicios", serviciosCache]
+            ["Servicios", serviciosCache],
+            // Estas 4 se sumaron al panel después de que se armó el respaldo
+            // y habían quedado afuera: son justamente las que guardan las
+            // deudas (de clientes y a proveedores) y el trabajo del taller.
+            ["Cuentas", cuentasCache],
+            ["ComprasProveedor", comprasProveedorCache],
+            ["OrdenesTrabajo", ordenesTrabajoCache],
+            ["EntregasFirmadas", entregasFirmadasCache]
         ];
 
         colecciones.forEach(([nombreHoja, lista]) => {
