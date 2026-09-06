@@ -6882,7 +6882,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" onclick="confirmarCobroCC()">Registrar cobro</button>
+            <button class="btn-red" id="btnConfirmarCobroCC" onclick="confirmarCobroCC(this)">Registrar cobro</button>
         </div>
 
         <p id="mensajeEstadoCobrarCC"></p>
@@ -11479,10 +11479,11 @@ window.seleccionarCuentaParaCobrar = function (cuentaId) {
     document.getElementById("cobrarCCPagado").textContent = formatoPlata(c.pagado);
     document.getElementById("cobrarCCSaldo").textContent = formatoPlata(c.saldo);
     document.getElementById("cobrarCCMonto").value = c.saldo;
+    desbloquearBoton(document.getElementById("btnConfirmarCobroCC"));
 
 };
 
-window.confirmarCobroCC = async function () {
+window.confirmarCobroCC = async function (boton) {
 
     const cuentaId = document.getElementById("cobrarCCCuentaId").value;
     const monto = parseFloat(document.getElementById("cobrarCCMonto").value);
@@ -11494,6 +11495,18 @@ window.confirmarCobroCC = async function () {
 
     const cuenta = cuentasCache.find(c => c.id === cuentaId);
     if (!cuenta) return;
+
+    // No se puede cobrar más de lo que se debe: sin esto, un error de tipeo
+    // (ej: 50000 en vez de 5000) metía plata inexistente en la Caja e
+    // inflaba la facturación del día.
+    const saldoActual = Number(cuenta.saldo) || 0;
+    if (monto > saldoActual + 0.5) {
+        estado.textContent = `El saldo pendiente es ${formatoPlata(saldoActual)}. No podés cobrar más que eso.`;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    bloquearBoton(boton, "Cobrando...");
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -11527,11 +11540,13 @@ window.confirmarCobroCC = async function () {
 
         estado.textContent = "✅ ¡Cobro registrado!";
         estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Cobro registrado");
         setTimeout(() => window.cerrarModales(), 900);
 
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
@@ -15495,13 +15510,17 @@ async function ejecutarCobroCuenta(clienteId, vehiculoId, cliente, estado, boton
         const descripciones = cuentaItems.map(i => i.descripcion).join(" + ");
         const sufijoDescuento = descuentoPorc > 0 ? ` (desc. ${descuentoPorc}%)` : "";
 
-        // Descuenta stock de cada ítem escaneado
+        // Descuenta stock de cada ítem escaneado, respetando la cantidad real
+        // del ítem (antes descontaba siempre 1, así que vender 4 bujías solo
+        // bajaba 1 del inventario).
         for (const item of cuentaItems) {
             if (item.tipo === "stock" && item.stockId) {
                 const producto = stockCache.find(p => p.id === item.stockId);
                 if (producto) {
-                    const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) - 1);
+                    const cantidadVendida = Number(item.cantidad) || 1;
+                    const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) - cantidadVendida);
                     await updateDoc(doc(db, "stock", item.stockId), { cantidad: nuevaCantidad });
+                    await registrarMovimientoStock(item.stockId, producto.nombre, -cantidadVendida, nuevaCantidad, "Venta / cobro");
                 }
             }
         }
