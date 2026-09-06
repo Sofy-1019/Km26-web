@@ -6483,7 +6483,33 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cerrar</button>
+            <button class="btn-chico" id="btnEliminarDesdeFicha" style="flex:1;color:#ff6b6b;border-color:#ff6b6b;" onclick="abrirEliminarDesdeFicha()">🗑️ Eliminar...</button>
         </div>
+    </div>
+</div>
+
+<!-- ---------- Modal: elegir qué eliminar (cliente completo o un vehículo) ---------- -->
+<div class="overlay" id="modalEliminarFicha">
+    <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
+        <h3>🗑️ ¿Qué querés eliminar?</h3>
+
+        <input type="hidden" id="elimClienteId">
+
+        <p style="font-size:12.5px;color:#999;margin-bottom:16px;" id="elimClienteNombre"></p>
+
+        <div style="margin-bottom:18px;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">Vehículos de este cliente</p>
+            <div id="elimListaVehiculos"></div>
+        </div>
+
+        <div style="border-top:1px solid #262626;padding-top:16px;">
+            <p style="font-size:12px;color:#999;margin-bottom:10px;">O eliminar todo</p>
+            <button class="btn-chico" style="width:100%;color:#ff6b6b;border-color:#ff6b6b;" onclick="eliminarClienteCompletoDesdeFicha()">
+                ❌ Eliminar el cliente y todos sus vehículos
+            </button>
+        </div>
+
     </div>
 </div>
 
@@ -8655,6 +8681,7 @@ window.cerrarModales = function () {
     vehiculoHistorialDirectoActual = null;
     document.getElementById("modalCliente").classList.remove("abierto");
     document.getElementById("modalFicha").classList.remove("abierto");
+    document.getElementById("modalEliminarFicha").classList.remove("abierto");
     document.getElementById("modalEditarVehiculo").classList.remove("abierto");
     document.getElementById("modalCaja").classList.remove("abierto");
     document.getElementById("modalProducto").classList.remove("abierto");
@@ -9830,6 +9857,13 @@ window.abrirFicha = function (clienteId, nombreCompleto) {
     window.cambiarFichaTab("vehiculos");
     renderFichaVehiculos();
 
+    // Mismo criterio que el resto de la gestión de clientes: solo admin y
+    // recepción pueden borrar.
+    const btnEliminar = document.getElementById("btnEliminarDesdeFicha");
+    if (btnEliminar) {
+        btnEliminar.style.display = (rolActual === "admin" || rolActual === "recepcion") ? "block" : "none";
+    }
+
     document.getElementById("modalFicha").classList.add("abierto");
 
 };
@@ -10335,6 +10369,75 @@ window.borrarVehiculo = async function (id) {
     if (!confirmado) return;
 
     await borrarConDeshacer("vehiculos", id, "Vehículo borrado.");
+
+};
+
+// ---------- Eliminar desde la ficha del cliente ----------
+// Deja elegir: borrar un vehículo puntual (por ejemplo si el cliente lo
+// vendió) o al cliente entero con todos sus autos.
+
+window.abrirEliminarDesdeFicha = function () {
+
+    const clienteId = document.getElementById("fichaClienteId").value;
+    const cliente = clientesCache.find(c => c.id === clienteId);
+    if (!cliente) return;
+
+    document.getElementById("elimClienteId").value = clienteId;
+    document.getElementById("elimClienteNombre").textContent = `${cliente.nombre} ${cliente.apellido}`;
+
+    const vehiculos = vehiculosCache.filter(v => v.clienteId === clienteId);
+    const el = document.getElementById("elimListaVehiculos");
+
+    el.innerHTML = vehiculos.length === 0
+        ? '<p style="font-size:12px;color:#777;">Este cliente no tiene vehículos cargados.</p>'
+        : vehiculos.map(v => `
+            <div class="cuenta-item-fila">
+                <span class="cuenta-item-nombre">🚗 ${escapar(v.patente)} · ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</span>
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="eliminarSoloEsteVehiculo('${v.id}', '${escaparComillas(v.patente)}')">Eliminar</button>
+            </div>
+        `).join("");
+
+    cerrarModales();
+    document.getElementById("modalEliminarFicha").classList.add("abierto");
+
+};
+
+// Borra un solo vehículo (el cliente y sus otros autos quedan intactos).
+window.eliminarSoloEsteVehiculo = async function (vehiculoId, patente) {
+
+    const confirmado = confirm(`¿Eliminar el vehículo ${patente}?\n\nEl cliente y sus otros vehículos no se tocan. Vas a tener unos segundos para deshacerlo.`);
+    if (!confirmado) return;
+
+    await borrarConDeshacer("vehiculos", vehiculoId, `Vehículo ${patente} borrado.`);
+
+    // Refresca la lista para que se vea el cambio al instante
+    const clienteId = document.getElementById("elimClienteId").value;
+    const vehiculosRestantes = vehiculosCache.filter(v => v.clienteId === clienteId && v.id !== vehiculoId);
+
+    if (vehiculosRestantes.length === 0) {
+        document.getElementById("elimListaVehiculos").innerHTML =
+            '<p style="font-size:12px;color:#777;">Ya no quedan vehículos cargados.</p>';
+    } else {
+        document.getElementById("elimListaVehiculos").innerHTML = vehiculosRestantes.map(v => `
+            <div class="cuenta-item-fila">
+                <span class="cuenta-item-nombre">🚗 ${escapar(v.patente)} · ${escapar(v.marca || "")} ${escapar(v.modelo || "")}</span>
+                <button class="btn-chico" style="color:#ff6b6b;" onclick="eliminarSoloEsteVehiculo('${v.id}', '${escaparComillas(v.patente)}')">Eliminar</button>
+            </div>
+        `).join("");
+    }
+
+};
+
+// Borra el cliente completo — reutiliza la función que ya se encarga de
+// llevarse también sus vehículos, cada uno con su "Deshacer".
+window.eliminarClienteCompletoDesdeFicha = async function () {
+
+    const clienteId = document.getElementById("elimClienteId").value;
+    const cliente = clientesCache.find(c => c.id === clienteId);
+    if (!cliente) return;
+
+    cerrarModales();
+    await window.borrarCliente(clienteId, `${cliente.nombre} ${cliente.apellido}`);
 
 };
 
