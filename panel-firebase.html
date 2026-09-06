@@ -15721,6 +15721,31 @@ window.usarRepuestoDelStock = async function () {
 
 };
 
+// Devuelve al stock un repuesto agregado por error. Es necesario porque el
+// descuento se hace al instante (para que el inventario esté siempre al
+// día): sin esta opción, un repuesto agregado por equivocación quedaba
+// descontado para siempre aunque no se usara.
+window.devolverRepuestoAlStock = async function (indice) {
+
+    const r = ordenRepuestosTemp[indice];
+    if (!r) return;
+
+    const confirmado = confirm(`¿Devolver ${r.cantidad} de "${r.nombre}" al stock?`);
+    if (!confirmado) return;
+
+    const producto = stockCache.find(p => p.id === r.stockId);
+    if (producto) {
+        const nuevaCantidad = (Number(producto.cantidad) || 0) + r.cantidad;
+        await updateDoc(doc(db, "stock", r.stockId), { cantidad: nuevaCantidad });
+        await registrarMovimientoStock(r.stockId, producto.nombre, r.cantidad, nuevaCantidad, "Devuelto de orden de trabajo");
+    }
+
+    ordenRepuestosTemp.splice(indice, 1);
+    renderListaRepuestosOrdenStock();
+    window.mostrarToastExito(`Se devolvieron ${r.cantidad} al stock`);
+
+};
+
 function renderListaRepuestosOrdenStock() {
 
     const el = document.getElementById("listaRepuestosOrdenStock");
@@ -15730,10 +15755,11 @@ function renderListaRepuestosOrdenStock() {
         return;
     }
 
-    el.innerHTML = ordenRepuestosTemp.map(r => `
+    el.innerHTML = ordenRepuestosTemp.map((r, i) => `
         <div class="cuenta-item-fila">
             <span class="cuenta-item-nombre">📦 ${escapar(r.nombre)} x${r.cantidad}</span>
             <span class="cuenta-item-monto">${formatoPlata(r.montoUnitario * r.cantidad)}</span>
+            <button class="cuenta-item-quitar" title="Devolver al stock" onclick="devolverRepuestoAlStock(${i})">✕</button>
         </div>
     `).join("");
 
@@ -16533,7 +16559,20 @@ async function ejecutarGuardarPresupuesto(clienteId, vehiculoId, notas, estado, 
 };
 
 window.cambiarEstadoPresupuesto = async function (id, nuevoEstado) {
+
+    const p = presupuestosCache.find(x => x.id === id);
+
+    // Un presupuesto ya cobrado ("Convertido") no puede volver atrás: si se
+    // permitía, quedaba marcado como pendiente de cobro y volvía a aparecer
+    // en el Dashboard como "sin cobrar", aunque la plata ya había entrado.
+    if (p && p.estado === "Convertido" && nuevoEstado !== "Convertido") {
+        alert("Este presupuesto ya fue cobrado, no se puede volver a un estado anterior.\n\nSi hubo un error en el cobro, corregilo desde Caja o Cuentas.");
+        renderPresupuestos();
+        return;
+    }
+
     await updateDoc(doc(db, "presupuestos", id), { estado: nuevoEstado });
+
 };
 
 window.borrarPresupuesto = async function (id) {
