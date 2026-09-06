@@ -7045,7 +7045,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" onclick="guardarPagoProveedor()">Registrar pago</button>
+            <button class="btn-red" id="btnGuardarPagoProveedor" onclick="guardarPagoProveedor(this)">Registrar pago</button>
         </div>
 
         <p id="mensajeEstadoPagoProveedor"></p>
@@ -11822,6 +11822,16 @@ window.guardarMovimiento = function (boton) {
         return;
     }
 
+    // El monto tiene que ser un número positivo: sin esta validación, un
+    // texto o un número negativo se guardaba igual y rompía el cálculo del
+    // saldo de Caja (quedaba en "NaN" o restaba donde debía sumar).
+    const montoNumero = parseFloat(monto);
+    if (isNaN(montoNumero) || montoNumero <= 0) {
+        estado.textContent = "El monto tiene que ser un número mayor a cero.";
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
     bloquearBoton(boton, "Guardando...");
     ejecutarGuardarMovimiento(id, descripcion, contraparte, categoria, monto, medioPago, estado, boton);
 
@@ -13528,6 +13538,7 @@ window.abrirModalPagoProveedor = function (id) {
     }
 
     document.getElementById("mensajeEstadoPagoProveedor").textContent = "";
+    desbloquearBoton(document.getElementById("btnGuardarPagoProveedor"));
     document.getElementById("modalPagoProveedor").classList.add("abierto");
 
 };
@@ -13540,7 +13551,7 @@ window.actualizarMontoSugeridoPagoProv = function () {
     }
 };
 
-window.guardarPagoProveedor = async function () {
+window.guardarPagoProveedor = async function (boton) {
 
     const proveedorId = document.getElementById("pagoProvId").value;
     const compraId = document.getElementById("pagoProvCompraId").value;
@@ -13560,6 +13571,18 @@ window.guardarPagoProveedor = async function () {
         estado.style.color = "#ff6b6b";
         return;
     }
+
+    // No se puede pagar más de lo que se debe: sin esto, un error de tipeo
+    // sacaba plata de más de la Caja y desbalanceaba el saldo real.
+    const compraAPagar = comprasProveedorCache.find(c => c.id === compraId);
+    const saldoCompra = compraAPagar ? (Number(compraAPagar.saldo) || 0) : 0;
+    if (monto > saldoCompra + 0.5) {
+        estado.textContent = `El saldo de esta compra es ${formatoPlata(saldoCompra)}. No podés pagar más que eso.`;
+        estado.style.color = "#ff6b6b";
+        return;
+    }
+
+    bloquearBoton(boton, "Registrando...");
 
     estado.textContent = "Registrando pago...";
     estado.style.color = "#999";
@@ -13590,11 +13613,13 @@ window.guardarPagoProveedor = async function () {
 
         estado.textContent = "✅ Pago registrado y descontado de caja.";
         estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Pago a proveedor registrado");
         setTimeout(() => window.cerrarModales(), 900);
 
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
