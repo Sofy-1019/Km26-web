@@ -7256,7 +7256,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 
         <div class="modal-botones">
             <button class="btn-cancelar" onclick="cerrarModales()">Cancelar</button>
-            <button class="btn-red" onclick="guardarTurno()">Guardar</button>
+            <button class="btn-red" id="btnGuardarTurno" onclick="guardarTurno(this)">Guardar</button>
         </div>
 
         <div class="modal-botones" id="accionesTurno" style="display:none;"></div>
@@ -10120,6 +10120,21 @@ window.agregarVehiculo = function (boton) {
 
     if (!patente) {
         alert("Ponele al menos la patente.");
+        return;
+    }
+
+    // Evita duplicados: esta vía (agregar desde la ficha del cliente) no
+    // tenía el control que sí tiene "Ingresar vehículo", así que se podía
+    // cargar dos veces el mismo auto sin darse cuenta.
+    const patenteLimpia = patente.replace(/\s/g, "");
+    const yaExiste = vehiculosCache.find(v =>
+        String(v.patente || "").toUpperCase().replace(/\s/g, "") === patenteLimpia
+    );
+
+    if (yaExiste) {
+        const duenoActual = clientesCache.find(c => c.id === yaExiste.clienteId);
+        const nombreDueno = duenoActual ? `${duenoActual.nombre} ${duenoActual.apellido}` : "otro cliente";
+        alert(`La patente ${patente} ya está cargada a nombre de ${nombreDueno} (${yaExiste.marca || ""} ${yaExiste.modelo || ""}).\n\nSi el vehículo cambió de dueño, editalo desde su ficha en vez de cargarlo de nuevo.`);
         return;
     }
 
@@ -15203,6 +15218,7 @@ window.abrirModalTurno = function (id) {
 
     }
 
+    desbloquearBoton(document.getElementById("btnGuardarTurno"));
     document.getElementById("modalTurno").classList.add("abierto");
 
 };
@@ -15218,7 +15234,7 @@ window.actualizarVehiculosTurno = function () {
 
 };
 
-window.guardarTurno = async function () {
+window.guardarTurno = async function (boton) {
 
     const id = document.getElementById("tId").value;
     const clienteId = document.getElementById("tCliente").value;
@@ -15236,6 +15252,27 @@ window.guardarTurno = async function () {
     }
 
     const fechaHora = new Date(`${fecha}T${hora}:00`);
+
+    // Aviso de superposición: si ya hay un turno a la misma hora (y con el
+    // mismo mecánico, si se eligió uno), se avisa antes de guardar. No lo
+    // bloquea — a veces se atienden dos autos a la vez a propósito — pero
+    // evita agendar dos cosas encima sin darse cuenta.
+    const turnoSuperpuesto = turnosCache.find(t => {
+        if (t.id === id) return false;
+        if (t.estado === "Cancelado") return false;
+        const f = toDateSegura(t.fechaHora);
+        if (!f || Math.abs(f - fechaHora) > 60000) return false;
+        return !mecanico || !t.mecanico || t.mecanico === mecanico;
+    });
+
+    if (turnoSuperpuesto) {
+        const clienteOtro = clientesCache.find(c => c.id === turnoSuperpuesto.clienteId);
+        const nombreOtro = clienteOtro ? `${clienteOtro.nombre} ${clienteOtro.apellido}` : "otro cliente";
+        const seguir = confirm(`Ya hay un turno a esa hora${turnoSuperpuesto.mecanico ? " con " + turnoSuperpuesto.mecanico : ""} (${nombreOtro}).\n\n¿Guardar igual?`);
+        if (!seguir) return;
+    }
+
+    bloquearBoton(boton, "Guardando...");
 
     estado.textContent = "Guardando...";
     estado.style.color = "#999";
@@ -15262,12 +15299,14 @@ window.guardarTurno = async function () {
 
         estado.textContent = "¡Turno guardado!";
         estado.style.color = "#5fd98a";
+        window.mostrarToastExito("Turno guardado");
 
         setTimeout(() => window.cerrarModales(), 600);
 
     } catch (err) {
         estado.textContent = "Error: " + err.message;
         estado.style.color = "#ff6b6b";
+        desbloquearBoton(boton);
     }
 
 };
