@@ -534,6 +534,39 @@ td.mono{
     width:100%;
     max-height:85vh;
     overflow-y:auto;
+    position:relative;
+}
+
+/* Botón ✕ siempre visible arriba a la derecha de cada modal. Antes la única
+   salida estaba abajo de todo, y en los modales largos (ficha del vehículo,
+   orden de trabajo, presupuesto) había que scrollear mucho para encontrarla,
+   sobre todo en celular. */
+.modal-cerrar-x{
+    position:sticky;
+    top:-24px;
+    float:right;
+    margin:-24px -24px 0 0;
+    width:38px;
+    height:38px;
+    border-radius:0 16px 0 12px;
+    background:#242426;
+    border:none;
+    border-left:1px solid #333;
+    border-bottom:1px solid #333;
+    color:#bbb;
+    font-size:20px;
+    line-height:1;
+    cursor:pointer;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.15s;
+}
+
+.modal-cerrar-x:hover{
+    background:#d71920;
+    color:#fff;
 }
 
 .modal h3{
@@ -4322,6 +4355,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: cambiar contraseña ---------- -->
 <div class="overlay" id="modalCambiarContrasena">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>🔒 Cambiar contraseña</h3>
 
         <label>Contraseña actual</label>
@@ -6154,6 +6188,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Overlay: Más opciones (agrupa las secciones que no están en la nav inferior) ---------- -->
 <div class="overlay" id="overlayMas">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarOverlayMas()" title="Cerrar" aria-label="Cerrar">✕</button>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
             <button class="btn-atras-menu" onclick="cerrarOverlayMas()" title="Atrás">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -6233,6 +6268,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Overlay: acción rápida (botón + de la nav inferior) ---------- -->
 <div class="overlay" id="overlayRapido">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarOverlayRapido()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Acción rápida</h3>
         <button class="rapido-item" onclick="cerrarOverlayRapido(); abrirModalIngresarVehiculo()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 01-2-2v-1.4a2 2 0 01.4-1.2L5.5 9a2 2 0 011.6-.8h9.8a2 2 0 011.6.8l2.1 3.4a2 2 0 01.4 1.2V15a2 2 0 01-2 2"/></svg>
@@ -6271,6 +6307,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: ingresar vehículo (busca cliente o crea uno rápido) ---------- -->
 <div class="overlay" id="modalIngresarVehiculo">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>+ Ingresar vehículo</h3>
 
         <label>Cliente (buscá por nombre o patente)</label>
@@ -6329,6 +6366,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: ver detalle de un presupuesto ---------- -->
 <div class="overlay" id="modalVerPresupuesto">
     <div class="modal" style="max-width:720px;">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="verPresuTitulo">Presupuesto</h3>
 
         <div style="font-size:13px;color:#ccc;margin-bottom:4px;" id="verPresuCliente"></div>
@@ -6364,6 +6402,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nuevo/editar cliente ---------- -->
 <div class="overlay" id="modalCliente">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="modalClienteTitulo">Nuevo cliente</h3>
 
         <input type="hidden" id="cId">
@@ -6406,6 +6445,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: ficha de cliente (sus vehículos) ---------- -->
 <div class="overlay" id="modalFicha">
     <div class="modal" style="max-width:560px;">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="fichaTitulo">Cliente</h3>
 
         <div class="ficha-tabs">
@@ -6450,6 +6490,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: editar vehículo ---------- -->
 <div class="overlay" id="modalEditarVehiculo">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="document.getElementById('modalEditarVehiculo').classList.remove('abierto')" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Editar vehículo</h3>
 
         <input type="hidden" id="evId">
@@ -6477,6 +6518,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: ficha completa del vehículo ---------- -->
 <div class="overlay" id="modalFichaVehiculo">
     <div class="modal" style="max-width:720px;">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="fichaVehTitulo" style="color:#fff;">Ficha del vehículo</h3>
 
         <input type="hidden" id="fvId">
@@ -6597,6 +6639,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: QR de historial para el cliente ---------- -->
 <div class="overlay" id="modalQRVehiculo">
     <div class="modal" style="text-align:center;">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Escaneá para ver el historial</h3>
         <p style="font-size:12px;color:#999;margin-bottom:14px;">Mostrale este código al cliente al entregar el auto, o mandaselo por WhatsApp. Ve sus últimos servicios con fecha y hora (sin costos), sin necesidad de iniciar sesión.</p>
 
@@ -6617,6 +6660,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: firma digital de conformidad al entregar ---------- -->
 <div class="overlay" id="modalFirmaEntrega">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>✍️ Conformidad de entrega</h3>
         <p id="firmaEntregaDatosVehiculo" style="font-size:13px;color:#ccc;margin-bottom:6px;"></p>
         <p style="font-size:11.5px;color:#777;margin-bottom:14px;">Pasale la pantalla al cliente para que firme acá abajo con el dedo, confirmando que retira el vehículo conforme.</p>
@@ -6644,6 +6688,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: Orden de Trabajo ---------- -->
 <div class="overlay" id="modalOrdenTrabajo">
     <div class="modal" style="max-width:720px;">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="otTitulo">🔧 Orden de trabajo</h3>
 
         <input type="hidden" id="otId">
@@ -6726,6 +6771,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: historia clínica directa (desde la lista de Vehículos) ---------- -->
 <div class="overlay" id="modalHistorialDirecto">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="historialDirectoTitulo">📋 Historia clínica</h3>
 
 
@@ -6740,6 +6786,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: inspección de ingreso (fotos) ---------- -->
 <div class="overlay" id="modalInspeccion">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="inspeccionTitulo">📷 Inspección de ingreso</h3>
 
         <input type="hidden" id="inspeccionVehiculoId">
@@ -6770,6 +6817,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nuevo movimiento de caja ---------- -->
 <div class="overlay" id="modalCaja">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Registrar movimiento</h3>
 
         <input type="hidden" id="mMovId">
@@ -6819,6 +6867,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: arqueo de caja ---------- -->
 <div class="overlay" id="modalArqueoCaja">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>🧮 Arqueo de caja</h3>
         <p style="font-size:12px;color:#999;margin-bottom:14px;">Contá el efectivo real que tenés en el cajón y compará contra lo que dice el sistema.</p>
 
@@ -6854,6 +6903,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: registrar cobro (pago parcial o total) sobre una cuenta ---------- -->
 <div class="overlay" id="modalCobrarCC">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>💲 Registrar cobro</h3>
 
         <input type="hidden" id="cobrarCCCuentaId">
@@ -6892,6 +6942,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: ver detalle de una cuenta ---------- -->
 <div class="overlay" id="modalVerCuentaCC">
     <div class="modal" style="max-width:720px;">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="verCCTitulo">Cuenta</h3>
         <div style="font-size:12px;color:#888;margin-bottom:10px;" id="verCCSub"></div>
 
@@ -6921,6 +6972,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nuevo/editar proveedor ---------- -->
 <div class="overlay" id="modalProveedor">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="modalProveedorTitulo">Nuevo proveedor</h3>
 
         <input type="hidden" id="provId">
@@ -6985,6 +7037,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nueva compra a proveedor (genera deuda real con saldo) ---------- -->
 <div class="overlay" id="modalCompraProveedor">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>🛒 Nueva compra</h3>
 
         <input type="hidden" id="compraProvId">
@@ -7019,6 +7072,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: registrar pago (contra una compra puntual o el total de deuda) ---------- -->
 <div class="overlay" id="modalPagoProveedor">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>💸 Registrar pago a proveedor</h3>
 
         <input type="hidden" id="pagoProvId">
@@ -7055,6 +7109,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nueva/editar categoría ---------- -->
 <div class="overlay" id="modalCategoria">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="modalCategoriaTitulo">Nueva categoría</h3>
 
         <input type="hidden" id="catId">
@@ -7085,6 +7140,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nuevo/editar servicio ---------- -->
 <div class="overlay" id="modalServicio">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="modalServicioTitulo">Nuevo servicio</h3>
 
         <input type="hidden" id="servId">
@@ -7112,6 +7168,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nuevo producto ---------- -->
 <div class="overlay" id="modalProducto">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Nuevo producto</h3>
 
         <label style="color:#fff;font-size:13px;">Nombre</label>
@@ -7150,6 +7207,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: editar producto ---------- -->
 <div class="overlay" id="modalEditarProducto">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Editar producto</h3>
 
         <input type="hidden" id="epId">
@@ -7192,6 +7250,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: etiqueta imprimible ---------- -->
 <div class="overlay" id="modalEtiqueta">
     <div class="modal" style="text-align:center;">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Etiqueta para imprimir</h3>
 
         <div id="etiquetaContenido" style="background:#fff;color:#000;border-radius:12px;padding:24px;margin:16px 0;">
@@ -7209,6 +7268,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: escáner ---------- -->
 <div class="overlay" id="modalEscaner">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarEscaner()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>Escanear producto</h3>
 
         <video id="videoEscaner" autoplay playsinline muted style="width:100%;border-radius:12px;background:#000;"></video>
@@ -7225,6 +7285,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nuevo/editar turno ---------- -->
 <div class="overlay" id="modalTurno">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3 id="modalTurnoTitulo">Nuevo turno</h3>
 
         <input type="hidden" id="tId">
@@ -7268,6 +7329,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: Cobros (varios ítems, un solo cobro) ---------- -->
 <div class="overlay" id="modalCuenta">
     <div class="modal" style="max-width:520px;">
+        <button class="modal-cerrar-x" onclick="cerrarModalCuenta()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>💲 Cobros</h3>
 
         <label>Cliente (buscá por nombre o patente)</label>
@@ -7334,6 +7396,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: agregar/editar usuario del equipo ---------- -->
 <div class="overlay" id="modalUsuario">
     <div class="modal">
+        <button class="modal-cerrar-x" onclick="cerrarModales()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>👤 Usuario del equipo</h3>
 
         <label>Email (el mismo que usa para iniciar sesión)</label>
@@ -7361,6 +7424,7 @@ body.vista-compacta .turnos-stat-card{ padding:11px; }
 <!-- ---------- Modal: nuevo presupuesto ---------- -->
 <div class="overlay" id="modalPresupuesto">
     <div class="modal" style="max-width:520px;">
+        <button class="modal-cerrar-x" onclick="cerrarModalPresupuesto()" title="Cerrar" aria-label="Cerrar">✕</button>
         <h3>📋 Nuevo presupuesto</h3>
 
         <label>Cliente</label>
@@ -14570,6 +14634,10 @@ window.ajustarDesdeEscaner = async function (id, delta) {
     const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) + delta);
     await updateDoc(doc(db, "stock", id), { cantidad: nuevaCantidad });
 
+    // Deja constancia del ajuste, igual que el resto del sistema — antes
+    // este cambio de stock no quedaba registrado en ningún lado.
+    await registrarMovimientoStock(id, producto.nombre, delta, nuevaCantidad, "Ajuste desde escáner");
+
     document.getElementById("escaner-cantidad").textContent = nuevaCantidad;
 
 };
@@ -14585,6 +14653,14 @@ window.registrarVentaDesdeEscaner = async function (id, nombre) {
         return;
     }
 
+    // No vender lo que no hay: sin este control se registraba la venta y el
+    // ingreso igual, dejando el stock en 0 y los números sin sentido.
+    const productoPrevio = stockCache.find(p => p.id === id);
+    if (productoPrevio && (Number(productoPrevio.cantidad) || 0) <= 0) {
+        const seguir = confirm(`"${nombre}" figura sin stock (0 unidades). ¿Registrar la venta igual?`);
+        if (!seguir) return;
+    }
+
     estado.textContent = "Registrando...";
     estado.style.color = "#999";
 
@@ -14594,11 +14670,13 @@ window.registrarVentaDesdeEscaner = async function (id, nombre) {
         const nuevaCantidad = Math.max(0, (Number(producto.cantidad) || 0) - 1);
 
         await updateDoc(doc(db, "stock", id), { cantidad: nuevaCantidad });
+        await registrarMovimientoStock(id, nombre, -1, nuevaCantidad, "Venta rápida (escáner)");
 
         await addDoc(collection(db, "caja"), {
             tipo: "Ingreso",
             descripcion: "Venta: " + nombre,
             monto: parseFloat(precio),
+            categoria: "Venta de repuestos",
             fecha: serverTimestamp()
         });
 
