@@ -10609,13 +10609,24 @@ function renderCaja() {
 
     // ---- Saldo actual (histórico completo: todos los ingresos/egresos, sin filtrar) ----
     let saldoActual = 0;
+    let efectivoDisponible = 0;
     cajaCache.forEach(m => {
-        if (m.tipo === "Ingreso") saldoActual += Number(m.monto) || 0;
-        else if (m.tipo === "Egreso") saldoActual -= Number(m.monto) || 0;
+        const monto = Number(m.monto) || 0;
+        const esEfectivo = (m.medioPago || "Efectivo") === "Efectivo";
+        if (m.tipo === "Ingreso") {
+            saldoActual += monto;
+            if (esEfectivo) efectivoDisponible += monto;
+        } else if (m.tipo === "Egreso") {
+            saldoActual -= monto;
+            if (esEfectivo) efectivoDisponible -= monto;
+        }
         // Transferencia no suma ni resta del total: solo cambia el medio, no el balance real
     });
     document.getElementById("cajaSaldoActual").textContent = formatoPlata(saldoActual);
-    document.getElementById("cajaEfectivoDisponible").textContent = formatoPlata(saldoActual);
+    // Antes acá se mostraba el saldo total, no el efectivo real: si cobrabas
+    // por transferencia, decía que tenías esa plata en efectivo y el arqueo
+    // de caja daba siempre mal.
+    document.getElementById("cajaEfectivoDisponible").textContent = formatoPlata(efectivoDisponible);
     document.getElementById("cajaActualizadoTexto").textContent = "Actualizado hoy " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
 
     // ---- Ingresos / Egresos / Balance de hoy ----
